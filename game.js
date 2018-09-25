@@ -1,3 +1,5 @@
+"use strict"
+
 let uniqid = require('uniqid');
 
 class GameFullException extends Error {
@@ -36,7 +38,13 @@ class Game {
     setState(playerId, ready = true){
         
     }
+
+    get maxPlayer(){
+        return this.max_player;
+    }
 }
+
+module.exports = Game
 
 let g = new Game(1);
 console.log(g);
@@ -49,3 +57,4 @@ try{
     console.log('Erreur : ' + e.message);
 
 }
+
