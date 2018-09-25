@@ -13,7 +13,6 @@
   "devDependencies": {
     "mochawesome": "^3.0.3",
     "mocha": "^5.2.0"
-
   },
   "scripts": {
     "start": "nodemon server.js",
