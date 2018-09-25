@@ -6,14 +6,18 @@
   "dependencies": {
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
-    "mocha": "^5.2.0",
     "request": "^2.88.0",
     "socket.io": "^2.1.1",
     "uniqid": "^5.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mochawesome": "^3.0.3",
+    "mocha": "^5.2.0"
+
+  },
   "scripts": {
     "start": "nodemon server.js",
+    "testBrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
     "test": "mocha"
   },
   "author": "",
