@@ -1,3 +1,5 @@
+"use strict"
+
 let uniqid = require('uniqid');
 let fs     = require('fs');
 let helpers = require('./helpers');
@@ -83,6 +85,11 @@ class Game {
     }
 }
 
+module.exports = Game
+
+
+
+
 let g = new Game();
 
 let user1 = uniqid();
@@ -100,3 +107,4 @@ g.setState(user3, true);
 g.init();
 
 console.log(g);
+

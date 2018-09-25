@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "nodemon server.js",
-    "testBrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
+    "testbrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
     "test": "mocha"
   },
   "author": "",
