@@ -9,3 +9,18 @@ exports.shuffle = (a) => {
     }
     return a;
 }
+
+//Test dans array1 il y a les elements de array2
+exports.include = (array1, array2) => {
+    if(array2.length == 0)
+        return false;
+        
+    let include = true;
+    for(let i = 0; i<array2.length ;i++){
+        if(!array1.includes(array2[i])){
+            include = false;
+            break;
+        }
+    }
+    return include;
+}

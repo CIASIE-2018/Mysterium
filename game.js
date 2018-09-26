@@ -48,12 +48,14 @@ class Game {
         let aleaGhost = Math.floor(Math.random() * this.players.length);
         for(let i =0 ; i< this.players.length ; i++){
             if(i == aleaGhost){
-                this.players[i].role = 'ghost';
-                this.players[i].hand = [];
+                this.players[i].role            = 'ghost';
+                this.players[i].hand            = [];
+                this.players[i].mediumsHasCards = [];
             }else{
-                this.players[i].role    = 'medium';
-                this.players[i].state   = 0;
-                this.players[i].visions = [];
+                this.players[i].role       = 'medium';
+                this.players[i].state      = MEDIUM_STATE_NOTHING;
+                this.players[i].visions    = [];
+                this.players[i].hasPlayed  = false;
             }
         }
     }
@@ -103,6 +105,8 @@ class Game {
         this.visions    = this.visions.filter(el => !this.ghost.hand.includes(el));
     }
 
+    
+
     init(){
         if(this.allIsReady){
             this.init_roles();
@@ -115,6 +119,41 @@ class Game {
         }
     }
 
+
+    getVisions(nb_visions){
+        //Pioche nb_visions cartes et les donne au fantome
+        //Retire les cartes piochees de la pile
+        let visions  = this.visions.slice(0, nb_visions);
+        this.visions = this.visions.filter(el => !visions.includes(el));
+        return visions;
+    }
+
+    giveCards(playerId, cards){
+        //verifier que fantome a bien les cartes dans sa main
+        // et que playerId nest pas deja dans mediumsHasCards
+        if(helpers.include(this.ghost.hand, cards) && !this.ghost.mediumsHasCards.includes(playerId)){
+            let medium = this.mediums.find(medium => medium.id == playerId);
+            medium.visions = medium.visions.concat(cards);
+
+            this.ghost.hand = this.ghost.hand.filter(el => !cards.includes(el));
+            this.ghost.hand = this.ghost.hand.concat(this.getVisions(cards.length));
+            this.ghost.mediumsHasCards.push(playerId);
+        }
+    }
+
+    //Retourne un booleen pour savoir si le joueur playerId peut jouer
+    canPlay(playerId){
+        if(this.ghost.id == playerId){
+            //Ghost
+            return this.ghost.mediumsHasCards.length != this.mediums.length;
+        }else{
+            //Medium
+            let medium = this.mediums.find(medium => medium.id == playerId);
+            return medium.hasPlayed ? false : (this.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+        }
+    }
+
+    //TODO
     improveStateMedium(playerId){
         let player = this.players.find(player => {
             return player.id == playerId;
@@ -173,4 +212,8 @@ g.setReady(user3, true);
 
 g.init();
 
-console.log(g);
+g.giveCards(g.mediums[0].id, [g.ghost.hand[0], g.ghost.hand[4]]);
+
+console.log('g',g.canPlay(g.ghost.id));
+console.log('m',g.canPlay(g.mediums[0].id));
+console.log('m',g.canPlay(g.mediums[1].id));
