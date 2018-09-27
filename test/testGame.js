@@ -46,16 +46,26 @@ describe('testPreGame',function(){
 
     })
 
-    it("getter_isFull", () => {
+    it("player_can_join", () => {
 
-        let g = new Game(2);
+        let g = new Game(6)
 
-        g.join(user1)
-        g.join(user2)
+        g.join(user1);
+        g.join(user2);
 
-        assert.equal(g.isFull, true)
+        assert.equal(g.players.length, 2)
+    })
 
-
+    //verifie qu'on a atteint le maximum de joueur
+    it("max_player_in_game",() => {
+        let g = new Game(6,4);
+        g.join(user1);
+        g.join(user2);
+        g.join(user3);
+        g.join(user4);
+        g.join(user5);
+        g.join(user6);
+        assert.equal(g.isFull, true);
     })
 
     it("getter_mediums", () => {
@@ -97,6 +107,20 @@ describe('testPreGame',function(){
 
     })
 
+    it('set_ready', () => {
+
+        let g = new Game(6);
+
+        g.join(user1)
+
+        g.setReady(user1)
+
+        let player =  g.players.find(player => player.id == user1)
+
+        assert.equal(player.ready,true)
+
+    });
+
     it("all_players_ready", () => {
 
         let g = new Game(6);
@@ -113,8 +137,6 @@ describe('testPreGame',function(){
         g.setReady(user2);
         g.setReady(user3);
 
-        g.init_roles();
-
         assert.equal(g.allIsReady, true)
 
     })
@@ -129,8 +151,6 @@ describe('testPreGame',function(){
 
         g.setReady(user1, true);
         g.setReady(user2, true);
-
-        g.init_roles();
 
         assert.equal(g.allIsReady, false)
 
@@ -152,26 +172,23 @@ describe('testPreGame',function(){
 
     })
 
-    it("player_can_join", () => {
+    it("initialisation", () => {
 
-        let g = new Game(6)
-
-        g.join(user1);
-        g.join(user2);
-
-        assert.equal(g.players.length, 2)
-    })
-
-    //verifie qu'on a atteint le maximum de joueur
-    it("max_player_in_game",() => {
         let g = new Game(6,4);
         g.join(user1);
         g.join(user2);
         g.join(user3);
-        g.join(user4);
-        g.join(user5);
-        g.join(user6);
-        assert.equal(g.max_player, 6);
+
+        g.setReady(user1);
+        g.setReady(user2);
+        g.setReady(user3);
+
+        assert.equal(g.isFull,true)
+
+        g.init();
+
+        assert.equal(g.started, true)
+
     })
 
     it("Role_well_initialize", () => {
@@ -282,27 +299,6 @@ describe('testPreGame',function(){
         g.init_visions();
 
         assert.equal(g.ghost.hand.length, 7)
-
-    })
-
-    it("initialisation", () => {
-
-        let g = new Game(6,4);
-        g.join(user1);
-        g.join(user2);
-        g.join(user3);
-
-        g.setReady(user1);
-        g.setReady(user2);
-        g.setReady(user3);
-
-        g.init_roles();
-        g.generate_cards()
-        g.init_scenarios();
-        g.init_visions();
-        g.init();
-
-        assert.equal(g.started, true)
 
     })
 
