@@ -24,17 +24,27 @@ class Game {
     }
 
     join(playerId){
-        if(!this.isFull && !this.started){
-            this.players.push({
-                id    : playerId,
-                ready : false
-            });
+
+        let playerAlreadyInGame = this.players.find(function(player) {
+            return player.id ==playerId;
+        })
+
+        if(!playerAlreadyInGame){
+
+            if(!this.isFull && !this.started){
+                this.players.push({
+                    id    : playerId,
+                    ready : false
+                });
+            }else{
+                throw new Error('Le jeu est plein ou déjà démarré.');
+            }
         }else{
-            throw new Error('Le jeu est plein ou déjà démarré.');
+            throw new Error('Le joueur est deja dans la partie.');
         }
+            
     }
 
-    
     setReady(playerId, ready = true){
         let player = this.players.find(player => {
             return player.id == playerId;
@@ -43,7 +53,7 @@ class Game {
     }
 
 
-    init_roles(){
+    init_roles(){      
         //Attribution aleatoire role a chaque joueur
         let aleaGhost = Math.floor(Math.random() * this.players.length);
         for(let i =0 ; i< this.players.length ; i++){
@@ -105,11 +115,15 @@ class Game {
 
     init(){
         if(this.allIsReady){
-            this.init_roles();
-            this.generate_cards();
-            this.init_scenarios();
-            this.init_visions();
-            this.started = true;
+            if(this.players.length >=3){
+                this.init_roles();
+                this.generate_cards();
+                this.init_scenarios();
+                this.init_visions();
+                this.started = true;
+            }else{
+                throw new Error('Pas assez de joueurs');
+            }
         }else{
             throw new Error('Tous les joueurs ne sont pas pret');
         }

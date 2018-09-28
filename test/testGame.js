@@ -1,6 +1,9 @@
 let uniqid = require('uniqid');
 
-var assert = require('assert');
+var assert = require('chai').assert
+var expect = require('chai').expect
+let helpers = require('../helpers');
+
 var Game = require("../game.js");
 
 describe('testPreGame',function(){
@@ -56,6 +59,8 @@ describe('testPreGame',function(){
         assert.equal(g.players.length, 2)
     })
 
+    
+
     //verifie qu'on a atteint le maximum de joueur
     it("max_player_in_game",() => {
         let g = new Game(6,4);
@@ -87,7 +92,7 @@ describe('testPreGame',function(){
 
     it("getter_ghost", () => {
 
-    let g = new Game(6)
+        let g = new Game(6)
 
 
         g.join(user1)
@@ -183,7 +188,7 @@ describe('testPreGame',function(){
         g.setReady(user2);
         g.setReady(user3);
 
-        assert.equal(g.isFull,true)
+        assert.equal(g.isFull,false)
 
         g.init();
 
@@ -264,6 +269,27 @@ describe('testPreGame',function(){
 
     })
 
+    it("each mediums has scenarios", () => {
+
+        let g = new Game(6,4,1);
+        g.join(user1);
+        g.join(user2);
+        g.join(user3);
+
+        g.setReady(user1)
+        g.setReady(user2)
+        g.setReady(user3)
+
+        g.init()
+
+        assert.isObject(g.mediums[0].scenario)
+        assert.isNotEmpty(g.mediums[0].scenario)
+
+        assert.isObject(g.mediums[1].scenario)
+        assert.isNotEmpty(g.mediums[1].scenario)
+
+    })
+
     it("initialisation_scenario", () => {
 
         let g = new Game(6,4);
@@ -301,5 +327,46 @@ describe('testPreGame',function(){
         assert.equal(g.ghost.hand.length, 7)
 
     })
+
+    //catch une erreur
+    it('player cannot be twice in the same party', () => {
+
+        let g = new Game(6,4);
+
+        g.join(user1);
+        g.join(user2);
+        g.join(user3);
+        
+        expect(() => g.join(user2)).to.throw();
+    })
+
+    //catch une erreur
+    it('minimum 1 ghost & 2 mediums', () => {
+
+        let g = new Game(6,4);
+
+        g.join(user1);
+        g.join(user2);
+
+        g.setReady(user1)
+        g.setReady(user2)
+        
+        expect(() => g.init()).to.throw();
+    })
+
+    //catch une erreur
+    it("player_cant_join", () => {
+
+        let g = new Game(3)
+
+        g.join(user1);
+        g.join(user2);
+        g.join(user3);
+        
+
+        expect(() => g.join(user4)).to.throw();
+    })
+
+    
 
 });
