@@ -1,4 +1,5 @@
-"use strict"
+
+let errors = require('./Error.js');
 
 let uniqid = require('uniqid');
 let fs     = require('fs');
@@ -37,10 +38,10 @@ class Game {
                     ready : false
                 });
             }else{
-                throw new Error('Le jeu est plein ou déjà démarré.');
+                throw new errors.MaxPlayerReachedError();
             }
         }else{
-            throw new Error('Le joueur est deja dans la partie.');
+            throw new errors.PlayerAlreadyInGameError();
         }
             
     }
@@ -95,37 +96,41 @@ class Game {
     }
 
     init_scenarios(){
-        //Attribuer un scenario a chaque joueur + scenario final
-        let scenarios             = helpers.shuffle(this.generate_scenarios());
-        let index_scenarios_final = Math.floor(Math.random() * this.mediums.length);
+        if(g.started == true){
+            //Attribuer un scenario a chaque joueur + scenario final
+            let scenarios             = helpers.shuffle(this.generate_scenarios());
+            let index_scenarios_final = Math.floor(Math.random() * this.mediums.length);
 
-        for(let i=0; i < this.mediums.length ; i++){
-            if(i == index_scenarios_final)
-                this.scenario_final = scenarios[i];
-            this.mediums[i].scenario = scenarios[i];
+            for(let i=0; i < this.mediums.length ; i++){
+                if(i == index_scenarios_final)
+                    this.scenario_final = scenarios[i];
+                this.mediums[i].scenario = scenarios[i];
+            }
         }
     }
 
     init_visions(){
-        //Creer la main du fantome
-        this.visions    = helpers.shuffle(fs.readdirSync(__dirname + '/assets/images/visions'));
-        this.ghost.hand = this.visions.slice(0, 7);
-        this.visions    = this.visions.filter(el => !this.ghost.hand.includes(el));
+        if(g.started){
+            //Creer la main du fantome
+            this.visions    = helpers.shuffle(fs.readdirSync(__dirname + '/assets/images/visions'));
+            this.ghost.hand = this.visions.slice(0, 7);
+            this.visions    = this.visions.filter(el => !this.ghost.hand.includes(el));
+        }
     }
 
     init(){
         if(this.allIsReady){
             if(this.players.length >=3){
+                this.started = true;
                 this.init_roles();
                 this.generate_cards();
                 this.init_scenarios();
                 this.init_visions();
-                this.started = true;
             }else{
-                throw new Error('Pas assez de joueurs');
+                throw new errors.NotEnoughPlayerError();
             }
         }else{
-            throw new Error('Tous les joueurs ne sont pas pret');
+            throw new errors.NotAllAreReady();
         }
     }
 
