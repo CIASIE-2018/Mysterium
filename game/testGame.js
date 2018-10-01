@@ -31,7 +31,7 @@ describe('Rejoindre une partie', function(){
 
 
 describe('Lancer une partie', function(){
-    it('lorsqu\'une personne n\'est pas pret', function(){
+    it('impossible lorsqu\'une personne n\'est pas pret', function(){
         
     });
     it('lorsque tout le monde est pret', function(){
@@ -40,7 +40,55 @@ describe('Lancer une partie', function(){
     it('lorsque le nombre de joueur > 2', function(){
 
     });
-    it('lorsque le nombre de joueur < 2', function(){
+    it('impossible lorsque le nombre de joueur < 2', function(){
+
+    });
+});
+
+describe('Mettre son statut a prêt', function () {
+    it('Se mettre prêt', function () {
+
+    });
+
+    it('Changer de prêt à pas prêt', function () {
+
+    });
+
+    it('Tout le monde est prêt ', function () {
+
+    });
+});
+
+describe('test au commencement d\'une partie', function () {
+    it('chacun a un rôle attribué', function () {
+
+    });
+
+    it('il n\'y a qu\'un seul fantôme', function () {
+
+    });
+
+    it('il y a le bon nombre de medium', function () {
+
+    });
+
+    it('les scenarios sont initialisés, difficulté 0', function () {
+
+    });
+
+    it('les scenarios sont initialisés, difficulté 1', function () {
+
+    });
+
+    it('chaque medium a un scenario', function () {
+
+    });
+
+    it('il n\'y a pas deux scenarios identiques', function () {
+
+    });
+
+    it('cartes visions correctement chargées ', function () {
 
     });
 });
