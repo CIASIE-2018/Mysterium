@@ -3,19 +3,44 @@ let errors            = require('./Error');
 let {assert, expect}  = require('chai');
 let {join}            = require('./game')
 
-describe('XXXX', function(){
-    
-    beforeEach(function(){
-        this.game = {
-            players : []
-        }
-    });
+beforeEach(function(){
+    this.game = {
+        players : []
+    }
+});
 
-    
-    it('Ajout player', function(){
+describe('Rejoindre une partie', function(){
+    it('lorsque tout est ok', function(){
         let newGame = join(this.game, 'joueur1');
         assert.equal(newGame.players.length, 1);
         assert.equal(newGame.players[0], 'joueur1');
     });
+    it('lorsque la partie est lancée', function(){
+
+    });
+    it('lorsqu\'on est deja dans la partie', function(){
+
+    });
+    it('lorsque la partie est pleine et non lancée', function(){
+
+    });
+    it('lorsque la partie est pleine et lancée', function(){
+
+    });
 });
 
+
+describe('Lancer une partie', function(){
+    it('lorsqu\'une personne n\'est pas pret', function(){
+        
+    });
+    it('lorsque tout le monde est pret', function(){
+        
+    });
+    it('lorsque le nombre de joueur > 2', function(){
+
+    });
+    it('lorsque le nombre de joueur < 2', function(){
+
+    });
+});
