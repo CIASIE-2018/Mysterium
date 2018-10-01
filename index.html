@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,14 +6,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mysterium</title>
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <p>Mysterium</p>
+    <div class="game_container">
+        <div class="menu_container">
+            <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
+        </div>
+        <div class="game_content">
+            <div class="player_list">
+                <div class="player_list_item played">
+                    <div class="player_list_item_pseudo">JO</div>
+                </div>
+                <div class="player_list_item">
+                    <div class="player_list_item_pseudo">BA</div>
+                </div>
+                <div class="player_list_item">
+                    <div class="player_list_item_pseudo">AQ</div>
+                </div>
+                <div class="player_list_item">
+                    <div class="player_list_item_pseudo">TH</div>
+                </div>
+                <div class="player_list_item">
+                    <div class="player_list_item_pseudo">QA</div>
+                </div>
+                <div class="player_list_item">
+                    <div class="player_list_item_pseudo">BO</div>
+                </div>
+            </div>
 
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+            <div class="card_selected">
+                <div class="card_selected_content">
+                    <img src="/images/personnage/5.png">
+                    <div class="card_selected_btn">Choisir</div>
+                </div>
+            </div>
+
+            <div class="cards_hand">
+                <div class="cards_hand_detail">
+                    <img src="/images/visions/1.png">
+                </div>
+
+                <div class="cards_hand_list">
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/1.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/12.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/15.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/19.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/21.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/7.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/17.png">
+                    </div>
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/3.png">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="game_plateau">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/1.png">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/5.png">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/2.png">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/8.png">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/9.png">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/10.png">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous">
+    </script>
+    <script
+    src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+    integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+    crossorigin="anonymous"></script>
+    <script src="/js/swiper.min.js"></script>
+    <script src="/js/jquery.magnify.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        let socket = io();
+        $(function(){
+            let swiper = new Swiper('.swiper-container', {
+                slidesPerView : 6,
+                spaceBetween : 30
+            });
+
+            function initZoom(img){
+                let zoom = img.magnify({
+                    src : img.prop('src')
+                });
+                return zoom;
+            }
+
+            initZoom($('.cards_hand_detail img'));
+
+            $('.game_plateau .swiper-slide').on('click', function(e){
+                let pictureUrl = $(e.target).prop('src');
+                $('.card_selected img').prop('src', pictureUrl);
+            });
+
+            $('.cards_hand_list_item').on('click', function(e){
+                let pictureUrl    = $(e.target).prop('src');
+                let detailElement = $('.cards_hand_detail img');
+
+                detailElement.fadeOut('fast', function () {
+                    detailElement.prop('src', pictureUrl);
+                    detailElement.fadeIn('fast', function(){
+                        initZoom(detailElement);
+
+                    });
+
+                });
+
+            });
+
+            let socket = io();
+        })
+            
+        
+        
     </script>
 </body>
 </html>
