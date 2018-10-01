@@ -60,12 +60,14 @@ class Game {
         let aleaGhost = Math.floor(Math.random() * this.players.length);
         for(let i = 0 ; i< this.players.length ; i++){
             if(i == aleaGhost){
-                this.players[i].role = 'ghost';
-                this.players[i].hand = [];
+                this.players[i].role            = 'ghost';
+                this.players[i].hand            = [];
+                this.players[i].mediumsHasCards = [];
             }else{
-                this.players[i].role    = 'medium';
-                this.players[i].state   = 0;
-                this.players[i].visions = [];
+                this.players[i].role      = 'medium';
+                this.players[i].state     = 0;
+                this.players[i].visions   = [];
+                this.players[i].hasPlayed = false;
             }
         }
     }
