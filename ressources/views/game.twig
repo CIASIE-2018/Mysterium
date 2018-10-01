@@ -1,0 +1,89 @@
+{% extends "layouts/master.twig" %}
+
+{% block content %}
+    <div class="game_container">
+        <div class="menu_container">
+            <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
+        </div>
+        <div class="game_content">
+            <div class="player_list">
+            {% for pseudo in ['JO', 'BA', 'AQ', 'TH', 'QA', 'BO'] %}
+                <div class="player_list_item played">
+                    <div class="player_list_item_pseudo">{{ pseudo }}</div>
+                </div>
+            {% endfor %}
+            </div>
+
+            <div class="card_selected">
+                <div class="card_selected_content">
+                    <img src="/images/personnage/5.png">
+                    {% if type is defined and type == 'medium' %}
+                        <div class="card_selected_btn">Choisir</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="cards_hand">
+                <div class="cards_hand_detail">
+                    <img src="/images/visions/1.png">
+                </div>
+
+                <div class="cards_hand_list">
+                {% for vision in [1,12,45,19,14,21,23,18] %}
+                    <div class="cards_hand_list_item">
+                        <img src="/images/visions/{{ vision }}.png">
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="game_plateau">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                {% for perso in [1,5,2,8,9,12] %}
+                    <div class="swiper-slide">
+                        <img src="/images/personnage/{{ perso }}.png">
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(function(){
+        let swiper = new Swiper('.swiper-container', {
+            slidesPerView : 6,
+            spaceBetween : 30
+        });
+
+        function initZoom(img){
+            let zoom = img.magnify({
+                src : img.prop('src')
+            });
+            return zoom;
+        }
+
+        initZoom($('.cards_hand_detail img'));
+        $('.game_plateau .swiper-slide').on('click', function(e){
+            let pictureUrl = $(e.target).prop('src');
+            $('.card_selected img').prop('src', pictureUrl);
+        });
+
+        $('.cards_hand_list_item').on('click', function(e){
+            let pictureUrl    = $(e.target).prop('src');
+            let detailElement = $('.cards_hand_detail img');
+            detailElement.fadeOut('fast', function () {
+                detailElement.prop('src', pictureUrl);
+                detailElement.fadeIn('fast', function(){
+                    initZoom(detailElement);
+                });
+            });
+        });
+        let socket = io();
+    })
+</script>
+{% endblock %}
