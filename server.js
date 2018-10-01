@@ -1,9 +1,12 @@
 const config = require('./config/config');
 
-let app    = require('express')();
-let server = require('http').createServer(app);
-let io     = require('socket.io').listen(server);
-let fs     = require('fs');
+let express = require('express');
+let app     = express();
+let server  = require('http').createServer(app);
+let io      = require('socket.io').listen(server);
+let fs      = require('fs');
+
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
     fs.readFile('./index.html', 'utf-8', function(error, content) {
