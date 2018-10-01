@@ -5,7 +5,34 @@ let {join}            = require('./game')
 
 beforeEach(function(){
     this.game = {
-        players : []
+        id         : uniqid(),
+        max_player : 7,
+        max_turn   : 7,
+        turn       : 0,
+        started    : false,
+        difficulte : 0,
+        persos     : [],
+        lieux      : [],
+        armes      : [],
+        scenario_final: {},
+        players    : [
+            //Structure des joueurs
+            {
+                role            : 'ghost',
+                id              : null,
+                ready           : false,
+                hand            : [],
+                mediumsHasCards : []
+            },
+            {
+                role      : 'medium',
+                id        : null,
+                ready     : false,
+                state     : 0,
+                visions   : [],
+                hasPlayed : false
+            }
+        ],
     }
 });
 
