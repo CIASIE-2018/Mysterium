@@ -4,6 +4,8 @@ let uniqid = require('uniqid');
 let fs     = require('fs');
 let helpers = require('./helpers');
 
+const PATH_CARDS = __dirname + '/public/images';
+
 const MEDIUM_STATE_NOTHING = 0;
 const MEDIUM_STATE_PERSO   = 1;
 const MEDIUM_STATE_LIEU    = 2;
@@ -56,14 +58,16 @@ class Game {
     init_roles(){      
         //Attribution aleatoire role a chaque joueur
         let aleaGhost = Math.floor(Math.random() * this.players.length);
-        for(let i =0 ; i< this.players.length ; i++){
+        for(let i = 0 ; i< this.players.length ; i++){
             if(i == aleaGhost){
-                this.players[i].role = 'ghost';
-                this.players[i].hand = [];
+                this.players[i].role            = 'ghost';
+                this.players[i].hand            = [];
+                this.players[i].mediumsHasCards = [];
             }else{
-                this.players[i].role    = 'medium';
-                this.players[i].state   = 0;
-                this.players[i].visions = [];
+                this.players[i].role      = 'medium';
+                this.players[i].state     = 0;
+                this.players[i].visions   = [];
+                this.players[i].hasPlayed = false;
             }
         }
     }
@@ -71,13 +75,13 @@ class Game {
     generate_cards(){
         //Generation cartes du jeu
         let nb_scenarios = this.mediums.length + (this.difficulte == 0 ? 2 : (this.difficulte == 1 ? 3 : 0));
-        let persos  = fs.readdirSync(__dirname + '/assets/images/personnage');
+        let persos  = fs.readdirSync(PATH_CARDS + '/personnage');
         this.persos = helpers.shuffle(persos).slice(0, nb_scenarios);
 
-        let lieux  = fs.readdirSync(__dirname + '/assets/images/lieux');
+        let lieux  = fs.readdirSync(PATH_CARDS + '/lieux');
         this.lieux = helpers.shuffle(lieux).slice(0, nb_scenarios);
 
-        let armes  = fs.readdirSync(__dirname + '/assets/images/armes');
+        let armes  = fs.readdirSync(PATH_CARDS + '/armes');
         this.armes = helpers.shuffle(armes).slice(0, nb_scenarios);
     }
 
@@ -108,7 +112,7 @@ class Game {
 
     init_visions(){
         //Creer la main du fantome
-        this.visions    = helpers.shuffle(fs.readdirSync(__dirname + '/assets/images/visions'));
+        this.visions    = helpers.shuffle(fs.readdirSync(PATH_CARDS + '/visions'));
         this.ghost.hand = this.visions.slice(0, 7);
         this.visions    = this.visions.filter(el => !this.ghost.hand.includes(el));
     }
@@ -129,6 +133,43 @@ class Game {
         }
     }
 
+
+    getVisions(nb_visions){
+        //Pioche nb_visions cartes et les donne au fantome
+        //Retire les cartes piochees de la pile
+        let visions  = this.visions.slice(0, nb_visions);
+        this.visions = this.visions.filter(el => !visions.includes(el));
+        return visions;
+    }
+
+    giveCards(playerId, cards){
+        //verifier que fantome a bien les cartes dans sa main
+        // et que playerId nest pas deja dans mediumsHasCards
+        if(this.canPlay(this.ghost.id)){
+            if(helpers.include(this.ghost.hand, cards) && !this.ghost.mediumsHasCards.includes(playerId)){
+                let medium = this.mediums.find(medium => medium.id == playerId);
+                medium.visions = medium.visions.concat(cards);
+    
+                this.ghost.hand = this.ghost.hand.filter(el => !cards.includes(el));
+                this.ghost.hand = this.ghost.hand.concat(this.getVisions(cards.length));
+                this.ghost.mediumsHasCards.push(playerId);
+            }
+        }
+    }
+
+    //Retourne un booleen pour savoir si le joueur playerId peut jouer
+    canPlay(playerId){
+        if(this.ghost.id == playerId){
+            //Ghost
+            return this.ghost.mediumsHasCards.length != this.mediums.length;
+        }else{
+            //Medium
+            let medium = this.mediums.find(medium => medium.id == playerId);
+            return medium.hasPlayed ? false : (this.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+        }
+    }
+
+    //TODO
     improveStateMedium(playerId){
         let player = this.players.find(player => {
             return player.id == playerId;
@@ -187,4 +228,9 @@ g.setReady(user3, true);
 
 g.init();
 
+g.giveCards(g.mediums[0].id, [g.ghost.hand[0], g.ghost.hand[4]]);
+
 console.log(g);
+console.log('g',g.canPlay(g.ghost.id));
+console.log('m',g.canPlay(g.mediums[0].id));
+console.log('m',g.canPlay(g.mediums[1].id));

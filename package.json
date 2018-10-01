@@ -12,13 +12,15 @@
     "uniqid": "^5.0.3"
   },
   "devDependencies": {
+    "mocha": "^5.2.0",
     "mochawesome": "^3.0.3",
-    "mocha": "^5.2.0"
+    "node-sass": "^4.9.3"
   },
   "scripts": {
     "start": "nodemon server.js",
     "testbrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
-    "test": "mocha"
+    "test": "mocha",
+    "scss" : "node-sass --output-style compressed --watch ressources/scss --output public/css"
   },
   "author": "",
   "license": "ISC"

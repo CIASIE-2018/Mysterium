@@ -1,0 +1,187 @@
+@import "./swiper";
+@import "./magnify";
+
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+.magnify{
+    width: 100%;
+    height: 100%;
+    .magnify-lens {
+        width: 140px;
+        height: 140px;
+        border: 3px solid #fff;
+        box-shadow: none;
+      }
+}
+
+body{
+    height: 100vh;
+    background-image: url('/images/bg2.jpg');
+
+    background-size: cover;
+
+    .game_container{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .menu_container{
+            height: 60px;
+            text-align: center;
+            //background: black;
+            img{
+                height: 100%;
+                width: auto;
+            }
+        }
+
+        .game_content{
+            flex:1;
+            display: flex;
+
+            .player_list{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding-left: 20px;
+                .player_list_item{
+                    position:relative;
+                    width: 60px;
+                    height: 60px;
+                    background: rgba(179, 179, 179, .4);
+                    border: 2px solid rgb(168, 63, 63);
+                    border-radius: 50%;
+                    margin: 5px 0;
+                    &.played{
+                        &:after{
+                            content:'';
+                            display: block;
+                            background-image: url('/images/check.svg');
+                            background-size:contain;
+                            background-repeat:no-repeat;
+                            background-position: center center;
+                            width: 30px;
+                            height: 30px;
+                            position: absolute;
+                            bottom: 0px;
+                            right: -15px;
+                        }
+                    }
+                    .player_list_item_pseudo{
+                        color: #fff;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%,-50%);
+                    }
+                }
+            }
+
+            .card_selected{
+                width: 45%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                .card_selected_content{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    img{
+                        object-fit: contain;
+                        max-width: 100%;
+                        max-height: 80%;
+                    }
+                    .card_selected_btn{
+                        background: rgba(179, 179, 179, .4);
+                        border: 2px solid rgb(168, 63, 63);
+                        padding: 6px 20px;
+                       // margin-top: ;
+                        color:#fff;
+                        text-transform: uppercase;
+                        font-weight: 700;
+    
+                    }
+
+                }
+            }
+
+            .cards_hand{
+                flex:1;
+                padding: 20px;
+                display: flex;
+                .cards_hand_detail{
+                    flex:1 0 70%;
+                    margin-right: 10px;
+                    .magnify{
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                    }
+                    img{
+                        object-fit: contain;
+                        max-width: 100%;
+                        max-height: 100%;
+                        margin: 0 auto;
+                    }
+                }
+                .cards_hand_list{
+                    position: relative;
+                    width: 200px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    border-top: 3px solid blue;
+                    border-bottom: 3px solid blue;
+                    box-shadow: 0px 0px 10px rgba(0,0,0,.8);
+                    border-radius: 20px;
+                    padding: 20px 0;
+                    height: 100%;
+                    
+                    .cards_hand_list_item{
+                        flex:1 1 50%;
+                        height: calc(100% / 4);
+                        text-align: center;
+                        img{
+                            max-width: 100%;
+                            height: auto;
+                            max-height: 100%;
+                        }
+                    }
+                    
+                }
+            }
+        }
+
+        .game_plateau{
+            padding: 0 30px;
+            .swiper-container, .swiper-wrapper, .swiper-slide{
+                height: 100%;
+            }
+            .swiper-slide{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            img{
+                width: 100%;
+            }
+        }
+
+    }
+    
+
+    
+}
+
+
