@@ -1,44 +1,25 @@
+{% extends "layouts/master.twig" %}
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Mysterium</title>
-    <link rel="stylesheet" href="css/index.css">
-</head>
-<body>
+{% block content %}
     <div class="game_container">
         <div class="menu_container">
             <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
         </div>
         <div class="game_content">
             <div class="player_list">
+            {% for pseudo in ['JO', 'BA', 'AQ', 'TH', 'QA', 'BO'] %}
                 <div class="player_list_item played">
-                    <div class="player_list_item_pseudo">JO</div>
+                    <div class="player_list_item_pseudo">{{ pseudo }}</div>
                 </div>
-                <div class="player_list_item">
-                    <div class="player_list_item_pseudo">BA</div>
-                </div>
-                <div class="player_list_item">
-                    <div class="player_list_item_pseudo">AQ</div>
-                </div>
-                <div class="player_list_item">
-                    <div class="player_list_item_pseudo">TH</div>
-                </div>
-                <div class="player_list_item">
-                    <div class="player_list_item_pseudo">QA</div>
-                </div>
-                <div class="player_list_item">
-                    <div class="player_list_item_pseudo">BO</div>
-                </div>
+            {% endfor %}
             </div>
 
             <div class="card_selected">
                 <div class="card_selected_content">
                     <img src="/images/personnage/5.png">
-                    <div class="card_selected_btn">Choisir</div>
+                    {% if type is defined and type == 'medium' %}
+                        <div class="card_selected_btn">Choisir</div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -48,111 +29,61 @@
                 </div>
 
                 <div class="cards_hand_list">
+                {% for vision in [1,12,45,19,14,21,23,18] %}
                     <div class="cards_hand_list_item">
-                        <img src="/images/visions/1.png">
+                        <img src="/images/visions/{{ vision }}.png">
                     </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/12.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/15.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/19.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/21.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/7.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/17.png">
-                    </div>
-                    <div class="cards_hand_list_item">
-                        <img src="/images/visions/3.png">
-                    </div>
+                {% endfor %}
                 </div>
             </div>
         </div>
         <div class="game_plateau">
             <div class="swiper-container">
                 <div class="swiper-wrapper">
+                {% for perso in [1,5,2,8,9,12] %}
                     <div class="swiper-slide">
-                        <img src="/images/personnage/1.png">
+                        <img src="/images/personnage/{{ perso }}.png">
                     </div>
-                    <div class="swiper-slide">
-                        <img src="/images/personnage/5.png">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="/images/personnage/2.png">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="/images/personnage/8.png">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="/images/personnage/9.png">
-                    </div>
-                    <div class="swiper-slide">
-                        <img src="/images/personnage/10.png">
-                    </div>
+                {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-    <script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous">
-    </script>
-    <script
-    src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-    integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-    crossorigin="anonymous"></script>
-    <script src="/js/swiper.min.js"></script>
-    <script src="/js/jquery.magnify.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        $(function(){
-            let swiper = new Swiper('.swiper-container', {
-                slidesPerView : 6,
-                spaceBetween : 30
-            });
+{% endblock %}
 
-            function initZoom(img){
-                let zoom = img.magnify({
-                    src : img.prop('src')
+
+{% block scripts %}
+<script>
+    $(function(){
+        let swiper = new Swiper('.swiper-container', {
+            slidesPerView : 6,
+            spaceBetween : 30
+        });
+
+        function initZoom(img){
+            let zoom = img.magnify({
+                src : img.prop('src')
+            });
+            return zoom;
+        }
+
+        initZoom($('.cards_hand_detail img'));
+        $('.game_plateau .swiper-slide').on('click', function(e){
+            let pictureUrl = $(e.target).prop('src');
+            $('.card_selected img').prop('src', pictureUrl);
+        });
+
+        $('.cards_hand_list_item').on('click', function(e){
+            let pictureUrl    = $(e.target).prop('src');
+            let detailElement = $('.cards_hand_detail img');
+            detailElement.fadeOut('fast', function () {
+                detailElement.prop('src', pictureUrl);
+                detailElement.fadeIn('fast', function(){
+                    initZoom(detailElement);
                 });
-                return zoom;
-            }
-
-            initZoom($('.cards_hand_detail img'));
-
-            $('.game_plateau .swiper-slide').on('click', function(e){
-                let pictureUrl = $(e.target).prop('src');
-                $('.card_selected img').prop('src', pictureUrl);
             });
-
-            $('.cards_hand_list_item').on('click', function(e){
-                let pictureUrl    = $(e.target).prop('src');
-                let detailElement = $('.cards_hand_detail img');
-
-                detailElement.fadeOut('fast', function () {
-                    detailElement.prop('src', pictureUrl);
-                    detailElement.fadeIn('fast', function(){
-                        initZoom(detailElement);
-
-                    });
-
-                });
-
-            });
-
-            let socket = io();
-        })
-            
-        
-        
-    </script>
-</body>
-</html>
+        });
+        let socket = io();
+    })
+</script>
+{% endblock %}
