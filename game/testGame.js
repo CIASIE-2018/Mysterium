@@ -1,4 +1,5 @@
 let helpers           = require('../helpers');
+let uniqid            = require('uniqid');
 let errors            = require('./Error');
 let {assert, expect}  = require('chai');
 let {join}            = require('./game')
@@ -17,6 +18,7 @@ beforeEach(function(){
         scenario_final: {},
         players    : [
             //Structure des joueurs
+            /*
             {
                 role            : 'ghost',
                 id              : null,
@@ -32,17 +34,20 @@ beforeEach(function(){
                 visions   : [],
                 hasPlayed : false
             }
+            */
         ],
     }
 });
 
 describe('Rejoindre une partie', function(){
     it('lorsque tout est ok', function(){
-        let newGame = join(this.game, 'joueur1');
+        let newGame = join(this.game, 'medium', 'joueur1');
         assert.equal(newGame.players.length, 1);
-        assert.equal(newGame.players[0], 'joueur1');
+        assert.equal(newGame.players[0].id, 'joueur1');
+        console.log(newGame);
     });
     it('lorsque la partie est lancée', function(){
+
 
     });
     it('lorsqu\'on est deja dans la partie', function(){
