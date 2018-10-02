@@ -57,13 +57,13 @@ describe('Rejoindre une partie', function(){
     });
     it('lorsque la partie est pleine et non lancée', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = join(this.game, 'joueur2');
-        newGame = join(this.game, 'joueur3');
-        newGame = join(this.game, 'joueur4');
-        newGame = join(this.game, 'joueur5');
-        newGame = join(this.game, 'joueur6');
-        newGame = join(this.game, 'joueur2');
-        newGame = join(this.game, 'joueur7');
+        newGame = join(newGame, 'joueur2');
+        newGame = join(newGame, 'joueur3');
+        newGame = join(newGame, 'joueur4');
+        newGame = join(newGame, 'joueur5');
+        newGame = join(newGame, 'joueur6');
+        newGame = join(newGame, 'joueur2');
+        newGame = join(newGame, 'joueur7');
         assert.equal(newGame.isFull, true);
         assert.equal(newGame.started, false);
         expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
@@ -77,7 +77,7 @@ describe('Rejoindre une partie', function(){
         newGame = join(this.game, 'joueur6');
         newGame = join(this.game, 'joueur2');
         newGame = join(this.game, 'joueur7');
-        assert.equal(newGame.isFull, true);
+        assert.equal(isFull(newGame), true);
         startedGame = start(newGame);
         assert.equal(newGame.started, true);
         expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
