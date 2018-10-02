@@ -1,4 +1,5 @@
 let helpers           = require('../helpers');
+let uniqid            = require('uniqid');
 let errors            = require('./Error');
 let {assert, expect}  = require('chai');
 let {join}            = require('./game')
@@ -17,6 +18,7 @@ beforeEach(function(){
         scenario_final: {},
         players    : [
             //Structure des joueurs
+            /*
             {
                 role            : 'ghost',
                 id              : null,
@@ -32,6 +34,7 @@ beforeEach(function(){
                 visions   : [],
                 hasPlayed : false
             }
+            */
         ],
     }
 });
@@ -40,19 +43,45 @@ describe('Rejoindre une partie', function(){
     it('lorsque tout est ok', function(){
         let newGame = join(this.game, 'joueur1');
         assert.equal(newGame.players.length, 1);
-        assert.equal(newGame.players[0], 'joueur1');
+        assert.equal(newGame.players[0].id, 'joueur1');
     });
     it('lorsque la partie est lancée', function(){
-
+        this.game.started = true;
+        let newGame = join(this.game, 'joueur1');
+        assert.equal(newGame.started, true);
+        assert.equal(newGame.players.length, 0);
     });
     it('lorsqu\'on est deja dans la partie', function(){
-
+        let newGame = join(this.game, 'joueur1');
+        expect(join.bind(newGame, 'joueur1')).to.throw(errors.PlayerAlreadyInGameError);
     });
     it('lorsque la partie est pleine et non lancée', function(){
-
+        let newGame = join(this.game, 'joueur1');
+        newGame = join(newGame, 'joueur2');
+        newGame = join(newGame, 'joueur3');
+        newGame = join(newGame, 'joueur4');
+        newGame = join(newGame, 'joueur5');
+        newGame = join(newGame, 'joueur6');
+        newGame = join(newGame, 'joueur2');
+        newGame = join(newGame, 'joueur7');
+        assert.equal(newGame.isFull, true);
+        assert.equal(newGame.started, false);
+        expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
     });
 
     it('lorsque la partie est pleine et lancée', function(){
+        let newGame = join(this.game, 'joueur1');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur3');
+        newGame = join(this.game, 'joueur4');
+        newGame = join(this.game, 'joueur5');
+        newGame = join(this.game, 'joueur6');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur7');
+        assert.equal(isFull(newGame), true);
+        startedGame = start(newGame);
+        assert.equal(newGame.started, true);
+        expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
 
     });
 });
