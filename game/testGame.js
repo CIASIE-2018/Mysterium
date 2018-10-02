@@ -92,3 +92,7 @@ describe('test au commencement d\'une partie', function () {
 
     });
 });
+
+describe('tests fonctionnalités InGame', function () {
+    
+})
