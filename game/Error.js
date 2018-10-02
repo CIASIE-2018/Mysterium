@@ -24,6 +24,12 @@ class NotAllAreReady  extends Error{
     }
 }
 
+class GameAlreadyStarted extends Error{
+    constructor(){
+        super('Le jeu est déjà lancé')
+    }
+}
+
 module.exports = {
     PlayerAlreadyInGameError : PlayerAlreadyInGameError,
     MaxPlayerReachedError : MaxPlayerReachedError,
