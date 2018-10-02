@@ -41,22 +41,46 @@ beforeEach(function(){
 
 describe('Rejoindre une partie', function(){
     it('lorsque tout est ok', function(){
-        let newGame = join(this.game, 'medium', 'joueur1');
+        let newGame = join(this.game, 'joueur1');
         assert.equal(newGame.players.length, 1);
         assert.equal(newGame.players[0].id, 'joueur1');
-        console.log(newGame);
     });
     it('lorsque la partie est lancée', function(){
-
-
+        this.game.started = true;
+        let newGame = join(this.game, 'joueur1');
+        assert.equal(newGame.started, true);
+        assert.equal(newGame.players.length, 0);
     });
     it('lorsqu\'on est deja dans la partie', function(){
-
+        let newGame = join(this.game, 'joueur1');
+        expect(join.bind(newGame, 'joueur1')).to.throw(errors.PlayerAlreadyInGameError);
     });
     it('lorsque la partie est pleine et non lancée', function(){
-
+        let newGame = join(this.game, 'joueur1');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur3');
+        newGame = join(this.game, 'joueur4');
+        newGame = join(this.game, 'joueur5');
+        newGame = join(this.game, 'joueur6');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur7');
+        assert.equal(newGame.isFull, true);
+        assert.equal(newGame.started, false);
+        expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
     });
     it('lorsque la partie est pleine et lancée', function(){
+        let newGame = join(this.game, 'joueur1');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur3');
+        newGame = join(this.game, 'joueur4');
+        newGame = join(this.game, 'joueur5');
+        newGame = join(this.game, 'joueur6');
+        newGame = join(this.game, 'joueur2');
+        newGame = join(this.game, 'joueur7');
+        assert.equal(newGame.isFull, true);
+        startedGame = start(newGame);
+        assert.equal(newGame.started, true);
+        expect(join.bind(newGame, 'joueur8')).to.throw(errors.MaxPlayerReachedError);
 
     });
 });

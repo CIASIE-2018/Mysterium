@@ -1,9 +1,9 @@
 let { produce } = require('immer'); /* https://github.com/mweststrate/immer */
 
-exports.join = (baseGame, role, playerId) => {
+exports.join = (baseGame, playerId) => {
     let newGame = produce(baseGame, draftGame => {
         draftGame.players.push({
-            role      : role,
+            role      : null,
             id        : playerId,
             ready     : false,
             state     : 0,
