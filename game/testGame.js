@@ -24,6 +24,7 @@ describe('Rejoindre une partie', function(){
     it('lorsque la partie est pleine et non lancée', function(){
 
     });
+
     it('lorsque la partie est pleine et lancée', function(){
 
     });
