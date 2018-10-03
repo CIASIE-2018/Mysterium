@@ -67,8 +67,24 @@ exports.init = (baseGame) => {
     });
 }
 
-
+/**
+ * Verifie si un joueur peut jouer
+ * @param {object}  baseGame Instance de jeu
+ * @param {string}  playerId Identifiant du joueur
+ */
+exports.canPlay = (baseGame, playerId) => {
+    
+    if(baseGame.ghost.id == playerId){
+        //Ghost
+        return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
+    }else{
+        //Medium
+        let medium = baseGame.mediums.find(medium => medium.id == playerId);
+        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+    }
+}
 /** PRIVATE FUNCTIONS */
+
 
 /**
  * Vérifie que tous les joueurs sont prêts
@@ -222,4 +238,9 @@ game = a.setReady(game, 'test3', true);
 // game = a.init_scenarios(game);
 // console.log(a.init_visions(game));;
 
-a.init(game)
+game = a.init(game)
+
+console.log(a.canPlay(game, 'test1'));
+console.log(a.canPlay(game, 'test2'));
+console.log(a.canPlay(game, 'test3'));
+
