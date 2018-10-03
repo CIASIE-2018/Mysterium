@@ -78,6 +78,28 @@ exports.generate_cards = baseGame => {
     });
 }
 
+exports.init_scenarios = baseGame => {
+    let scenarios = [];
+    for(let i=0; i<baseGame.persos.length ; i++){
+        scenarios.push({
+            perso : baseGame.persos[i],
+            lieu  : baseGame.lieux[i],
+            arme  : baseGame.armes[i]
+        });
+    }
+    scenarios = helpers.shuffle(scenarios);
+    let index_scenarios_final = Math.floor(Math.random() * baseGame.mediums.length);
+
+    return produce(baseGame, draftGame => {
+        draftGame.mediums.forEach((medium, i) => {
+            if(i === index_scenarios_final)
+                draftGame.scenario_final = scenarios[i];
+            medium.scenario = scenarios[i];
+        });
+    });
+}
+
+
 function getRandomFiles(path, nb_files){
     let files  = fs.readdirSync(path);
     files      = helpers.shuffle(files).slice(0, nb_files);
@@ -106,4 +128,5 @@ game = a.setReady(game, 'test1', true);
 game = a.setReady(game, 'test2', true);
 game = a.init_roles(game);
 game = a.generate_cards(game);
+game = a.init_scenarios(game);
 console.log(game);
