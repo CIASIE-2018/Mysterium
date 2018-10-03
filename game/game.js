@@ -7,6 +7,11 @@ const config = require('../config/config');
 
 /** PUBLIC FUNCTIONS */
 
+/**
+ * Ajoute un nouveau joueur au jeu
+ * @param {object} baseGame Instance de jeu
+ * @param {string} playerId Identifiant du nouveau joueur
+ */
 exports.join = (baseGame, playerId) => {
     let player = baseGame.players.find(player => player.id === playerId);
     if(player != undefined)
@@ -23,6 +28,12 @@ exports.join = (baseGame, playerId) => {
     });
 }
 
+/**
+ * Modifie l'état d'un joueur
+ * @param {object}  baseGame Instance de jeu
+ * @param {string}  playerId Identifiant du joueur
+ * @param {boolean} ready    Etat
+ */
 exports.setReady = (baseGame, playerId, ready = true) => {
     return produce(baseGame, draftGame => {
         let player = draftGame.players.find(player => player.id === playerId);
@@ -32,6 +43,10 @@ exports.setReady = (baseGame, playerId, ready = true) => {
 
 /** PRIVATE FUNCTIONS */
 
+/**
+ * Initialise aléatoirement le rôle de chaque joueur
+ * @param {object} baseGame Instance de jeu
+ */
 function init_roles(baseGame) {
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
@@ -65,6 +80,10 @@ function init_roles(baseGame) {
     });
 }
 
+/**
+ * Génère les cartes persos, lieux et armes pour le jeu en fonction de la difficulté
+ * @param {object} baseGame Instance de jeu
+ */
 function generate_cards(baseGame) {
     let nb_scenarios = baseGame.mediums.length;
     switch(baseGame.difficulte){
@@ -82,6 +101,12 @@ function generate_cards(baseGame) {
     });
 }
 
+/**
+ * Génère différents scénarios en fonction des cartes du jeu,
+ * associe un scénario à chaque medium,
+ * défini le scénario final
+ * @param {object} baseGame Instance de jeu
+ */
 function init_scenarios(baseGame) {
     let scenarios = [];
     for(let i=0; i<baseGame.persos.length ; i++){
@@ -103,6 +128,10 @@ function init_scenarios(baseGame) {
     });
 }
 
+/**
+ * Initialise la main du fantôme (cartes visions)
+ * @param {object} baseGame Instance de jeu
+ */
 function init_visions(baseGame) {
     let visions    = getRandomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
