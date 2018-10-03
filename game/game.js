@@ -5,6 +5,8 @@ let fs       = require('fs');
 let helpers  = require('../helpers');
 const config = require('../config/config');
 
+/** PUBLIC FUNCTIONS */
+
 exports.join = (baseGame, playerId) => {
     let player = baseGame.players.find(player => player.id === playerId);
     if(player != undefined)
@@ -28,7 +30,9 @@ exports.setReady = (baseGame, playerId, ready = true) => {
     });
 }
 
-exports.init_roles = baseGame => {
+/** PRIVATE FUNCTIONS */
+
+function init_roles(baseGame) {
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
@@ -61,7 +65,7 @@ exports.init_roles = baseGame => {
     });
 }
 
-exports.generate_cards = baseGame => {
+function generate_cards(baseGame) {
     let nb_scenarios = baseGame.mediums.length;
     switch(baseGame.difficulte){
         case 0 : 
@@ -78,7 +82,7 @@ exports.generate_cards = baseGame => {
     });
 }
 
-exports.init_scenarios = baseGame => {
+function init_scenarios(baseGame) {
     let scenarios = [];
     for(let i=0; i<baseGame.persos.length ; i++){
         scenarios.push({
@@ -99,7 +103,7 @@ exports.init_scenarios = baseGame => {
     });
 }
 
-exports.init_visions = baseGame => {
+function init_visions(baseGame) {
     let visions    = getRandomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
