@@ -99,10 +99,25 @@ exports.init_scenarios = baseGame => {
     });
 }
 
+exports.init_visions = baseGame => {
+    let visions    = getRandomFiles(config.directory.images + '/visions');
+    let ghost_hand = visions.slice(visions.length-7,visions.length);
+    visions        = visions.slice(0, -7);
 
-function getRandomFiles(path, nb_files){
+    return produce(baseGame, draftGame => {
+        draftGame.visions    = visions;
+        draftGame.ghost.hand = ghost_hand;
+    });
+}
+
+
+function getRandomFiles(path, nb_files = -1){
     let files  = fs.readdirSync(path);
-    files      = helpers.shuffle(files).slice(0, nb_files);
+    files      = helpers.shuffle(files);
+
+    if(nb_files >= 0)
+        files = files.slice(0, nb_files);
+    
     return files;
 }
 
@@ -129,4 +144,4 @@ game = a.setReady(game, 'test2', true);
 game = a.init_roles(game);
 game = a.generate_cards(game);
 game = a.init_scenarios(game);
-console.log(game);
+console.log(a.init_visions(game));;
