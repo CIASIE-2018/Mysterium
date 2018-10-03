@@ -41,7 +41,48 @@ exports.setReady = (baseGame, playerId, ready = true) => {
     });
 }
 
+/**
+ * Initialise une partie
+ * @param {object}  baseGame Instance de jeu
+ */
+exports.init = (baseGame) => {
+
+    let game = {};
+
+    if(allIsReady(baseGame)){
+        if(baseGame.players.length >= 3) {
+            game = init_roles(baseGame)
+            game = generate_cards(game);
+            game = init_scenarios(game);
+            game = init_visions(game);
+        }else{
+            throw new errors.NotEnoughPlayerError();
+        }
+    }else{
+        throw new errors.NotAllAreReady();
+    }
+
+    return produce(game, draftGame => {
+        draftGame.started = true;
+    });
+}
+
+
 /** PRIVATE FUNCTIONS */
+
+/**
+ * Vérifie que tous les joueurs sont prêts
+ * @param {object} baseGame Instance de jeu
+ */
+function allIsReady(baseGame){
+    let ready = true;
+    baseGame.players.forEach(player => {
+        if(player.ready == false){
+            ready = false;
+        }
+    });
+    return ready;
+}
 
 /**
  * Initialise aléatoirement le rôle de chaque joueur
@@ -172,9 +213,13 @@ let game = {
 
 game = a.join(game, 'test1');
 game = a.join(game, 'test2');
+game = a.join(game, 'test3');
 game = a.setReady(game, 'test1', true);
 game = a.setReady(game, 'test2', true);
-game = a.init_roles(game);
-game = a.generate_cards(game);
-game = a.init_scenarios(game);
-console.log(a.init_visions(game));;
+game = a.setReady(game, 'test3', true);
+// game = a.init_roles(game);
+// game = a.generate_cards(game);
+// game = a.init_scenarios(game);
+// console.log(a.init_visions(game));;
+
+a.init(game)
