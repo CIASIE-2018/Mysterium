@@ -5,7 +5,25 @@ let fs       = require('fs');
 let helpers  = require('../helpers');
 const config = require('../config/config');
 
+const UIDGenerator = require('uid-generator');
+const uidgen = new UIDGenerator(256); 
+ 
 /** PUBLIC FUNCTIONS */
+
+exports.createGame = (max_player = 7, max_turn = 7, difficulte = 0) =>{
+    return game = {
+        id         : uidgen.generateSync(),
+        max_player  : max_player,
+        max_turn   : max_turn,
+        turn        : 0,
+        started    : false,
+        difficulte  : difficulte,
+        persos     : [],
+        lieux       : [],
+        armes      : [],
+        players     : []
+    }
+}
 
 /**
  * Ajoute un nouveau joueur au jeu
