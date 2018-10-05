@@ -11,16 +11,16 @@ const uidgen = new UIDGenerator(256);
 /** PUBLIC FUNCTIONS */
 
 function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
-    return game = {
-        id         : uidgen.generateSync(),
+    return {
+        id          : uidgen.generateSync(),
         max_player  : max_player,
-        max_turn   : max_turn,
+        max_turn    : max_turn,
         turn        : 0,
-        started    : false,
+        started     : false,
         difficulte  : difficulte,
-        persos     : [],
+        persos      : [],
         lieux       : [],
-        armes      : [],
+        armes       : [],
         players     : []
     }
 }
@@ -68,9 +68,7 @@ function setReady(baseGame, playerId, ready = true) {
  * @param {object}  baseGame Instance de jeu
  */
 function init(baseGame) {
-
     let game = {};
-
     if(allIsReady(baseGame)){
         if(baseGame.players.length >= 3) {
             game = initRoles(baseGame)
@@ -94,11 +92,49 @@ function init(baseGame) {
 function allIsReady(baseGame) {
     let ready = true;
     baseGame.players.forEach(player => {
-        if(player.ready == false){
+        if(player.ready == false)
             ready = false;
-        }
     });
     return ready;
+}
+
+
+/**
+ * Retire de la main du fantome les cartes 'cards' pour les donner au joueur
+ * qui a pour identifiant 'playerId'.
+ * La main du fantome est automatiquement complete par de nouvelles cartes
+ * visions (il doit toujours avoir 7 cartes visions dans sa main)
+ * @param {object} baseGame Instance de jeu
+ * @param {string} playerId Identifiant du joueur qui recoit les cartes visions
+ * @param {array} cards     Cartes visions a donner
+ */
+function giveVisionsToMedium(baseGame, playerId, cards){
+    if(canPlay(baseGame,baseGame.ghost.id)){
+        if(!baseGame.ghost.mediumsHasCards.includes(playerId)){
+            if(helpers.include(baseGame.ghost.hand, cards)){
+
+                return produce(baseGame, draftGame => {
+                    let ghost  = draftGame.ghost;
+                    let medium = draftGame.mediums.find(medium => medium.id == playerId);
+    
+                    let visions            = draftGame.visions;
+                    let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+                    draftGame.visions      = visions.slice(0, -cards.length);
+
+                    //Retire les cartes a donner de la main du fantome
+                    ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+                    //Complete la main du fantome avec le nombre de cartes manquantes
+                    ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+                    
+                    medium.visions = medium.visions.concat(cards);
+                    ghost.mediumsHasCards.push(playerId);
+                });
+            }else
+                throw new Error('Le fantome n\'a pas les cartes visions');
+        }else
+            throw new Error('Le fantome a deja donne des cartes a ce joueur');
+    }else
+        throw new Error('Le fantome ne peut pas jouer maintenant');
 }
 
 module.exports = {
@@ -106,7 +142,8 @@ module.exports = {
     join,
     setReady,
     init,
-    allIsReady
+    allIsReady,
+    giveVisionsToMedium
 }
 
 /** PRIVATE FUNCTIONS */
@@ -230,36 +267,16 @@ function canPlay(baseGame, playerId){
 }
 
 
+/*
+let game = createGame();
+game     = join(game, 'test1');
+game     = join(game, 'test2');
+game     = join(game, 'test3');
+game     = setReady(game, 'test1', true);
+game     = setReady(game, 'test2', true);
+game     = setReady(game, 'test3', true);
+game     = init(game);
+game     = giveVisionsToMedium(game, game.mediums[0].id, [game.ghost.hand[0], game.ghost.hand[5], game.ghost.hand[1]]);
+*/
 
-let a = require('./game.js');
-
-let game = {
-    id         : 1233,
-    max_player : 7,
-    max_turn   : 7,
-    turn       : 0,
-    started    : false,
-    difficulte : 0,
-    persos     : [],
-    lieux      : [],
-    armes      : [],
-    players    : []
-}
-
-game = a.join(game, 'test1');
-game = a.join(game, 'test2');
-game = a.join(game, 'test3');
-game = a.setReady(game, 'test1', true);
-game = a.setReady(game, 'test2', true);
-game = a.setReady(game, 'test3', true);
-// game = a.init_roles(game);
-// game = a.generate_cards(game);
-// game = a.init_scenarios(game);
-// console.log(a.init_visions(game));;
-
-game = a.init(game)
-
-/*console.log(a.canPlay(game, 'test1'));
-console.log(a.canPlay(game, 'test2'));
-console.log(a.canPlay(game, 'test3'));*/
-
+/*game     = play(game, 'test1', '25.png');*/
