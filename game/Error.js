@@ -31,8 +31,9 @@ class GameAlreadyStarted extends Error{
 }
 
 module.exports = {
-    PlayerAlreadyInGameError : PlayerAlreadyInGameError,
-    MaxPlayerReachedError : MaxPlayerReachedError,
-    NotEnoughPlayerError : NotEnoughPlayerError,
-    NotAllAreReady : NotAllAreReady
+    PlayerAlreadyInGameError,
+    MaxPlayerReachedError,
+    NotEnoughPlayerError,
+    NotAllAreReady,
+    GameAlreadyStarted
 }

@@ -19,7 +19,7 @@ describe('Rejoindre une partie', function(){
         let newGame = this.game;
         expect(function(){
             join(newGame, 'joueur1');
-        }).to.throw(errors.MaxPlayerReachedError);
+        }).to.throw(errors.GameAlreadyStarted);
 
 
     });
@@ -43,21 +43,20 @@ describe('Rejoindre une partie', function(){
         }).to.throw(errors.MaxPlayerReachedError);
     });
 
-    it('lorsque la partie est pleine et lancée', function(){
+    it('lorsque la partie est lancée', function(){
         let newGame = join(this.game, 'joueur1');
         newGame = setReady(newGame, 'joueur1', true);
-        for(i = 2; i < 8; i++){
+        for(i = 2; i < 4; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
             newGame = setReady(newGame, idJoueur, true);
         }
 
-        assert.equal(newGame.players.length, newGame.max_player);
         let startedGame = init(newGame);
         assert.equal(startedGame.started, true);
         expect(function(){
-            join(startedGame, 'joueur8');
-        }).to.throw(errors.MaxPlayerReachedError);
+            join(startedGame, 'joueur4');
+        }).to.throw(errors.GameAlreadyStarted);
 
     });
 });
