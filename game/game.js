@@ -69,38 +69,21 @@ exports.init = (baseGame) => {
 
     if(allIsReady(baseGame)){
         if(baseGame.players.length >= 3) {
-            game = init_roles(baseGame)
-            game = generate_cards(game);
-            game = init_scenarios(game);
-            game = init_visions(game);
-        }else{
+            game = initRoles(baseGame)
+            game = generateCards(game);
+            game = initScenarios(game);
+            game = initVisions(game);
+        }else
             throw new errors.NotEnoughPlayerError();
-        }
-    }else{
+    }else
         throw new errors.NotAllAreReady();
-    }
 
     return produce(game, draftGame => {
         draftGame.started = true;
     });
 }
 
-/**
- * Verifie si un joueur peut jouer
- * @param {object}  baseGame Instance de jeu
- * @param {string}  playerId Identifiant du joueur
- */
-exports.canPlay = (baseGame, playerId) => {
-    
-    if(baseGame.ghost.id == playerId){
-        //Ghost
-        return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
-    }else{
-        //Medium
-        let medium = baseGame.mediums.find(medium => medium.id == playerId);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
-    }
-}
+
 /** PRIVATE FUNCTIONS */
 
 
@@ -122,7 +105,7 @@ function allIsReady(baseGame){
  * Initialise aléatoirement le rôle de chaque joueur
  * @param {object} baseGame Instance de jeu
  */
-function init_roles(baseGame) {
+function initRoles(baseGame) {
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
@@ -159,7 +142,7 @@ function init_roles(baseGame) {
  * Génère les cartes persos, lieux et armes pour le jeu en fonction de la difficulté
  * @param {object} baseGame Instance de jeu
  */
-function generate_cards(baseGame) {
+function generateCards(baseGame) {
     let nb_scenarios = baseGame.mediums.length;
     switch(baseGame.difficulte){
         case 0 : 
@@ -170,9 +153,9 @@ function generate_cards(baseGame) {
         break;
     }
     return produce(baseGame, draftGame => {
-        draftGame.persos = getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
-        draftGame.lieux  = getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
-        draftGame.armes  = getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
+        draftGame.persos = helpers.getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
+        draftGame.lieux  = helpers.getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
+        draftGame.armes  = helpers.getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
     });
 }
 
@@ -182,7 +165,7 @@ function generate_cards(baseGame) {
  * défini le scénario final
  * @param {object} baseGame Instance de jeu
  */
-function init_scenarios(baseGame) {
+function initScenarios(baseGame) {
     let scenarios = [];
     for(let i=0; i<baseGame.persos.length ; i++){
         scenarios.push({
@@ -207,8 +190,8 @@ function init_scenarios(baseGame) {
  * Initialise la main du fantôme (cartes visions)
  * @param {object} baseGame Instance de jeu
  */
-function init_visions(baseGame) {
-    let visions    = getRandomFiles(config.directory.images + '/visions');
+function initVisions(baseGame) {
+    let visions    = helpers.andomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
 
@@ -219,15 +202,23 @@ function init_visions(baseGame) {
 }
 
 
-function getRandomFiles(path, nb_files = -1){
-    let files  = fs.readdirSync(path);
-    files      = helpers.shuffle(files);
-
-    if(nb_files >= 0)
-        files = files.slice(0, nb_files);
+/**
+ * Verifie si un joueur peut jouer
+ * @param {object}  baseGame Instance de jeu
+ * @param {string}  playerId Identifiant du joueur
+ */
+function canPlay(baseGame, playerId){
     
-    return files;
+    if(baseGame.ghost.id == playerId){
+        //Ghost
+        return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
+    }else{
+        //Medium
+        let medium = baseGame.mediums.find(medium => medium.id == playerId);
+        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+    }
 }
+
 
 
 let a = require('./game.js');
@@ -258,7 +249,7 @@ game = a.setReady(game, 'test3', true);
 
 game = a.init(game)
 
-console.log(a.canPlay(game, 'test1'));
+/*console.log(a.canPlay(game, 'test1'));
 console.log(a.canPlay(game, 'test2'));
-console.log(a.canPlay(game, 'test3'));
+console.log(a.canPlay(game, 'test3'));*/
 
