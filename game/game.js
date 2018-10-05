@@ -35,7 +35,7 @@ exports.join = (baseGame, playerId) => {
     if(player != undefined)
         throw new errors.PlayerAlreadyInGameError();
     
-    if(baseGame.isFull || baseGame.started)
+    if(baseGame.players.length == baseGame.max_player || baseGame.started)
         throw new errors.MaxPlayerReachedError();
     
     return produce(baseGame, draftGame => {
