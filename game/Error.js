@@ -20,7 +20,7 @@ class NotEnoughPlayerError  extends Error{
 
 class NotAllAreReady  extends Error{
     constructor(){
-        super('Tput le monde n\'est pas prêt')
+        super('Tout le monde n\'est pas prêt')
     }
 }
 
