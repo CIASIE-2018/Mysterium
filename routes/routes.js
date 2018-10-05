@@ -15,7 +15,6 @@ router.post('/', (req, res) => {
     game = join(game, player_id); 
     req.app.io.sockets.emit('new_player', player_id);
     res.redirect('/salon');
-
 })
 
 router.get('/salon', (req, res) => {

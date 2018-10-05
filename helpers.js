@@ -1,8 +1,10 @@
+const fs = require('fs');
+
 /**
  * Shuffles array in place. ES6 version
  * @param {Array} a items An array containing the items.
  */
-exports.shuffle = (a) => {
+function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
@@ -11,7 +13,7 @@ exports.shuffle = (a) => {
 }
 
 //Test dans array1 il y a les elements de array2
-exports.include = (array1, array2) => {
+function include(array1, array2) {
     if(array2.length == 0)
         return false;
         
@@ -25,12 +27,18 @@ exports.include = (array1, array2) => {
     return include;
 }
 
-exports.getRandomFiles = (path, nb_files = -1) => {
+function getRandomFiles(path, nb_files = -1) {
     let files  = fs.readdirSync(path);
-    files      = helpers.shuffle(files);
+    files      = shuffle(files);
 
     if(nb_files >= 0)
         files = files.slice(0, nb_files);
     
     return files;
+}
+
+module.exports = {
+    shuffle,
+    include,
+    getRandomFiles
 }

@@ -191,7 +191,7 @@ function initScenarios(baseGame) {
  * @param {object} baseGame Instance de jeu
  */
 function initVisions(baseGame) {
-    let visions    = helpers.andomFiles(config.directory.images + '/visions');
+    let visions    = helpers.getRandomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
 
