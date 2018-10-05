@@ -135,9 +135,9 @@ function generateCards(baseGame) {
         break;
     }
     return produce(baseGame, draftGame => {
-        draftGame.persos = getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
-        draftGame.lieux  = getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
-        draftGame.armes  = getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
+        draftGame.persos = helpers.getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
+        draftGame.lieux  = helpers.getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
+        draftGame.armes  = helpers.getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
     });
 }
 
@@ -173,7 +173,7 @@ function initScenarios(baseGame) {
  * @param {object} baseGame Instance de jeu
  */
 function initVisions(baseGame) {
-    let visions    = getRandomFiles(config.directory.images + '/visions');
+    let visions    = helpers.andomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
 
@@ -201,16 +201,6 @@ function canPlay(baseGame, playerId){
     }
 }
 
-
-function getRandomFiles(path, nb_files = -1){
-    let files  = fs.readdirSync(path);
-    files      = helpers.shuffle(files);
-
-    if(nb_files >= 0)
-        files = files.slice(0, nb_files);
-    
-    return files;
-}
 
 
 let a = require('./game.js');

@@ -24,3 +24,13 @@ exports.include = (array1, array2) => {
     }
     return include;
 }
+
+exports.getRandomFiles = (path, nb_files = -1) => {
+    let files  = fs.readdirSync(path);
+    files      = helpers.shuffle(files);
+
+    if(nb_files >= 0)
+        files = files.slice(0, nb_files);
+    
+    return files;
+}
