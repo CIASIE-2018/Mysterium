@@ -30,14 +30,18 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
  */
+
 function join(baseGame, playerId) {
+    if(baseGame.started)
+        throw new errors.GameAlreadyStarted();
+
     let player = baseGame.players.find(player => player.id === playerId);
     if(player != undefined)
         throw new errors.PlayerAlreadyInGameError();
-    
-    if(baseGame.players.length == baseGame.max_player || baseGame.started)
+
+    if(baseGame.players.length == baseGame.max_player)
         throw new errors.MaxPlayerReachedError();
-    
+
     return produce(baseGame, draftGame => {
         draftGame.players.push({
             id    : playerId,
