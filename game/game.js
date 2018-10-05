@@ -72,7 +72,7 @@ function init(baseGame) {
     let game = {};
 
     if(allIsReady(baseGame)){
-        if(baseGame.players.length >= 2) {
+        if(baseGame.players.length >= 3) {
             game = initRoles(baseGame)
             game = generateCards(game);
             game = initScenarios(game);
