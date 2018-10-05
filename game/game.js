@@ -55,34 +55,17 @@ exports.init = (baseGame) => {
             game = generate_cards(game);
             game = init_scenarios(game);
             game = init_visions(game);
-        }else{
+        }else
             throw new errors.NotEnoughPlayerError();
-        }
-    }else{
+    }else
         throw new errors.NotAllAreReady();
-    }
 
     return produce(game, draftGame => {
         draftGame.started = true;
     });
 }
 
-/**
- * Verifie si un joueur peut jouer
- * @param {object}  baseGame Instance de jeu
- * @param {string}  playerId Identifiant du joueur
- */
-exports.canPlay = (baseGame, playerId) => {
-    
-    if(baseGame.ghost.id == playerId){
-        //Ghost
-        return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
-    }else{
-        //Medium
-        let medium = baseGame.mediums.find(medium => medium.id == playerId);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
-    }
-}
+
 /** PRIVATE FUNCTIONS */
 
 
@@ -201,6 +184,24 @@ function init_visions(baseGame) {
 }
 
 
+/**
+ * Verifie si un joueur peut jouer
+ * @param {object}  baseGame Instance de jeu
+ * @param {string}  playerId Identifiant du joueur
+ */
+function canPlay(baseGame, playerId){
+    
+    if(baseGame.ghost.id == playerId){
+        //Ghost
+        return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
+    }else{
+        //Medium
+        let medium = baseGame.mediums.find(medium => medium.id == playerId);
+        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+    }
+}
+
+
 function getRandomFiles(path, nb_files = -1){
     let files  = fs.readdirSync(path);
     files      = helpers.shuffle(files);
@@ -240,7 +241,7 @@ game = a.setReady(game, 'test3', true);
 
 game = a.init(game)
 
-console.log(a.canPlay(game, 'test1'));
+/*console.log(a.canPlay(game, 'test1'));
 console.log(a.canPlay(game, 'test2'));
-console.log(a.canPlay(game, 'test3'));
+console.log(a.canPlay(game, 'test3'));*/
 
