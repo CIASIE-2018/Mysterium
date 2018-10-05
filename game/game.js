@@ -51,10 +51,10 @@ exports.init = (baseGame) => {
 
     if(allIsReady(baseGame)){
         if(baseGame.players.length >= 3) {
-            game = init_roles(baseGame)
-            game = generate_cards(game);
-            game = init_scenarios(game);
-            game = init_visions(game);
+            game = initRoles(baseGame)
+            game = generateCards(game);
+            game = initScenarios(game);
+            game = initVisions(game);
         }else
             throw new errors.NotEnoughPlayerError();
     }else
@@ -87,7 +87,7 @@ function allIsReady(baseGame){
  * Initialise aléatoirement le rôle de chaque joueur
  * @param {object} baseGame Instance de jeu
  */
-function init_roles(baseGame) {
+function initRoles(baseGame) {
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
@@ -124,7 +124,7 @@ function init_roles(baseGame) {
  * Génère les cartes persos, lieux et armes pour le jeu en fonction de la difficulté
  * @param {object} baseGame Instance de jeu
  */
-function generate_cards(baseGame) {
+function generateCards(baseGame) {
     let nb_scenarios = baseGame.mediums.length;
     switch(baseGame.difficulte){
         case 0 : 
@@ -147,7 +147,7 @@ function generate_cards(baseGame) {
  * défini le scénario final
  * @param {object} baseGame Instance de jeu
  */
-function init_scenarios(baseGame) {
+function initScenarios(baseGame) {
     let scenarios = [];
     for(let i=0; i<baseGame.persos.length ; i++){
         scenarios.push({
@@ -172,7 +172,7 @@ function init_scenarios(baseGame) {
  * Initialise la main du fantôme (cartes visions)
  * @param {object} baseGame Instance de jeu
  */
-function init_visions(baseGame) {
+function initVisions(baseGame) {
     let visions    = getRandomFiles(config.directory.images + '/visions');
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
