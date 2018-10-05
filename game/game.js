@@ -10,7 +10,7 @@ const uidgen = new UIDGenerator(256);
  
 /** PUBLIC FUNCTIONS */
 
-exports.createGame = (max_player = 7, max_turn = 7, difficulte = 0) =>{
+function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
     return game = {
         id         : uidgen.generateSync(),
         max_player  : max_player,
@@ -30,9 +30,11 @@ exports.createGame = (max_player = 7, max_turn = 7, difficulte = 0) =>{
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
  */
-exports.join = (baseGame, playerId) => {
+
+function join(baseGame, playerId) {
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
+
     let player = baseGame.players.find(player => player.id === playerId);
     if(player != undefined)
         throw new errors.PlayerAlreadyInGameError();
@@ -54,7 +56,7 @@ exports.join = (baseGame, playerId) => {
  * @param {string}  playerId Identifiant du joueur
  * @param {boolean} ready    Etat
  */
-exports.setReady = (baseGame, playerId, ready = true) => {
+function setReady(baseGame, playerId, ready = true) {
     return produce(baseGame, draftGame => {
         let player = draftGame.players.find(player => player.id === playerId);
         player.ready = ready;
@@ -65,12 +67,12 @@ exports.setReady = (baseGame, playerId, ready = true) => {
  * Initialise une partie
  * @param {object}  baseGame Instance de jeu
  */
-exports.init = (baseGame) => {
+function init(baseGame) {
 
     let game = {};
 
     if(allIsReady(baseGame)){
-        if(baseGame.players.length >= 3) {
+        if(baseGame.players.length >= 2) {
             game = initRoles(baseGame)
             game = generateCards(game);
             game = initScenarios(game);
@@ -85,15 +87,11 @@ exports.init = (baseGame) => {
     });
 }
 
-
-/** PRIVATE FUNCTIONS */
-
-
 /**
  * Vérifie que tous les joueurs sont prêts
  * @param {object} baseGame Instance de jeu
  */
-function allIsReady(baseGame){
+function allIsReady(baseGame) {
     let ready = true;
     baseGame.players.forEach(player => {
         if(player.ready == false){
@@ -102,6 +100,16 @@ function allIsReady(baseGame){
     });
     return ready;
 }
+
+module.exports = {
+    createGame,
+    join,
+    setReady,
+    init,
+    allIsReady
+}
+
+/** PRIVATE FUNCTIONS */
 
 /**
  * Initialise aléatoirement le rôle de chaque joueur
