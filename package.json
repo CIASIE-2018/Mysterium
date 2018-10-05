@@ -23,7 +23,7 @@
   "scripts": {
     "start": "nodemon server.js",
     "testbrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
-    "test": "mocha",
+    "test": "mocha game/testGame.js",
     "scss": "node-sass --output-style compressed --watch ressources/scss --output public/css"
   },
   "author": "",
