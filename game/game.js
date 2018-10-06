@@ -11,7 +11,7 @@ const uidgen = new UIDGenerator(256);
 /** PUBLIC FUNCTIONS */
 
 function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
-    return game = {
+    return {
         id         : uidgen.generateSync(),
         max_player  : max_player,
         max_turn   : max_turn,
@@ -352,18 +352,7 @@ function canPlay(baseGame, playerId){
 
 let a = require('./game.js');
 
-let game = {
-    id         : 1233,
-    max_player : 7,
-    max_turn   : 7,
-    turn       : 0,
-    started    : false,
-    difficulte : 0,
-    persos     : [],
-    lieux      : [],
-    armes      : [],
-    players    : []
-}
+let game = createGame()
 
 game = a.join(game, 'test1');
 game = a.join(game, 'test2');
