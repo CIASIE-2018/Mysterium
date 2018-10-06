@@ -32,24 +32,27 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
  */
 function getPlayerState(baseGame, playerId) {
     
+    //fantome
     let player = baseGame.ghost
-    let state  = {};
+
+    //medium
+    if(player.id !== playerId)
+        player = baseGame.mediums.find(player => player.id == playerId)
+
+    let state  = {
+        turn : baseGame.turn,
+        id   : player.id,
+    };
 
     //verifie si le joueur existe
     if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
         throw new errors.PlayerDoesNotExistError();
 
-    if(player.id === playerId){
-        state  = {
-            turn             : baseGame.turn,
-            id               : player.id,
-            hand             : player.hand,
-            mediumsHasCards  : player.mediumsHasCards,
-            otherMediums     : baseGame.mediums
-        };
+    if(player === baseGame.ghost){
+            state.hand             = player.hand,
+            state.mediumsHasCards  = player.mediumsHasCards,
+            state.otherMediums     = baseGame.mediums
     }else{
-        player = baseGame.mediums.find(player => player.id == playerId)
-
         let players      = baseGame.mediums.filter(player => player.id !== playerId);
         let otherMediums = [];
 
@@ -61,15 +64,11 @@ function getPlayerState(baseGame, playerId) {
             })
         })
         
-        state  = {
-            turn         : baseGame.turn,
-            id           : player.id,
-            state        : player.state,
-            visions      : player.visions,
-            hasPlayed    : player.hasPlayed,
-            scenario     : player.scenario,
-            otherMediums
-        };
+        state.state        = player.state,
+        state.visions      = player.visions,
+        state.hasPlayed    = player.hasPlayed,
+        state.scenario     = player.scenario,
+        state.otherMediums = otherMediums
     }
 
     return state;
