@@ -26,6 +26,43 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
 }
 
 /**
+ * Renvoie l'état du joueur 
+ * @param {object} baseGame Instance de jeu
+ * @param {string} playerId Identifiant du nouveau joueur
+ */
+function getPlayerState(baseGame, playerId) {
+    
+    let player = baseGame.ghost
+    let state  = {};
+
+    //verifie si le joueur existe
+    if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
+        throw new Error('le joueur n\'existe pas');
+
+    if(player.id === playerId){
+        state  = {
+            id               : player.id,
+            hand             : player.hand,
+            mediumsHasCards  : player.mediumsHasCards,
+            otherMediums     : baseGame.mediums
+        };
+    }else{
+        player = baseGame.mediums.find(player => player.id == playerId)
+        
+        state  = {
+            id           : player.id,
+            state        : player.state,
+            visions      : player.visions,
+            hasPlayed    : player.hasPlayed,
+            scenario     : player.scenario,
+            otherMediums : baseGame.mediums.filter(player => player.id !== playerId)
+        };
+    }
+
+    return state;
+}
+
+/**
  * Ajoute un nouveau joueur au jeu
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
@@ -99,6 +136,7 @@ function allIsReady(baseGame) {
 
 module.exports = {
     createGame,
+    getPlayerState,
     join,
     setReady,
     init,
@@ -248,14 +286,10 @@ game = a.join(game, 'test3');
 game = a.setReady(game, 'test1', true);
 game = a.setReady(game, 'test2', true);
 game = a.setReady(game, 'test3', true);
-// game = a.init_roles(game);
-// game = a.generate_cards(game);
-// game = a.init_scenarios(game);
-// console.log(a.init_visions(game));;
+
 
 game = a.init(game)
 
-/*console.log(a.canPlay(game, 'test1'));
-console.log(a.canPlay(game, 'test2'));
-console.log(a.canPlay(game, 'test3'));*/
+console.log(a.getPlayerState(game, 'test'));
+
 
