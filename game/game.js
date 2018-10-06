@@ -41,6 +41,7 @@ function getPlayerState(baseGame, playerId) {
 
     if(player.id === playerId){
         state  = {
+            turn             : baseGame.turn,
             id               : player.id,
             hand             : player.hand,
             mediumsHasCards  : player.mediumsHasCards,
@@ -48,14 +49,26 @@ function getPlayerState(baseGame, playerId) {
         };
     }else{
         player = baseGame.mediums.find(player => player.id == playerId)
+
+        let players      = baseGame.mediums.filter(player => player.id !== playerId);
+        let otherMediums = [];
+
+        players.forEach(player => {
+            otherMediums.push({
+                id        : player.id,
+                state     : player.state,
+                hasPlayed : player.hasPlayed
+            })
+        })
         
         state  = {
+            turn         : baseGame.turn,
             id           : player.id,
             state        : player.state,
             visions      : player.visions,
             hasPlayed    : player.hasPlayed,
             scenario     : player.scenario,
-            otherMediums : baseGame.mediums.filter(player => player.id !== playerId)
+            otherMediums
         };
     }
 
@@ -362,8 +375,8 @@ game = a.setReady(game, 'test3', true);
 
 game = a.init(game)
 
-game = play(game, 'test3', '12.png');
+// game = play(game, 'test3', '12.png');
 
-// console.log(a.getPlayerState(game, 'test'));
+console.log(a.getPlayerState(game, 'test3'));
 
 
