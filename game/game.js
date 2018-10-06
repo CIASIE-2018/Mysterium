@@ -134,13 +134,84 @@ function allIsReady(baseGame) {
     return ready;
 }
 
+/**
+ * Le joueur joue en choisissant une carte du plateau
+ * @param {object} baseGame 
+ * @param {string} playerId 
+ * @param {string} chosenCard 
+ */
+function play(baseGame, playerId, chosenCard){
+
+    let canChoose = false;
+
+    //verifier que le personnage n'est pas le fantome
+    if(baseGame.ghost.id !== playerId){
+        let player = baseGame.mediums.find(player => player.id === playerId);
+        let state  = player.state;
+    
+        //verifier que le personnage peut jouer
+        if(!player.hasPlayed){
+
+            //verifier l'etat d'avancement du joueur sur le plateau
+            switch(state){
+
+                //stade personnage
+                case 0:
+                    //verifier si la carte choisi est presente sur le plateau au stade des personnages
+                    if(baseGame.persos.find(perso => perso === chosenCard))
+                        canChoose = true;
+                    else
+                        throw new errors.ChosenCardError("La carte personnage choisis n'est pas sur le plateau")
+    
+                    break;
+
+                //stade lieux
+                case 1:
+                    //verifier si la carte choisi est presente sur le plateau au stade des lieux
+                    if(baseGame.lieux.find(lieu => lieu === chosenCard))
+                        canChoose = true;             
+                    else
+                        throw new errors.ChosenCardError("La carte lieu choisis n'est pas sur le plateau")
+    
+                    break;
+
+                //stade armes
+                case 2:
+                    //verifier si la carte choisi est presente sur le plateau au stade des armes
+                    if(baseGame.armes.find(arme => arme === chosenCard))
+                        canChoose = true;  
+                    else
+                        throw new errors.ChosenCardError("La carte arme choisis n'est pas sur le plateau")
+                        
+                    break;
+            }
+        }
+    //si le joueur est un fantome
+    }else{
+        throw new Error('Le joueur est le fantome')
+    }
+
+    return produce(baseGame, draftGame => {
+        //si la carte est presente sur le plateau au bon stade du joueur et que le joueur peut jouer
+        if(canChoose){
+            let player = draftGame.mediums.find(player => player.id === playerId);
+            player.chosenCard = chosenCard;
+            player.hasPlayed = true;
+        }else{
+            throw new Error('Le joueur ne peux pas choisir de cartes')
+        }
+    });
+
+}
+
 module.exports = {
     createGame,
     getPlayerState,
     join,
     setReady,
     init,
-    allIsReady
+    allIsReady,
+    play
 }
 
 /** PRIVATE FUNCTIONS */
@@ -265,6 +336,7 @@ function canPlay(baseGame, playerId){
 
 
 
+
 let a = require('./game.js');
 
 let game = {
@@ -290,6 +362,8 @@ game = a.setReady(game, 'test3', true);
 
 game = a.init(game)
 
-console.log(a.getPlayerState(game, 'test'));
+game = play(game, 'test3', '12.png');
+
+// console.log(a.getPlayerState(game, 'test'));
 
 

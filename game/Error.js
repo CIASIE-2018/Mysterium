@@ -36,10 +36,17 @@ class GameAlreadyStarted extends Error{
     }
 }
 
+class ChosenCardError extends Error{
+    constructor(message){
+        super(message)
+    }
+}
+
 module.exports = {
     PlayerAlreadyInGameError,
     MaxPlayerReachedError,
     NotEnoughPlayerError,
     NotAllAreReady ,
-    PlayerDoesNotExistError
+    PlayerDoesNotExistError,
+    ChosenCardError
 }
