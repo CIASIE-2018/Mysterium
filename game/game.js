@@ -37,7 +37,7 @@ function getPlayerState(baseGame, playerId) {
 
     //verifie si le joueur existe
     if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
-        throw new Error('le joueur n\'existe pas');
+        throw new errors.PlayerDoesNotExistError();
 
     if(player.id === playerId){
         state  = {
