@@ -29,6 +29,6 @@ server.listen(config.app.port, () => {
 
 /***** WEBSOCKETS SOCKET.IO *****/
 io.sockets.on('connection', socket => {
-    console.log(`connection ${socket.id}`);
+    console.log(`connection ${socket.id} on a une connection au server`);
 });
 /********************************/
