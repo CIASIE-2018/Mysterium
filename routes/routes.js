@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const { createGame, init, join, setReady, allIsReady } = require('../game/game');
+const { createGame, init, join, setReady, allIsReady, getPlayerState } = require('../game/game');
 
 
 
@@ -15,9 +15,14 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    let player_id = req.body.id;
+    let player_name = req.body.name;
     try{
-        game = join(game, player_id); 
+        game = join(game, player_name);
+        let player = game.players.find(player => player.name === player_name);
+        req.session.player = {
+            id   : player.id,
+            name : player.name
+        };
         req.app.io.sockets.emit('reload');
         res.redirect('/salon');
     }catch(e){
@@ -26,8 +31,10 @@ router.post('/', (req, res) => {
 });
 
 router.get('/salon', (req, res) => {
+    let player = req.session.player;
     res.render('salon', {
-        players: game.players
+        players : game.players,
+        me      : player.id
     });
 });
 
@@ -46,9 +53,16 @@ router.post('/salon', (req, res) => {
 });
 
 router.get('/game', (req, res) => {
-    res.render('game', {
-        type : 'medium'
-    });
+    let player = game.players.find(player => player.id === req.session.player.id);
+
+    if(player != undefined){
+        let state_player = getPlayerState(game,  player.id)
+        res.render('game', {
+            state_player
+        });
+    }else
+        res.redirect('/erreur');
+
 });
 
 module.exports = router;
