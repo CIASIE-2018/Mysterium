@@ -168,6 +168,49 @@ function play(baseGame, playerId, chosenCard){
 }
 
 /**
+ * Renvoie l'état du joueur 
+ * @param {object} baseGame Instance de jeu
+ * @param {string} playerId Identifiant du nouveau joueur
+ */
+function getPlayerState(baseGame, playerId) {
+    
+    //fantome
+    let player = baseGame.ghost
+     //medium
+    if(player.id !== playerId)
+        player = baseGame.mediums.find(player => player.id == playerId)
+     let state  = {
+        turn : baseGame.turn,
+        id   : player.id,
+    };
+     //verifie si le joueur existe
+    if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
+        throw new errors.PlayerDoesNotExistError();
+     if(player === baseGame.ghost){
+            state.hand             = player.hand,
+            state.mediumsHasCards  = player.mediumsHasCards,
+            state.otherMediums     = baseGame.mediums
+    }else{
+        let players      = baseGame.mediums.filter(player => player.id !== playerId);
+        let otherMediums = [];
+         players.forEach(player => {
+            otherMediums.push({
+                id        : player.id,
+                state     : player.state,
+                hasPlayed : player.hasPlayed
+            })
+        })
+        
+        state.state        = player.state,
+        state.visions      = player.visions,
+        state.hasPlayed    = player.hasPlayed,
+        state.scenario     = player.scenario,
+        state.otherMediums = otherMediums
+    }
+     return state;
+}
+
+/**
  * Retire de la main du fantome les cartes 'cards' pour les donner au joueur
  * qui a pour identifiant 'playerId'.
  * La main du fantome est automatiquement complete par de nouvelles cartes
@@ -212,7 +255,8 @@ module.exports = {
     init,
     allIsReady,
     play,
-    giveVisionsToMedium
+    giveVisionsToMedium,
+    getPlayerState
 }
 
 /** PRIVATE FUNCTIONS */
