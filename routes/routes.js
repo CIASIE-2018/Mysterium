@@ -2,6 +2,8 @@ const express = require('express');
 const router  = express.Router();
 const { createGame, init, join, setReady, allIsReady } = require('../game/game');
 
+
+
 /* Instance du jeu */
 let game = createGame();
 

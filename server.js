@@ -6,7 +6,9 @@ const twig       = require('twig');
 const server     = require('http').createServer(app);
 const io         = require('socket.io').listen(server);
 
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+
+const session = require('express-session');
  
 app.io = io;
 
@@ -20,10 +22,12 @@ if(config.app.mode == 'dev')
 
 
 /***** MIDDLEWARES *****/
+app.use(session({ secret: 'mysterium2018'}))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use('/', require('./routes/routes'));
+
 /*******************/
 
 server.listen(config.app.port, () => {
