@@ -32,6 +32,8 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
  */
 
 function join(baseGame, playerName) {
+    console.log(playerName);
+    
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
