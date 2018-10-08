@@ -26,6 +26,55 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
 }
 
 /**
+ * Renvoie l'état du joueur 
+ * @param {object} baseGame Instance de jeu
+ * @param {string} playerId Identifiant du nouveau joueur
+ */
+function getPlayerState(baseGame, playerId) {
+    
+    //fantome
+    let player = baseGame.ghost
+
+    //medium
+    if(player.id !== playerId)
+        player = baseGame.mediums.find(player => player.id == playerId)
+
+    let state  = {
+        turn : baseGame.turn,
+        id   : player.id,
+    };
+
+    //verifie si le joueur existe
+    if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
+        throw new errors.PlayerDoesNotExistError();
+
+    if(player === baseGame.ghost){
+            state.hand             = player.hand,
+            state.mediumsHasCards  = player.mediumsHasCards,
+            state.otherMediums     = baseGame.mediums
+    }else{
+        let players      = baseGame.mediums.filter(player => player.id !== playerId);
+        let otherMediums = [];
+
+        players.forEach(player => {
+            otherMediums.push({
+                id        : player.id,
+                state     : player.state,
+                hasPlayed : player.hasPlayed
+            })
+        })
+        
+        state.state        = player.state,
+        state.visions      = player.visions,
+        state.hasPlayed    = player.hasPlayed,
+        state.scenario     = player.scenario,
+        state.otherMediums = otherMediums
+    }
+
+    return state;
+}
+
+/**
  * Ajoute un nouveau joueur au jeu
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
@@ -98,6 +147,74 @@ function allIsReady(baseGame) {
     return ready;
 }
 
+/**
+ * Le joueur joue en choisissant une carte du plateau
+ * @param {object} baseGame 
+ * @param {string} playerId 
+ * @param {string} chosenCard 
+ */
+function play(baseGame, playerId, chosenCard){
+
+    let canChoose = false;
+
+    //verifier que le personnage n'est pas le fantome
+    if(baseGame.ghost.id !== playerId){
+        let player = baseGame.mediums.find(player => player.id === playerId);
+        let state  = player.state;
+    
+        //verifier que le personnage peut jouer
+        if(!player.hasPlayed){
+
+            //verifier l'etat d'avancement du joueur sur le plateau
+            switch(state){
+
+                //stade personnage
+                case 0:
+                    //verifier si la carte choisi est presente sur le plateau au stade des personnages
+                    if(baseGame.persos.find(perso => perso === chosenCard))
+                        canChoose = true;
+                    else
+                        throw new errors.ChosenCardError("La carte personnage choisis n'est pas sur le plateau")
+    
+                    break;
+
+                //stade lieux
+                case 1:
+                    //verifier si la carte choisi est presente sur le plateau au stade des lieux
+                    if(baseGame.lieux.find(lieu => lieu === chosenCard))
+                        canChoose = true;             
+                    else
+                        throw new errors.ChosenCardError("La carte lieu choisis n'est pas sur le plateau")
+    
+                    break;
+
+                //stade armes
+                case 2:
+                    //verifier si la carte choisi est presente sur le plateau au stade des armes
+                    if(baseGame.armes.find(arme => arme === chosenCard))
+                        canChoose = true;  
+                    else
+                        throw new errors.ChosenCardError("La carte arme choisis n'est pas sur le plateau")
+                        
+                    break;
+            }
+        }
+    //si le joueur est un fantome
+    }else{
+        throw new Error('Le joueur est le fantome')
+    }
+
+    return produce(baseGame, draftGame => {
+        //si la carte est presente sur le plateau au bon stade du joueur et que le joueur peut jouer
+        if(canChoose){
+            let player = draftGame.mediums.find(player => player.id === playerId);
+            player.chosenCard = chosenCard;
+            player.hasPlayed = true;
+        }else{
+            throw new Error('Le joueur ne peux pas choisir de cartes')
+        }
+    });
+}
 
 /**
  * Retire de la main du fantome les cartes 'cards' pour les donner au joueur
@@ -139,10 +256,12 @@ function giveVisionsToMedium(baseGame, playerId, cards){
 
 module.exports = {
     createGame,
+    getPlayerState,
     join,
     setReady,
     init,
     allIsReady,
+    play,
     giveVisionsToMedium
 }
 
@@ -278,5 +397,25 @@ game     = setReady(game, 'test3', true);
 game     = init(game);
 game     = giveVisionsToMedium(game, game.mediums[0].id, [game.ghost.hand[0], game.ghost.hand[5], game.ghost.hand[1]]);
 */
+
+let a = require('./game.js');
+
+let game = createGame()
+
+game = a.join(game, 'test1');
+game = a.join(game, 'test2');
+game = a.join(game, 'test3');
+game = a.setReady(game, 'test1', true);
+game = a.setReady(game, 'test2', true);
+game = a.setReady(game, 'test3', true);
+
+
+game = a.init(game)
+
+// game = play(game, 'test3', '12.png');
+
+console.log(a.getPlayerState(game, 'test3'));
+
+
 
 /*game     = play(game, 'test1', '25.png');*/

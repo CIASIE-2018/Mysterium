@@ -6,6 +6,12 @@ class MaxPlayerReachedError extends Error{
     }
 }
 
+class PlayerDoesNotExistError extends Error{
+    constructor(){
+        super('Le joueur n\'existe pas')
+    }
+}
+
 class PlayerAlreadyInGameError  extends Error{
     constructor(){
         super('Vous êtes déjà dans la parti')
@@ -30,10 +36,18 @@ class GameAlreadyStarted extends Error{
     }
 }
 
+class ChosenCardError extends Error{
+    constructor(message){
+        super(message)
+    }
+}
+
 module.exports = {
     PlayerAlreadyInGameError,
     MaxPlayerReachedError,
     NotEnoughPlayerError,
-    NotAllAreReady,
+    NotAllAreReady ,
+    PlayerDoesNotExistError,
+    ChosenCardError,
     GameAlreadyStarted
 }
