@@ -33,7 +33,7 @@ router.post('/salon', (req, res) => {
     let player = game.players.find(player => player.id === req.body.id);
     if(player != undefined){
         game = setReady(game, player.id, !player.ready);
-        if(game.players.length >= 2 && allIsReady(game)){
+        if(game.players.length >= 3 && allIsReady(game)){
             game = init(game);
             req.app.io.sockets.emit('allIsReady');
         }else{
