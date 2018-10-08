@@ -156,8 +156,11 @@ function getPlayerState(baseGame, playerId) {
     if(player.id !== playerId)
         player = baseGame.mediums.find(player => player.id == playerId)
      let state  = {
-        turn : baseGame.turn,
-        id   : player.id,
+        turn   : baseGame.turn,
+        id     : player.id,
+        persos : baseGame.persos,
+        lieux  : baseGame.lieux,
+        armes  : baseGame.armes,
     };
      //verifie si le joueur existe
     if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
@@ -180,7 +183,7 @@ function getPlayerState(baseGame, playerId) {
         state.state        = player.state,
         state.visions      = player.visions,
         state.hasPlayed    = player.hasPlayed,
-        state.otherMediums = otherMediums
+        state.otherMediums = otherMediums,
     }
      return state;
 }
