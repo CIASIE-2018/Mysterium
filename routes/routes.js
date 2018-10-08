@@ -16,8 +16,11 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     let player_name = req.body.name;
+    console.log(player_name);
+    
     try{
         game = join(game, player_name);
+        
         let player = game.players.find(player => player.name === player_name);
         req.session.player = {
             id   : player.id,
@@ -32,6 +35,7 @@ router.post('/', (req, res) => {
 
 router.get('/salon', (req, res) => {
     let player = req.session.player;
+    
     res.render('salon', {
         players : game.players,
         me      : player.id
