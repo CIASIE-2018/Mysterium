@@ -115,40 +115,13 @@ function play(baseGame, playerId, chosenCard){
     
         //verifier que le personnage peut jouer
         if(!player.hasPlayed){
+            let type_carte = state == 0 ? 'persos' : (state == 1 ? 'lieux' : 'armes');
 
             //verifier l'etat d'avancement du joueur sur le plateau
-            switch(state){
-
-                //stade personnage
-                case 0:
-                    //verifier si la carte choisi est presente sur le plateau au stade des personnages
-                    if(baseGame.persos.find(perso => perso === chosenCard))
-                        canChoose = true;
-                    else
-                        throw new errors.ChosenCardError("La carte personnage choisis n'est pas sur le plateau")
-    
-                    break;
-
-                //stade lieux
-                case 1:
-                    //verifier si la carte choisi est presente sur le plateau au stade des lieux
-                    if(baseGame.lieux.find(lieu => lieu === chosenCard))
-                        canChoose = true;             
-                    else
-                        throw new errors.ChosenCardError("La carte lieu choisis n'est pas sur le plateau")
-    
-                    break;
-
-                //stade armes
-                case 2:
-                    //verifier si la carte choisi est presente sur le plateau au stade des armes
-                    if(baseGame.armes.find(arme => arme === chosenCard))
-                        canChoose = true;  
-                    else
-                        throw new errors.ChosenCardError("La carte arme choisis n'est pas sur le plateau")
-                        
-                    break;
-            }
+            if(baseGame[type_carte].find(perso => perso === chosenCard))
+                canChoose = true;
+            else
+                throw new errors.ChosenCardError(`La carte ${type_carte} choisis n'est pas sur le plateau`);
         }
     //si le joueur est un fantome
     }else{
@@ -204,7 +177,6 @@ function getPlayerState(baseGame, playerId) {
         state.state        = player.state,
         state.visions      = player.visions,
         state.hasPlayed    = player.hasPlayed,
-        state.scenario     = player.scenario,
         state.otherMediums = otherMediums
     }
      return state;
@@ -378,39 +350,3 @@ function canPlay(baseGame, playerId){
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
     }
 }
-
-
-/*
-let game = createGame();
-game     = join(game, 'test1');
-game     = join(game, 'test2');
-game     = join(game, 'test3');
-game     = setReady(game, 'test1', true);
-game     = setReady(game, 'test2', true);
-game     = setReady(game, 'test3', true);
-game     = init(game);
-game     = giveVisionsToMedium(game, game.mediums[0].id, [game.ghost.hand[0], game.ghost.hand[5], game.ghost.hand[1]]);
-*/
-
-/*game     = play(game, 'test1', '25.png');*/
-let a = require('./game.js');
-
-let game = createGame()
-
-game = a.join(game, 'test1');
-game = a.join(game, 'test2');
-game = a.join(game, 'test3');
-game = a.setReady(game, 'test1', true);
-game = a.setReady(game, 'test2', true);
-game = a.setReady(game, 'test3', true);
-
-
-game = a.init(game)
-
-// game = play(game, 'test3', '12.png');
-
-console.log(a.getPlayerState(game, 'test3'));
-
-
-
-/*game     = play(game, 'test1', '25.png');*/

@@ -48,10 +48,6 @@ module.exports = {
     NotEnoughPlayerError,
     NotAllAreReady ,
     PlayerDoesNotExistError,
-<<<<<<< HEAD
-    ChosenCardError
-=======
     ChosenCardError,
     GameAlreadyStarted
->>>>>>> e08067ad53f1a66b2184d3e4f39365a6c91de8db
 }
