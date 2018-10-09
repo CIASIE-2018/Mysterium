@@ -249,7 +249,7 @@ module.exports = {
     allIsReady,
     play,
     giveVisionsToMedium,
-    getPlayerState
+    getInformations
 }
 
 /** PRIVATE FUNCTIONS */

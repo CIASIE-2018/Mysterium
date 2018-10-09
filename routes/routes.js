@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const { createGame, init, join, setReady, allIsReady, getPlayerState } = require('../game/game');
+const { createGame, init, join, setReady, allIsReady, getInformations } = require('../game/game');
 
 
 
@@ -57,16 +57,9 @@ router.post('/salon', (req, res) => {
 });
 
 router.get('/game', (req, res) => {
-    let player = game.players.find(player => player.id === req.session.player.id);
-
-    if(player != undefined){
-        let state_player = getPlayerState(game,  player.id)
-        res.render('game', {
-            state_player
-        });
-    }else
-        res.redirect('/erreur');
-
+    res.render('game', {
+        infos : getInformations(game,  req.session.player.id);
+    });
 });
 
 module.exports = router;
