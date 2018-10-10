@@ -32,7 +32,6 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
  */
 
 function join(baseGame, playerName) {
-    console.log(playerName);
     
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
@@ -148,41 +147,60 @@ function play(baseGame, playerId, chosenCard){
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
  */
-function getPlayerState(baseGame, playerId) {
-    
-    //fantome
-    let player = baseGame.ghost
-     //medium
-    if(player.id !== playerId)
-        player = baseGame.mediums.find(player => player.id == playerId)
-     let state  = {
-        turn : baseGame.turn,
-        id   : player.id,
-    };
-     //verifie si le joueur existe
-    if(baseGame.ghost.id !== playerId && baseGame.mediums.find(player => player.id === playerId ) === undefined)
-        throw new errors.PlayerDoesNotExistError();
-     if(player === baseGame.ghost){
-            state.hand             = player.hand,
-            state.mediumsHasCards  = player.mediumsHasCards,
-            state.otherMediums     = baseGame.mediums
+function getInformations(baseGame, playerId) {
+
+    let player         = null;
+    let playerIsGhost  = false;
+    if(baseGame.ghost.id === playerId){
+        playerIsGhost = true;
+        player = baseGame.ghost;
+    }else
+        player =  baseGame.mediums.find(player => player.id == playerId);
+
+    if(player != null){
+
+        let infosPlayer = {
+            type : playerIsGhost ? 'ghost' : 'medium',
+            turn : baseGame.turn
+        };
+
+        infosPlayer.mediums = baseGame.mediums.map(medium => {
+            
+            let state = {
+                name             : medium.name,
+                hasPlayed        : medium.hasPlayed,
+                state            : medium.state,
+                initial          : medium.name.slice(0,2),
+                hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id)
+            };
+
+            if(playerIsGhost){
+                let cardType = medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme' );
+                state.card   = medium.scenario[cardType];
+            }
+
+            return state;
+        });
+
+        if(playerIsGhost){
+            infosPlayer.hand   = player.hand;
+            infosPlayer.persos = baseGame.persos;
+            infosPlayer.lieux  = baseGame.lieux;
+            infosPlayer.armes  = baseGame.armes;
+            
+        }else{
+            infosPlayer.visions = player.visions
+            let cardType = player.state == 0 ? 'persos' : (player.state == 1 ? 'lieux' : 'armes' );
+            infosPlayer.cards = baseGame[cardType];
+        }
+
+        return infosPlayer;
     }else{
-        let players      = baseGame.mediums.filter(player => player.id !== playerId);
-        let otherMediums = [];
-         players.forEach(player => {
-            otherMediums.push({
-                id        : player.id,
-                state     : player.state,
-                hasPlayed : player.hasPlayed
-            })
-        })
-        
-        state.state        = player.state,
-        state.visions      = player.visions,
-        state.hasPlayed    = player.hasPlayed,
-        state.otherMediums = otherMediums
+        throw new errors.PlayerAlreadyInGameError();
     }
-     return state;
+
+
+
 }
 
 /**
@@ -231,7 +249,7 @@ module.exports = {
     allIsReady,
     play,
     giveVisionsToMedium,
-    getPlayerState
+    getInformations
 }
 
 /** PRIVATE FUNCTIONS */
@@ -256,12 +274,14 @@ function initRoles(baseGame) {
         draftGame.players.forEach((player, i) => {
             if(aleaGhost === i){
                 draftGame.ghost = {
+                    name            : player.name,
                     id              : player.id,
                     hand            : [],
                     mediumsHasCards : []
                 };
             }else{
                 draftGame.mediums.push({
+                    name      : player.name,
                     id        : player.id,
                     state     : 0,
                     visions   : [],
@@ -353,3 +373,22 @@ function canPlay(baseGame, playerId){
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
     }
 }
+
+
+let a = require('./game.js');
+
+let game = createGame()
+
+game = a.join(game, 'test1');
+game = a.join(game, 'test2');
+game = a.join(game, 'test3');
+game = a.setReady(game, game.players[0].id, true);
+game = a.setReady(game, game.players[1].id, true);
+game = a.setReady(game, game.players[2].id, true);
+
+
+game = a.init(game)
+
+// game = play(game, 'test3', '12.png');
+
+console.log(a.getInformations(game, game.mediums[1].id));
