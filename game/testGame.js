@@ -1,7 +1,6 @@
-let helpers                            = require('../helpers');
-let uniqid                             = require('uniqid');
-let errors                             = require('./Error');
-let {assert, expect}                   = require('chai');
+let fs                                             = require('fs');
+let errors                                         = require('./Error');
+let {assert, expect}                               = require('chai');
 let {join, createGame, init, setReady, allIsReady} = require('./game')
 
 beforeEach(function(){
@@ -125,16 +124,16 @@ describe('Mettre son statut a prêt', function () {
 
     });
 });
-/*
+
 describe('test au commencement d\'une partie', function () {
 
     beforeEach(function(){
         newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         for(i = 2; i < 8; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+            newGame = setReady(newGame, newGame.players[i-1].id, true);
         }
         startedGame = init(newGame);
     });
@@ -147,8 +146,7 @@ describe('test au commencement d\'une partie', function () {
     });
 
     it('il n\'y a qu\'un seul fantôme', function () {
-        //Il ne peut pas il y avoir plusieurs ghost ?
-        // game.ghost n'est pas un tableau
+
     });
 
     it('il y a le bon nombre de medium', function () {
@@ -240,14 +238,13 @@ describe('test au commencement d\'une partie', function () {
     it('cartes visions correctement chargées ', function () {
         let nbCartesVisionsFantomes = startedGame.ghost.hand.length;
         let nbCcartesVisions = startedGame.visions.length;
-        let nbTotalVisions   = helpers.getRandomFiles(config.directory.images + '/visions');
+        let nbTotalVisions   = fs.readdirSync(__dirname + '/../public/images/visions').length;
         for(var i = 0; i < nbCartesVisionsFantomes; i++) {
             assert.equal(startedGame.visions.includes(startedGame.ghost.hand[i]), false);
         }
-
-        assert.equal(nbCartesVisionsFantomes+nbCcartesVisions, vnbTotalVisions);
+        assert.equal(nbCartesVisionsFantomes+nbCcartesVisions, nbTotalVisions);
     });
-});*/
+});
 
 describe('tests fonctionnalités InGame', function () {
     
