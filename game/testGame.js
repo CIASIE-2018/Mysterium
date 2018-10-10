@@ -58,15 +58,15 @@ describe('Rejoindre une partie', function(){
 });
 
 
-/*
+
 describe('Lancer une partie', function(){
 
     it('impossible lorsqu\'une personne n\'est pas pret', function(){
         let newGame = join(this.game, 'joueur1');
-        for(i = 2; i < 8; i++){
-            idJoueur = 'joueur' + i;
-            newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+        for(i = 2; i < 8; i++) {
+            nomJoueur = 'joueur' + i;
+            newGame = join(newGame, nomJoueur);
+            newGame = setReady(newGame, newGame.players[i - 1].id, true);
         }
         expect(function(){
             init(newGame);
@@ -75,9 +75,9 @@ describe('Lancer une partie', function(){
 
     it('impossible lorsque le nombre de joueur <= 2', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         newGame = join(newGame, 'joueur2');
-        newGame = setReady(newGame, 'joueur2', true);
+        newGame = setReady(newGame, newGame.players[1].id, true);
         assert.equal(newGame.players.length, 2);
         expect(function(){
             init(newGame);
@@ -86,17 +86,17 @@ describe('Lancer une partie', function(){
 
     it('lorsque tout le monde est pret et le nb de joueur > 2', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         for(i = 2; i < 5; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+            newGame = setReady(newGame, newGame.players[i-1].id, true);
         }
         startedGame = init(newGame);
         assert.equal(startedGame.started, true);
     });
 });
-
+/*
 describe('Mettre son statut a prêt', function () {
     it('Se mettre prêt', function () {
         let newGame = join(this.game, 'joueur1');
