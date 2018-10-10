@@ -12,15 +12,13 @@ describe('Rejoindre une partie', function(){
     it('lorsque tout est ok', function(){
         let newGame = join(this.game, 'joueur1');
         assert.equal(newGame.players.length, 1);
-        assert.equal(newGame.players[0].id, 'joueur1');
     });
     it('lorsque la partie est lancée', function(){
-        this.game.started = true;
         let newGame = this.game;
+        newGame.started = true;
         expect(function(){
             join(newGame, 'joueur1');
         }).to.throw(errors.GameAlreadyStarted);
-
 
     });
     it('lorsqu\'on est deja dans la partie', function(){
@@ -32,9 +30,8 @@ describe('Rejoindre une partie', function(){
     it('lorsque la partie est pleine et non lancée', function(){
         let newGame = join(this.game, 'joueur1');
         for(i = 2; i < 8; i++){
-            idJoueur = 'joueur' + i;
-            newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+            nomJoueur = 'joueur' + i;
+            newGame = join(newGame, nomJoueur);
         }
         assert.equal(newGame.players.length, newGame.max_player);
         assert.equal(newGame.started, false);
@@ -45,13 +42,12 @@ describe('Rejoindre une partie', function(){
 
     it('lorsque la partie est lancée', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
-        for(i = 2; i < 4; i++){
-            idJoueur = 'joueur' + i;
-            newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
+        for(i = 2; i < 8; i++) {
+            nomJoueur = 'joueur' + i;
+            newGame = join(newGame, nomJoueur);
+            newGame = setReady(newGame, newGame.players[i - 1].id, true);
         }
-
         let startedGame = init(newGame);
         assert.equal(startedGame.started, true);
         expect(function(){
@@ -62,7 +58,7 @@ describe('Rejoindre une partie', function(){
 });
 
 
-
+/*
 describe('Lancer une partie', function(){
 
     it('impossible lorsqu\'une personne n\'est pas pret', function(){
@@ -244,12 +240,14 @@ describe('test au commencement d\'une partie', function () {
     it('cartes visions correctement chargées ', function () {
         let nbCartesVisionsFantomes = startedGame.ghost.hand.length;
         let nbCcartesVisions = startedGame.visions.length;
+        let nbTotalVisions   = helpers.getRandomFiles(config.directory.images + '/visions');
         for(var i = 0; i < nbCartesVisionsFantomes; i++) {
             assert.equal(startedGame.visions.includes(startedGame.ghost.hand[i]), false);
         }
-        assert.equal(nbCartesVisionsFantomes+nbCcartesVisions, 90);
+
+        assert.equal(nbCartesVisionsFantomes+nbCcartesVisions, vnbTotalVisions);
     });
-});
+});*/
 
 describe('tests fonctionnalités InGame', function () {
     
