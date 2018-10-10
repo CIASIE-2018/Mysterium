@@ -96,19 +96,19 @@ describe('Lancer une partie', function(){
         assert.equal(startedGame.started, true);
     });
 });
-/*
+
 describe('Mettre son statut a prêt', function () {
     it('Se mettre prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         assert.equal(newGame.players[0].ready, true);
     });
 
     it('Changer de prêt à pas prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         assert.equal(newGame.players[0].ready, true);
-        newGame = setReady(newGame, 'joueur1', false); //faire une méthode switchReady() ?
+        newGame = setReady(newGame, newGame.players[0].id, false);
         assert.equal(newGame.players[0].ready, false);
     });
 
@@ -117,15 +117,15 @@ describe('Mettre son statut a prêt', function () {
         for(i = 2; i < 8; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, idJoueur, true);
+            newGame = setReady(newGame, newGame.players[i-1].id, true);
         }
         assert.equal(allIsReady(newGame), false);
-        newGame = setReady(newGame, 'joueur1', true);
+        newGame = setReady(newGame, newGame.players[0].id, true);
         assert.equal(allIsReady(newGame), true);
 
     });
 });
-
+/*
 describe('test au commencement d\'une partie', function () {
 
     beforeEach(function(){
