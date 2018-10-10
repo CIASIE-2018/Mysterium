@@ -6,6 +6,7 @@ const twig       = require('twig');
 const server     = require('http').createServer(app);
 const io         = require('socket.io').listen(server);
 
+<<<<<<< HEAD
 const bodyParser = require('body-parser');
 
 const session    = require('express-session');
@@ -24,6 +25,14 @@ mongoose.connect('mongodb://localhost/loginapp', {
 });
 /*****************************/
 
+=======
+const uniqid       = require('uniqid');
+const moment       = require('moment');
+const session      = require('express-session');
+
+const bodyParser = require('body-parser')
+ 
+>>>>>>> ajout des events sockets du chat côté serveur
 app.io = io;
 
 /***** VIEW CONFIGURATION *****/
@@ -45,6 +54,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
+<<<<<<< HEAD
 
 
 app.use(passport.initialize());
@@ -83,6 +93,12 @@ app.use(function (req, res, next) {
     req.isAuthenticated() ? next() : res.redirect('/login');
   }, require('./routes/gameRouter'));
 
+=======
+app.use('/', require('./routes/routes'));
+app.use(session({
+    secret : 'Mysterium 2018'
+}));
+>>>>>>> ajout des events sockets du chat côté serveur
 /*******************/
 
 
@@ -92,8 +108,41 @@ server.listen(config.app.port, () => {
 
 
 /***** WEBSOCKETS SOCKET.IO *****/
-io.sockets.on('connection', socket => {
-    console.log(`connection ${socket.id} on a une connection au server`);
+io.sockets.on('connection', (socket) => {
+    console.log('Nouvelle utilisateur connecté')
+
+    let usr = {};
+
+    socket.on('chat message', (data) => {
+        let msg_time = moment().format('HH:mm:ss');
+        
+        let msg = {
+            id      : msg_time,
+            content : moment(msg_time,moment.HTML5_FMT.TIME).format('HH:mm')+"  <span class='pseudo'>"+data.author +"</span>  :   "+ data.msg_content
+        }
+        io.emit('chat message',msg.content);
+        messages[msg.id] = msg;
+    });
+
+    //chaque socket declenchant l'ev nouvel utilisateur se verra attribuer un pseudo
+    socket.on('nouvel utilisateur', (pseudo) => {
+        usr.name = pseudo;
+        usr.id = uniqid();
+        users[usr.id] = usr;
+        
+        if(Object.keys(messages).length > 0){
+            for(let m in messages){
+                socket.emit('chat message', messages[m].content);
+            }
+        }
+        socket.emit('bienvenue', "Vous entrez dans le salon de chat sous le nom <span class='pseudo'>" + usr.name + "</span>");
+        socket.broadcast.emit('bienvenue', "<span class='pseudo'>"+usr.name +"</span> entre dans le salon de chat")
+    });
+
+    socket.on('disconnect',() => {
+        console.log("----------------------------------------");
+        socket.disconnect(true);
+    })
 });
 /********************************/
 
