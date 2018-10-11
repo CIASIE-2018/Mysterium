@@ -146,7 +146,7 @@ describe('test au commencement d\'une partie', function () {
     });
 
     it('il n\'y a qu\'un seul fantôme', function () {
-
+        assert.equal(startedGame.ghost != undefined, true);
     });
 
     it('il y a le bon nombre de medium', function () {
