@@ -8,12 +8,17 @@ beforeEach(function(){
 });
 
 describe('Rejoindre une partie', function(){
+
+    beforeEach(function(){
+        newGame = this.game;
+    });
+
     it('lorsque tout est ok', function(){
-        let newGame = join(this.game, 'joueur1');
+        newGame = join(this.game, 'joueur1');
         assert.equal(newGame.players.length, 1);
     });
+
     it('lorsque la partie est lancée', function(){
-        let newGame = this.game;
         newGame.started = true;
         expect(function(){
             join(newGame, 'joueur1');
@@ -21,14 +26,13 @@ describe('Rejoindre une partie', function(){
 
     });
     it('lorsqu\'on est deja dans la partie', function(){
-        let newGame = join(this.game, 'joueur1');
+        newGame = join(newGame, 'joueur1');
         expect(function(){
             join(newGame, 'joueur1');
         }).to.throw(errors.PlayerAlreadyInGameError);
     });
     it('lorsque la partie est pleine et non lancée', function(){
-        let newGame = join(this.game, 'joueur1');
-        for(i = 2; i < 8; i++){
+        for(i = 1; i < 8; i++){
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
         }
@@ -40,9 +44,7 @@ describe('Rejoindre une partie', function(){
     });
 
     it('lorsque la partie est lancée', function(){
-        let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
-        for(i = 2; i < 8; i++) {
+        for(i = 1; i < 4; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
             newGame = setReady(newGame, newGame.players[i - 1].id, true);
@@ -61,11 +63,11 @@ describe('Rejoindre une partie', function(){
 describe('Lancer une partie', function(){
 
     it('impossible lorsqu\'une personne n\'est pas pret', function(){
-        let newGame = join(this.game, 'joueur1');
-        for(i = 2; i < 8; i++) {
+        let newGame = this.game;
+        for(i = 1; i < 8; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
         }
         expect(function(){
             init(newGame);
@@ -84,12 +86,11 @@ describe('Lancer une partie', function(){
     });
 
     it('lorsque tout le monde est pret et le nb de joueur > 2', function(){
-        let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
-        for(i = 2; i < 5; i++){
-            idJoueur = 'joueur' + i;
-            newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, newGame.players[i-1].id, true);
+        let newGame = this.game;
+        for(i = 1; i < 5; i++) {
+            nomJoueur = 'joueur' + i;
+            newGame = join(newGame, nomJoueur);
+            newGame = setReady(newGame, newGame.players[i - 1].id, true);
         }
         startedGame = init(newGame);
         assert.equal(startedGame.started, true);
@@ -112,11 +113,11 @@ describe('Mettre son statut a prêt', function () {
     });
 
     it('Tout le monde est prêt ', function () {
-        let newGame = join(this.game, 'joueur1');
-        for(i = 2; i < 8; i++){
-            idJoueur = 'joueur' + i;
-            newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, newGame.players[i-1].id, true);
+        let newGame = this.game;
+        for(i = 1; i < 8; i++) {
+            nomJoueur = 'joueur' + i;
+            newGame = join(newGame, nomJoueur);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
         }
         assert.equal(allIsReady(newGame), false);
         newGame = setReady(newGame, newGame.players[0].id, true);
