@@ -1,0 +1,21 @@
+{% extends "layouts/master.twig" %}
+
+{% block content %}
+    <div class="login">
+      <h2 class="login-header">Account Login</h2>
+      <form class="login-form" method="post" action="/login">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" class="form-control" name="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn">Se connecter</button>
+      </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
