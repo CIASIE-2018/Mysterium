@@ -8,8 +8,23 @@ const io         = require('socket.io').listen(server);
 
 const bodyParser = require('body-parser');
 
-const session = require('express-session');
- 
+const session    = require('express-session');
+
+const path             = require('path');
+const cookieParser     = require('cookie-parser');
+const expressValidator = require('express-validator');
+const flash            = require('connect-flash');
+const passport         = require('passport');
+const LocalStrategy    = require('passport-local').Strategy;
+const mongo            = require('mongodb');
+const mongoose         = require('mongoose');
+
+
+/***** MONGODB *****/
+mongoose.connect('mongodb://localhost/loginapp');
+const db = mongoose.connection;
+/*****************************/
+
 app.io = io;
 
 /***** VIEW CONFIGURATION *****/
@@ -22,13 +37,51 @@ if(config.app.mode == 'dev')
 
 
 /***** MIDDLEWARES *****/
-app.use(session({ secret: 'mysterium2018'}))
+app.use(session({
+    secret: 'mysterium2018',
+    saveUninitialized: true,
+    resave: true
+}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(expressValidator({
+    errorFormatter: function(param, msg, value) {
+        let namespace = param.split('.')
+        , root    = namespace.shift()
+        , formParam = root;
+  
+      while(namespace.length) {
+        formParam += '[' + namespace.shift() + ']';
+      }
+      return {
+        param : formParam,
+        msg   : msg,
+        value : value
+      };
+    }
+}));
+
+app.use(flash());
+
+app.use(function (req, res, next) {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
+    next();
+  });
+
 app.use('/', require('./routes/routes'));
 
 /*******************/
+
 
 server.listen(config.app.port, () => {
     console.log(`Server run on port ${config.app.port}`);
