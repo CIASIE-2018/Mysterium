@@ -78,7 +78,8 @@ app.use(function (req, res, next) {
     next();
   });
 
-app.use('/', require('./routes/routes'));
+  app.use('/', require('./routes/userRouter'));
+  app.use('/', require('./routes/gameRouter'));
 
 /*******************/
 
