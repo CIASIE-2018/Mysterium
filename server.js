@@ -79,7 +79,10 @@ app.use(function (req, res, next) {
   });
 
   app.use('/', require('./routes/userRouter'));
-  app.use('/', require('./routes/gameRouter'));
+
+  app.use('/', (req, res, next) => {
+    req.isAuthenticated() ? next() : res.redirect('/login');
+  }, require('./routes/gameRouter'));
 
 /*******************/
 
