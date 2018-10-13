@@ -10,13 +10,10 @@ const bodyParser = require('body-parser');
 
 const session    = require('express-session');
 
-const path             = require('path');
 const cookieParser     = require('cookie-parser');
 const expressValidator = require('express-validator');
 const flash            = require('connect-flash');
 const passport         = require('passport');
-const LocalStrategy    = require('passport-local').Strategy;
-const mongo            = require('mongodb');
 const mongoose         = require('mongoose');
 
 
@@ -25,7 +22,6 @@ mongoose.connect('mongodb://localhost/loginapp', {
     useCreateIndex: true,
     useNewUrlParser: true
 });
-const db = mongoose.connection;
 /*****************************/
 
 app.io = io;
