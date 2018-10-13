@@ -32,5 +32,16 @@
             border: 1px solid gray;
         }
     }
+
+    &-btns{
+        a{
+            color: white;
+            text-decoration: none;
+
+            &:hover{
+                color: cyan;
+            }
+        }
+    }
     
 }
