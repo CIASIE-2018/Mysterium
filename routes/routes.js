@@ -20,16 +20,11 @@ router.get('/register', function (req, res) {
 });
 
 router.post('/register', function (req, res) {
-	let name = req.body.name;
-	let email = req.body.email;
 	let username = req.body.username;
 	let password = req.body.password;
 	let password2 = req.body.password2;
 
 	// Validation
-	req.checkBody('name', 'Name is required').notEmpty();
-	req.checkBody('email', 'Email is required').notEmpty();
-	req.checkBody('email', 'Email is not valid').isEmail();
 	req.checkBody('username', 'Username is required').notEmpty();
 	req.checkBody('password', 'Password is required').notEmpty();
 	req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
@@ -42,23 +37,20 @@ router.post('/register', function (req, res) {
 		});
 	}
 	else {
-		//checking for email and username are already taken
-		User.findOne({ username: { 
-			"$regex": "^" + username + "\\b", "$options": "i"
-	}}, function (err, user) {
-			User.findOne({ email: { 
-				"$regex": "^" + email + "\\b", "$options": "i"
-		}}, function (err, mail) {
-				if (user || mail) {
+		//checking username are already taken
+		User.findOne(
+            { 
+                username: { 
+			        "$regex": "^" + username + "\\b", "$options": "i"
+                }
+            }, function (err, user) {
+                if (user) {
 					res.render('register', {
 						user: user,
-						mail: mail
 					});
 				}
 				else {
 					let newUser = new User({
-						name: name,
-						email: email,
 						username: username,
 						password: password
 					});
@@ -68,7 +60,6 @@ router.post('/register', function (req, res) {
          	req.flash('success_msg', 'You are registered and can now login');
 					res.redirect('/login');
 				}
-			});
 		});
 	}
 });
