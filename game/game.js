@@ -373,22 +373,3 @@ function canPlay(baseGame, playerId){
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
     }
 }
-
-
-let a = require('./game.js');
-
-let game = createGame()
-
-game = a.join(game, 'test1');
-game = a.join(game, 'test2');
-game = a.join(game, 'test3');
-game = a.setReady(game, game.players[0].id, true);
-game = a.setReady(game, game.players[1].id, true);
-game = a.setReady(game, game.players[2].id, true);
-
-
-game = a.init(game)
-
-// game = play(game, 'test3', '12.png');
-
-console.log(a.getInformations(game, game.mediums[1].id));

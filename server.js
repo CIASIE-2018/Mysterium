@@ -10,19 +10,18 @@ const bodyParser = require('body-parser');
 
 const session    = require('express-session');
 
-const path             = require('path');
 const cookieParser     = require('cookie-parser');
 const expressValidator = require('express-validator');
 const flash            = require('connect-flash');
 const passport         = require('passport');
-const LocalStrategy    = require('passport-local').Strategy;
-const mongo            = require('mongodb');
 const mongoose         = require('mongoose');
 
 
 /***** MONGODB *****/
-mongoose.connect('mongodb://localhost/loginapp');
-const db = mongoose.connection;
+mongoose.connect('mongodb://localhost/loginapp', {
+    useCreateIndex: true,
+    useNewUrlParser: true
+});
 /*****************************/
 
 app.io = io;
@@ -78,7 +77,11 @@ app.use(function (req, res, next) {
     next();
   });
 
-app.use('/', require('./routes/routes'));
+  app.use('/', require('./routes/userRouter'));
+
+  app.use('/', (req, res, next) => {
+    req.isAuthenticated() ? next() : res.redirect('/login');
+  }, require('./routes/gameRouter'));
 
 /*******************/
 
