@@ -21,7 +21,10 @@ const mongoose         = require('mongoose');
 
 
 /***** MONGODB *****/
-mongoose.connect('mongodb://localhost/loginapp');
+mongoose.connect('mongodb://localhost/loginapp', {
+    useCreateIndex: true,
+    useNewUrlParser: true
+});
 const db = mongoose.connection;
 /*****************************/
 
