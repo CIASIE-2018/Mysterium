@@ -6,6 +6,9 @@ const twig       = require('twig');
 const server     = require('http').createServer(app);
 const io         = require('socket.io').listen(server);
 
+const uniqid       = require('uniqid');
+const moment       = require('moment');
+ 
 const bodyParser = require('body-parser');
 
 const session    = require('express-session');
@@ -24,9 +27,6 @@ mongoose.connect('mongodb://localhost/loginapp', {
 });
 /*****************************/
 
-const uniqid       = require('uniqid');
-const moment       = require('moment');
- 
 app.io = io;
 
 /***** VIEW CONFIGURATION *****/
@@ -48,7 +48,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
-
 
 app.use(passport.initialize());
 app.use(passport.session());
