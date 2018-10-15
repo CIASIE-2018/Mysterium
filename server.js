@@ -6,14 +6,9 @@ const twig       = require('twig');
 const server     = require('http').createServer(app);
 const io         = require('socket.io').listen(server);
 
-<<<<<<< HEAD
 const uniqid       = require('uniqid');
 const moment       = require('moment');
-const session      = require('express-session');
-
-const bodyParser = require('body-parser')
  
-=======
 const bodyParser = require('body-parser');
 
 const session    = require('express-session');
@@ -32,7 +27,6 @@ mongoose.connect('mongodb://localhost/loginapp', {
 });
 /*****************************/
 
->>>>>>> master
 app.io = io;
 
 /***** VIEW CONFIGURATION *****/
@@ -54,13 +48,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
-<<<<<<< HEAD
-app.use('/', require('./routes/routes'));
-app.use(session({
-    secret : 'Mysterium 2018'
-}));
-=======
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -98,7 +85,6 @@ app.use(function (req, res, next) {
     req.isAuthenticated() ? next() : res.redirect('/login');
   }, require('./routes/gameRouter'));
 
->>>>>>> master
 /*******************/
 
 
