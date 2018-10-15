@@ -11,18 +11,6 @@ A partir des rêves qu’ils vont recevoir, les Médiums devront recréer les é
 
 Mais le temps joue contre eux ; le propriétaire des lieux ne leur a donné que 7 jours pour percer le mystère...
 
-## Matériel de Jeu :
-
-84 cartes **Rêve**
-58 cartes **Médium**  : 20 Objets, 19 Lieux et 19 Personnages
-58 cartes **Fantôme** : 20 Objets, 19 Lieux et 19 Personnages
-
-Dans chacune des 6 couleurs (vert, rouge, bleu, jaune, noir et blanc) : 1 plaquette Médium, 1 jeton Horloge et 2 marqueurs Médium 1 plateau Calendrier et son marqueur Jour (couleur bois) servant de compte-tour
-
-## Mise en Place :
-
-Les joueurs s’accordent pour déterminer qui va jouer le Fantôme. Tous les autres joueurs incarneront chacun un Médium. Il est conseillé que les Médiums s’installent tous face au Fantôme.
-
 ## 1. Les Médiums
 
 Chaque Médium choisit 1 plaquette Médium qu’il place devant lui et prend le jeton Horloge
@@ -42,36 +30,7 @@ _NB : Pour une première partie, il est vivement conseillé de jouer en mode Fac
 Il est déconseillé de jouer en mode difficile ou très difficile à plus de 5 joueurs.
 Les règles spécifiques pour 2 joueurs sont expliquées à la fin de ces règles._
 
-```
-Le Médium place les cartes ainsi
-piochées, faces visibles, au centre de la
-table. Il prend soin de mettre les Objets
-en haut, les Lieux au centre et les
-Personnages en bas (voir ci-contre).
-```
-```
-Sous la grille ainsi constituée, il place le
-plateau Calendrier et pose le marqueur
-Jour sur la case 1 (lundi).
-```
-```
-Les cartes Médium restantes sont
-remise dans la boite et ne serviront plus
-pour cette partie.
-```
-```
-Exemple : Dans une partie à 4 joueurs
-et en niveau Facile, piochez au hasard
-6 cartes de chaque type et placez-les
-comme indiqué sur l’illustration ci-
-contre.
-```
-```
-Exemple 2 : Dans une partie à 5
-joueurs, en niveau Difficile, il faudrait
-p i o c h e r 9 O b j e t s , 9 L i e u x e t 9
-Personnages et les placer sur la table.
-```
+
 ### 2. Le Fantôme
 
 Le Fantôme prend les 58 cartes **Fantôme** (dos bleu). Il sort du paquet les mêmes cartes que
@@ -85,27 +44,6 @@ une carte devant chaque marqueur Médium qu’il a devant lui.
 Il fait de même avec les cartes Lieux puis Objets. Il génère ainsi, pour chaque Médium, une pile de
 3 cartes faces cachées comportant la combinaison d’un Objet, d’un Lieu et d’un Personnage.
 
-```
-Facile Normal Difficile Très Difficile
-```
-```
-2 joueurs 4 5 6 7
-```
-```
-3 joueurs 5 6 7 8
-```
-```
-4 joueurs 6 7 8 9
-```
-```
-5 joueurs 7 8 9 10
-```
-```
-6 joueurs 8 9 10 11
-```
-```
-7 joueurs 9 9 11 12
-```
 #### Objets
 
 #### Lieux
@@ -113,9 +51,6 @@ Facile Normal Difficile Très Difficile
 #### Personnages
 
 
-```
-EXEMPLE DE MISE EN PLACE À 4 JOUEURS SOIT 1 FANTÔME ET 3 MÉDIUMS
-```
 Ces combinaisons sont la clé qui conduiront à la révélation du Coupable (Personnage), de l’endroit
 où s’est réellement déroulé le crime (Lieu) et de l’arme utilisée ou de la preuve qui pourra
 compromettre le Coupable (Objet).
@@ -182,17 +117,6 @@ former une nouvelle pioche.
 En fonction du niveau de difficulté de la partie, le Fantôme peut défausser toutes les cartes **Rêve**
 qu’il a en main et en piocher 7 nouvelles (voir le tableau ci-dessous).
 
-```
-Facile Normale Difficile Très Difficile
-```
-```
-1 fois par tour 3 fois par partie 1 fois par partie Impossible
-```
-```
-Exemple : pour faire deviner au joueur Rouge que la Corde est l’Objet caché sous
-son marqueur, le Fantôme pose devant lui ces 3 cartes Rêve où apparaissent :
-une corde à linge, une corde soutenant une trappe et une pelote de laine.
-```
 
 ### b. L’Oniromancie
 
@@ -218,17 +142,6 @@ cartes posées devant le Fantôme sont différentes, il y aura forcément des er
 Lorsque tous les Médiums ont placé leur marqueur sur une carte, on passe à l’étape des Signes
 Mystérieux.
 
-```
-Exemple : Au vu des 2 cartes Rêve que
-le Fantôme a placé devant lui, le
-Médium bleu décide de placer son
-marqueur sur l’Extincteur.
-```
-```
-Il pense que le château en flammes et
-que la torche tenue par le chevalier font
-référence à cet Objet.
-```
 
 ### c. Les Signes Mystérieux
 
