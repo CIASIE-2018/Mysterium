@@ -23,6 +23,9 @@
     gameSocket.on('reload', function(){
         window.location.reload();
     });
-    
+
+    gameSocket.on('start', function(){
+        window.location.href = '/game';
+    });
 </script>
 {% endblock %}
