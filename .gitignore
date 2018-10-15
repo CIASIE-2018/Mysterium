@@ -4,3 +4,4 @@ node_modules/
 mochawesome-report/
 .DS_Store
 .idea
+*.css
