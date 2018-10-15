@@ -3,11 +3,8 @@
 {% block content %}
     <ul>
         {% for player in players %}
-            <li style="color:white">{{ player.id }} | {{ player.ready ? "pret" : "pas pret" }}
-                <form method="post">
-                    <input type="hidden" name="id" value="{{ player.id }}">
-                    <input type="submit" value="se mettre pret">
-                </form>
+            <li style="color:{% if player.id == me %}red{% else %}white{% endif %}">{{ player.name }} | {{ player.ready ? "pret" : "pas pret" }}
+
             </li>
         {% endfor %}
     </ul>

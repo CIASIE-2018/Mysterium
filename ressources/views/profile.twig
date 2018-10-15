@@ -1,0 +1,17 @@
+{% extends "layouts/master.twig" %}
+
+{% block content %}
+    <div class="profile">
+        <h2 class="profile-header">Dashboard</h2>
+        <p>Welcome to your dashboard {{ user.username }} </p>  
+
+        <form method="post">
+            <input type="submit" value="Supprimer le compte">
+        </form>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

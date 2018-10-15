@@ -1,0 +1,37 @@
+{% extends "layouts/master.twig" %}
+
+{% block content %}
+
+	<div class="register">
+
+		<h2 class="register-header">Register</h2>
+		{% if user %}
+						<div class="alert alert-danger">Username has taken already try new</div> 
+		{% endif %}
+		{% if errors %}
+					{% for error in errors %}
+						<div class="alert alert-danger">{{error.msg}}</div>
+					{% endfor %}
+		{% endif %}
+		<form class="register-form" method="post" action="/register">
+			<div class="form-group">
+				<label>Username</label>
+				<input type="text" class="form-control" placeholder="Username" name="username">
+			</div>
+			<div class="form-group">
+				<label>Password</label>
+				<input type="password" class="form-control" placeholder="Password" name="password">
+			</div>
+			<div class="form-group">
+				<label>Confirm Password</label>
+				<input type="password" class="form-control" placeholder="Password" name="password2">
+			</div>
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+
+	</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
