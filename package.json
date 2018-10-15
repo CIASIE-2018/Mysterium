@@ -18,9 +18,7 @@
     "moment": "^2.22.2",
 >>>>>>> resolution d'un autre conflits
     "express-messages": "*",
-    "express-session": "^1.15.6",
     "express-validator": "*",
-    "immer": "^1.7.2",
     "mongodb": "*",
     "mongoose": "*",
     "passport": "*",
