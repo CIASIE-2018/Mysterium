@@ -359,33 +359,6 @@ Le Fantôme révèle le jeton Horloge qu’il avait sélectionné ; tous les jou
 - Si le marqueur Jour était déjà sur la case 7, la partie est perdue. Sinon, le marqueur Jour est
     avancé d’une case et un nouveau tour commence par une étape d’Oniromancie.
 
-```
-Exemple (suite) :
-To u s l e s M é d i u m s a y a n t
-découvert leur combinaison, on
-passe à la phase de Révélation
-du Coupable.
-```
-```
-Au vu de ses cartes Rêve , le
-Fantôme décide que les 3 cartes
-du Médium rouge seront celles
-désignant le Coupable.
-```
-```
-Pour prouver son choix, il place le
-jeton Horloge rouge dans sa main
-et remet les autres dans la boite.
-```
-```
-Enfin, il sélectionne 3 cartes Rêve
-dont une pile de livres pour
-é v o q u e r l ’ I n s t i t u t r i c e e t u n
-monocycle pour rappeler celui
-dessiné sur le Lieu.
-Le Fantôme mélange ces 3 cartes
-et les pose devant les Médiums.
-```
 
 NB : Durant ce nouveau tour, le Fantôme ne posera pas de cartes **Rêve** supplémentaires. Les
 Médiums devront faire un nouveau choix en se basant sur les 3 cartes déjà posées.
@@ -407,34 +380,4 @@ Le propriétaire, ne voyant toujours pas de résultat, décide de renvoyer les M
 compensation. Le Fantôme continuera de hanter les lieux jusqu’à ce qu’une nouvelle équipe
 parvienne à le libérer.
 
-## Variante pour 2 joueurs :
-
-A 2 joueurs, l’un incarne le Fantôme et l’autre joue le Médium.
-
-Le Médium joue avec 2 couleurs ; il reçoit donc 2 plaquettes et tous les jetons et marqueurs
-associés.
-Le Fantôme créé 2 combinaisons de cartes **Fantôme** Objet, Lieu et Personnage que le Médium
-devra découvrir.
-
-```
-Exemple (fin) :
-En désaccord, Rouge se place sur la
-combinaison du Cuisinier, tandis que Blanc et
-Bleu se placent sur celle de l’Institutrice.
-Comme il y a une majorité de joueurs sur une
-combinaison, on passe à l’étape de
-Désignation du Coupable.
-```
-```
-La majorité a désigné la bonne combinaison de
-cartes. Le Fantôme révèle le jeton Horloge
-rouge. Tous les joueurs ont gagné!
-```
-```
-Si la majorité avait voté pour le Cuisinier, cette
-combinaison aurait été retirée du jeu et un
-nouveau tour de vote aurait commencé...
-A condition que le marqueur Jour ne soit pas
-déjà sur la case 7!
-```
 
