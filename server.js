@@ -42,8 +42,6 @@ server.listen(config.app.port, () => {
 io.sockets.on('connection', (socket) => {
     console.log('Nouvelle utilisateur connecté')
 
-    let usr = {};
-
     socket.on('chat message', (data) => {
         let msg_time = moment().format('HH:mm:ss');
         
@@ -52,20 +50,26 @@ io.sockets.on('connection', (socket) => {
             content : moment(msg_time,moment.HTML5_FMT.TIME).format('HH:mm')+"  <span class='pseudo'>"+data.author +"</span>  :   "+ data.msg_content
         }
         io.emit('chat message',msg.content);
-        messages[msg.id] = msg;
+        if(!req.app.session.messages){
+            req.app.session.messages = {};
+        }
+        req.app.session.messages[msg.id] = msg;
     });
 
     //chaque socket declenchant l'ev nouvel utilisateur se verra attribuer un pseudo
-    socket.on('nouvel utilisateur', (pseudo) => {
-        usr.name = pseudo;
-        usr.id = uniqid();
-        users[usr.id] = usr;
+    socket.on('nouvel utilisateur', (player_id) => {
         
-        if(Object.keys(messages).length > 0){
+        if(!app.session.players){ // si il n'y a pas encore de joueurs, on crée lattribut pour la session
+            app.session.players = {};
+        }
+        app.session.players[player_id] = player_id;
+
+        
+        /**if(Object.keys(messages).length > 0){
             for(let m in messages){
                 socket.emit('chat message', messages[m].content);
             }
-        }
+        } */
         socket.emit('bienvenue', "Vous entrez dans le salon de chat sous le nom <span class='pseudo'>" + usr.name + "</span>");
         socket.broadcast.emit('bienvenue', "<span class='pseudo'>"+usr.name +"</span> entre dans le salon de chat")
     });

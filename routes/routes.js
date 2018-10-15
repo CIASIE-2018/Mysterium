@@ -17,6 +17,7 @@ router.post('/', (req, res) => {
     try{
         game = join(game, player_id); 
         req.app.io.sockets.emit('reload');
+        req.app.io.sockets.emit('nouvel utilisateur', player_id);
         res.redirect('/salon');
     }catch(e){
         res.redirect('/erreur');
