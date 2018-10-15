@@ -12,9 +12,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    let player_name = req.body.name;
-    console.log(player_name);
-    
+    let player_name = req.body.name;    
     try{
         game = join(game, player_name);
         
