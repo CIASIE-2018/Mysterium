@@ -22,7 +22,8 @@
         </div>
 {% endblock %}
 {% block scripts %}
-<script src="../../game/client_chat.js"></script
+<script>var username = {{user.username}}</script>
+<script src="../../game/client_chat.js"></script>
 <script>
     //let socketChat  = io('/chat');
 

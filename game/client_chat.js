@@ -5,7 +5,7 @@ $(function(){
         event.preventDefault();
         socket.emit("chat message",{// transmission du message avec son contenu et son auteur
             msg_content : $("#msg_writing").val(),
-            author : pseudo,
+            author : username,
         })
         $("#msg_writing").val('').focus();
         return false;
