@@ -24,7 +24,6 @@ mongoose.connect('mongodb://localhost/loginapp', {
 });
 /*****************************/
 
-app.io = io;
 
 /***** VIEW CONFIGURATION *****/
 app.set('views', __dirname + '/ressources/views');
@@ -81,7 +80,7 @@ app.use(function (req, res, next) {
 
   app.use('/', (req, res, next) => {
     req.isAuthenticated() ? next() : res.redirect('/login');
-  }, require('./routes/gameRouter'));
+  }, require('./routes/gameRouter')(io));
 
 /*******************/
 
@@ -89,12 +88,3 @@ app.use(function (req, res, next) {
 server.listen(config.app.port, () => {
     console.log(`Server run on port ${config.app.port}`);
 });
-
-
-/***** WEBSOCKETS SOCKET.IO *****/
-io.sockets.on('connection', socket => {
-    console.log(`connection ${socket.id}`);
-});
-/********************************/
-
-

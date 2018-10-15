@@ -16,12 +16,13 @@
 {% endblock %}
 {% block scripts %}
 <script>
-    let socket = io();
-    socket.on('reload', function(){
-        location.reload();
+    //let socketChat  = io('/chat');
+
+    let gameSocket = io('/game');
+    
+    gameSocket.on('reload', function(){
+        window.location.reload();
     });
-    socket.on('allIsReady', function(){
-        location.href = '/game';
-    })
+    
 </script>
 {% endblock %}
