@@ -28,15 +28,15 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
 /**
  * Ajoute un nouveau joueur au jeu
  * @param {object} baseGame Instance de jeu
- * @param {string} playerName Identifiant du nouveau joueur
+ * @param {string} username Identifiant du nouveau joueur
  */
 
-function join(baseGame, playerName) {
+function join(baseGame, username) {
     
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
-    let player = baseGame.players.find(player => player.name === playerName);
+    let player = baseGame.players.find(player => player.username === username);
     if(player != undefined)
         throw new errors.PlayerAlreadyInGameError();
 
@@ -45,9 +45,9 @@ function join(baseGame, playerName) {
 
     return produce(baseGame, draftGame => {
         draftGame.players.push({
-            id    : uidgen.generateSync(),
-            name  : playerName,
-            ready : false
+            id        : uidgen.generateSync(),
+            username  : username,
+            ready     : false
         });
     });
 }
@@ -58,10 +58,10 @@ function join(baseGame, playerName) {
  * @param {string}  playerId Identifiant du joueur
  * @param {boolean} ready    Etat
  */
-function setReady(baseGame, playerId, ready = true) {
+function setReady(baseGame, username) {
     return produce(baseGame, draftGame => {
-        let player = draftGame.players.find(player => player.id === playerId);
-        player.ready = ready;
+        let player   = draftGame.players.find(player => player.username === username);
+        player.ready = !player.ready;
     });
 }
 
@@ -106,13 +106,13 @@ function allIsReady(baseGame) {
  * @param {string} playerId 
  * @param {string} chosenCard 
  */
-function play(baseGame, playerId, chosenCard){
+function play(baseGame, username, chosenCard){
 
     let canChoose = false;
 
     //verifier que le personnage n'est pas le fantome
-    if(baseGame.ghost.id !== playerId){
-        let player = baseGame.mediums.find(player => player.id === playerId);
+    if(baseGame.ghost.username !== username){
+        let player = baseGame.mediums.find(player => player.username === username);
         let state  = player.state;
     
         //verifier que le personnage peut jouer
@@ -133,7 +133,7 @@ function play(baseGame, playerId, chosenCard){
     return produce(baseGame, draftGame => {
         //si la carte est presente sur le plateau au bon stade du joueur et que le joueur peut jouer
         if(canChoose){
-            let player = draftGame.mediums.find(player => player.id === playerId);
+            let player = draftGame.mediums.find(player => player.username === username);
             player.chosenCard = chosenCard;
             player.hasPlayed = true;
         }else{
@@ -147,15 +147,15 @@ function play(baseGame, playerId, chosenCard){
  * @param {object} baseGame Instance de jeu
  * @param {string} playerId Identifiant du nouveau joueur
  */
-function getInformations(baseGame, playerId) {
+function getInformations(baseGame, username) {
 
     let player         = null;
     let playerIsGhost  = false;
-    if(baseGame.ghost.id === playerId){
+    if(baseGame.ghost.username === username){
         playerIsGhost = true;
         player = baseGame.ghost;
     }else
-        player =  baseGame.mediums.find(player => player.id == playerId);
+        player =  baseGame.mediums.find(player => player.username == username);
 
     if(player != null){
 
@@ -167,7 +167,7 @@ function getInformations(baseGame, playerId) {
         infosPlayer.mediums = baseGame.mediums.map(medium => {
             
             let state = {
-                name             : medium.name,
+                username         : medium.username,
                 hasPlayed        : medium.hasPlayed,
                 state            : medium.state,
                 initial          : medium.name.slice(0,2),
@@ -209,17 +209,17 @@ function getInformations(baseGame, playerId) {
  * La main du fantome est automatiquement complete par de nouvelles cartes
  * visions (il doit toujours avoir 7 cartes visions dans sa main)
  * @param {object} baseGame Instance de jeu
- * @param {string} playerId Identifiant du joueur qui recoit les cartes visions
+ * @param {string} username Identifiant du joueur qui recoit les cartes visions
  * @param {array} cards     Cartes visions a donner
  */
-function giveVisionsToMedium(baseGame, playerId, cards){
-    if(canPlay(baseGame,baseGame.ghost.id)){
-        if(!baseGame.ghost.mediumsHasCards.includes(playerId)){
+function giveVisionsToMedium(baseGame, username, cards){
+    if(canPlay(baseGame,baseGame.ghost.username)){
+        if(!baseGame.ghost.mediumsHasCards.includes(username)){
             if(helpers.include(baseGame.ghost.hand, cards)){
 
                 return produce(baseGame, draftGame => {
                     let ghost  = draftGame.ghost;
-                    let medium = draftGame.mediums.find(medium => medium.id == playerId);
+                    let medium = draftGame.mediums.find(medium => medium.username == username);
     
                     let visions            = draftGame.visions;
                     let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
@@ -231,7 +231,7 @@ function giveVisionsToMedium(baseGame, playerId, cards){
                     ghost.hand  = ghost.hand.concat(newVisionsForGhost);
                     
                     medium.visions = medium.visions.concat(cards);
-                    ghost.mediumsHasCards.push(playerId);
+                    ghost.mediumsHasCards.push(username);
                 });
             }else
                 throw new Error('Le fantome n\'a pas les cartes visions');
@@ -274,15 +274,13 @@ function initRoles(baseGame) {
         draftGame.players.forEach((player, i) => {
             if(aleaGhost === i){
                 draftGame.ghost = {
-                    name            : player.name,
-                    id              : player.id,
+                    username        : player.username,
                     hand            : [],
                     mediumsHasCards : []
                 };
             }else{
                 draftGame.mediums.push({
-                    name      : player.name,
-                    id        : player.id,
+                    username  : player.username,
                     state     : 0,
                     visions   : [],
                     hasPlayed : false
@@ -362,14 +360,14 @@ function initVisions(baseGame) {
  * @param {object}  baseGame Instance de jeu
  * @param {string}  playerId Identifiant du joueur
  */
-function canPlay(baseGame, playerId){
+function canPlay(baseGame, username){
     
-    if(baseGame.ghost.id == playerId){
+    if(baseGame.ghost.username == username){
         //Ghost
         return baseGame.ghost.mediumsHasCards.length != baseGame.mediums.length;
     }else{
         //Medium
-        let medium = baseGame.mediums.find(medium => medium.id == playerId);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(id => id == medium.id) != undefined);
+        let medium = baseGame.mediums.find(medium => medium.username == username);
+        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
 }

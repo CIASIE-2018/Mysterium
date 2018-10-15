@@ -6,24 +6,9 @@ const { createGame, init, join, setReady, allIsReady, getInformations } = requir
 /* Instance du jeu */
 let game = createGame();
 
-
 router.get('/', (req, res) => {
-    res.render('home');
-});
-
-router.post('/', (req, res) => {
-    let player_name = req.body.name;
-    console.log(player_name);
-    
     try{
-        game = join(game, player_name);
-        
-        let player = game.players.find(player => player.name === player_name);
-        req.session.player = {
-            id   : player.id,
-            name : player.name
-        };
-        req.app.io.sockets.emit('reload');
+        game = join(game, req.user.username);
         res.redirect('/salon');
     }catch(e){
         res.redirect('/erreur');
@@ -31,25 +16,18 @@ router.post('/', (req, res) => {
 });
 
 router.get('/salon', (req, res) => {
-    let player = req.session.player;
-    
     res.render('salon', {
-        players : game.players,
-        me      : player.id
+        players : game.players
     });
 });
 
 router.post('/salon', (req, res) => {
-    let player = game.players.find(player => player.id === req.body.id);
-    if(player != undefined){
-        game = setReady(game, player.id, !player.ready);
-        if(game.players.length >= 3 && allIsReady(game)){
-            game = init(game);
-            req.app.io.sockets.emit('allIsReady');
-        }else{
-            req.app.io.sockets.emit('reload');
-        }
+    let user = req.user;
+
+    if(req.body.username == user.username){
+        game = setReady(game, user.username);
     }
+        
     res.redirect('/salon');
 });
 
