@@ -24,6 +24,7 @@ router.post('/', (req, res) => {
             name : player.name
         };
         req.app.io.sockets.emit('reload');
+        req.app.io.sockets.emit('nouvel utilisateur', player_id);
         res.redirect('/salon');
     }catch(e){
         res.redirect('/erreur');

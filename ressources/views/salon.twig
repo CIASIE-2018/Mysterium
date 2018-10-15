@@ -8,15 +8,27 @@
             </li>
         {% endfor %}
     </ul>
+<<<<<<< HEAD
 
     <form method="post">
         <input type="hidden" name="id" value="{{ me }}">
         <input type="submit" value="se mettre pret">
     </form>
+=======
+    <div id="chat">
+            <ul id="msg_box"> 
+            </ul>
+            <form id="msg_form" method="" action="/">
+                <input id="msg_writing" autocomplete="off"><button id="send">send</button>
+            </form>
+    </div>
+>>>>>>> ajout du formulaire d'envoi de message sur la vue salon, l'envoie de message ramene sur la page de demande de pseudo --> a resoudre
 {% endblock %}
 {% block scripts %}
+<script src="../../game/chat.js" type="text/javascript"></script>
 <script>
     let socket = io();
+
     socket.on('reload', function(){
         location.reload();
     });

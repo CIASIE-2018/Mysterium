@@ -20,6 +20,7 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
+    "moment": "^2.22.2",
     "request": "^2.88.0",
     "socket.io": "^2.1.1",
     "twig": "^1.12.0",
