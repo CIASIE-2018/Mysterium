@@ -11,12 +11,9 @@
     "cookie-parser": "^1.4.1",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
-<<<<<<< HEAD
-=======
     "express-session": "^1.15.6",
     "immer": "^1.7.2",
     "moment": "^2.22.2",
->>>>>>> resolution d'un autre conflits
     "express-messages": "*",
     "express-validator": "*",
     "mongodb": "*",
@@ -24,10 +21,6 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
-<<<<<<< HEAD
-    "moment": "^2.22.2",
-=======
->>>>>>> resolution d'un autre conflits
     "request": "^2.88.0",
     "socket.io": "^2.1.1",
     "twig": "^1.12.0",
