@@ -14,9 +14,4 @@ $(function(){
     socket.on('chat message', (msg) => {
         $('#msg_box').append($('<li>').html(msg));
     });
-
-    //message a afficher a la connexion d'un joueur
-    socket.on ('bienvenue', (msg) => {
-        $('#msg_box').append($('<li>').html(msg));
-    });
 });

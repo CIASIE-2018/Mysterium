@@ -5,7 +5,8 @@ const { createGame, init, join, setReady, allIsReady, getInformations } = requir
 
 
 /* Instance du jeu */
-let game = createGame();
+let game     = createGame();
+let messages = [];
 
 module.exports = function(io){
 
@@ -17,27 +18,17 @@ module.exports = function(io){
 
     let chatSocket = io.of('/chat');
     chatSocket.on('connection', socket => {
-        console.log(`[chat] - connection ${socket.id}`);
+
         socket.on('chat message', (data) => {
-            let msg_time = moment().format('HH:mm:ss');
-            
-            let msg = {
-                id      : msg_time,
-                content : moment(msg_time,moment.HTML5_FMT.TIME).format('HH:mm')+"  <span class='pseudo'>"+data.author +"</span>  :   "+ data.msg_content
-            }
-            io.emit('chat message',msg.content);
+            //TODO ATTENTION INJECTION CODE !
+            let msg = moment().format('HH:mm') + " <span class='pseudo'>" + data.author +"</span>  : " + data.msg_content;
+            messages.push(msg);
+            chatSocket.emit('chat message',msg);
         });
     
-        /** socket.on('nouvel utilisateur', (pseudo) => {
-        
-            socket.emit('bienvenue', "Vous entrez dans le salon de chat sous le nom <span class='pseudo'>" + usr.name + "</span>");
-            socket.broadcast.emit('bienvenue', "<span class='pseudo'>"+usr.name +"</span> entre dans le salon de chat")
-        });*/
-    
         socket.on('disconnect',() => {
-            console.log("----------------------------------------");
             socket.disconnect(true);
-        })
+        });
     });
     /********************************/
 
@@ -55,7 +46,8 @@ module.exports = function(io){
     
     router.get('/salon', (req, res) => {
         res.render('salon', {
-            players : game.players
+            players : game.players,
+            messages
         });
     });
     

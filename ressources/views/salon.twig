@@ -15,6 +15,9 @@
     </form>
      <div id="chat">
             <ul id="msg_box"> 
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
             </ul>
             <form id="msg_form" method="" action="/">
                 <input id="msg_writing" autocomplete="off"><button id="send">send</button>
@@ -22,8 +25,8 @@
         </div>
 {% endblock %}
 {% block scripts %}
-<script>var username = {{user.username}}</script>
-<script src="../../game/client_chat.js"></script>
+<script>var username = "{{user.username}}"</script>
+<script src="/js/client_chat.js"></script>
 <script>
     //let socketChat  = io('/chat');
 
