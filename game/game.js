@@ -28,15 +28,15 @@ function createGame(max_player = 7, max_turn = 7, difficulte = 0) {
 /**
  * Ajoute un nouveau joueur au jeu
  * @param {object} baseGame Instance de jeu
- * @param {string} playerName Identifiant du nouveau joueur
+ * @param {string} username Identifiant du nouveau joueur
  */
 
-function join(baseGame, playerName) {
+function join(baseGame, username) {
     
     if(baseGame.started)
         throw new errors.GameAlreadyStarted();
 
-    let player = baseGame.players.find(player => player.name === playerName);
+    let player = baseGame.players.find(player => player.username === username);
     if(player != undefined)
         throw new errors.PlayerAlreadyInGameError();
 
@@ -46,7 +46,7 @@ function join(baseGame, playerName) {
     return produce(baseGame, draftGame => {
         draftGame.players.push({
             id        : uidgen.generateSync(),
-            username  : playerName,
+            username  : username,
             ready     : false
         });
     });
