@@ -241,10 +241,50 @@ function giveVisionsToMedium(baseGame, username, cards){
         throw new Error('Le fantome ne peut pas jouer maintenant');
 }
 
+/**
+ * Verifie si les joueurs ont choisis la bonne carte sur 
+ * le plateau en fonction de leur scenario
+ * @param {object} baseGame Instance de jeu
+ * @return {array} Tableau contenant les joueurs ayants choisis la bonne carte
+*/
+function verifyChoicePlayers(baseGame) {
+
+    baseGame.mediums.map(medium => {
+        if(!medium.hasPlayed)
+            throw new Error("Tous les joueurs n'ont pas joués")
+    });
+
+    let hasGoodCards = [];
+
+    baseGame.mediums.map(medium => {
+        let state = medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme');
+        
+        if(medium.chosenCard === medium.scenario[state])
+            hasGoodCards.push(medium.name);
+    });
+    
+    return produce(baseGame, draftGame => {
+        draftGame.mediums.map(medium => {
+            if(hasGoodCards.includes(medium.name)){
+                medium.state   += 1;
+                medium.visions  = [];
+            }
+            
+            medium.chosenCard = '';
+            medium.hasPlayed  = false;
+        })
+
+        if(baseGame.turn < baseGame.max_turn)
+            draftGame.turn += 1;
+    });
+}
+
+
 module.exports = {
     createGame,
     join,
     setReady,
+    verifyChoicePlayers,
     init,
     allIsReady,
     play,
