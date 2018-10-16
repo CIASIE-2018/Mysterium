@@ -260,12 +260,12 @@ function verifyChoicePlayers(baseGame) {
         let state = medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme');
         
         if(medium.chosenCard === medium.scenario[state])
-            hasGoodCards.push(medium.name);
+            hasGoodCards.push(medium.username);
     });
     
     return produce(baseGame, draftGame => {
         draftGame.mediums.map(medium => {
-            if(hasGoodCards.includes(medium.name)){
+            if(hasGoodCards.includes(medium.username)){
                 medium.state   += 1;
                 medium.visions  = [];
             }
