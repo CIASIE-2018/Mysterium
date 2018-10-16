@@ -170,7 +170,7 @@ function getInformations(baseGame, username) {
                 username         : medium.username,
                 hasPlayed        : medium.hasPlayed,
                 state            : medium.state,
-                initial          : medium.name.slice(0,2),
+                initial          : medium.username.slice(0,2),
                 hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id)
             };
 

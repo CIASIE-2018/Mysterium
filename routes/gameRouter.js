@@ -56,15 +56,20 @@ module.exports = function(io){
     
         if(req.body.username == user.username){
             game = setReady(game, user.username);
-            gameSocket.emit('reload');
+            if(game.players.length >= 3 && allIsReady(game)){
+                game = init(game);
+                gameSocket.emit('start');
+                res.redirect('/game');
+            }else{
+                gameSocket.emit('reload');
+                res.redirect('/salon');
+            }
         }
-            
-        res.redirect('/salon');
     });
     
     router.get('/game', (req, res) => {
         res.render('game', {
-            infos : getInformations(game,  req.session.player.id)
+            infos : getInformations(game, req.user.username)
         });
     });
     
