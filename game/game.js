@@ -7,6 +7,11 @@ const config = require('../config/config');
 
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(256); 
+
+const PERSO = 0;
+const LIEU = 1;
+const ARME = 2;
+const FINAL = 3;
  
 /** PUBLIC FUNCTIONS */
 
@@ -413,32 +418,29 @@ function canPlay(baseGame, username){
 }
 
 /**
- * vérifie que tout les joueurs ont trouvés leur scénario
- *  @param {object} baseGame Instance de jeu
+ * vérifie que tout les joueurs ont trouvé leur scénario
+ *  @param {object} game Instance courrante de jeu
  * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
  */
-function allScenariosFinded (baseGame){
-    let goForTheFinal = true ;
-    baseGame.players.forEach(function(player){
-        if(!scenarioFind(baseGame,player.username)){
-            goForTheFinal = false;
+function areAllScenariosFound (game){
+    let canGoForTheFinal = true ;
+    game.players.forEach(function(player){
+        if(!isScenarioFind(game,player.username)){
+            canGoForTheFinal = false;
             break;
         }
     });
-    return goForTheFinal;
+    return canGoForTheFinal;
 }
 
 /**
  * verifie qu'un joueur a trouvé tout son scenario
- * @param {object} baseGame 
- * @param {string} username 
+ * @param {object} game instance courrante du jeu 
+ * @param {string} username pseudo du joueur 
  * @returns {boolean} youFindIt indique 
  */
-function scenarioFind(baseGame,username){
+function isScenarioFound(game,username){
     let youFindIt = true;
-    let player = baseGame.players.find(player => player.username === username);
-    if(player.state < 3){
-        youFindIt = false ;
-    }
-    return youFindIt;
+    let player = game.players.find(player => player.username === username);
+    return player.state != FINAL;
 }
