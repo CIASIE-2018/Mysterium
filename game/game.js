@@ -411,3 +411,34 @@ function canPlay(baseGame, username){
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
 }
+
+/**
+ * vérifie que tout les joueurs ont trouvés leur scénario
+ *  @param {object} baseGame Instance de jeu
+ * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
+ */
+function allScenariosFinded (baseGame){
+    let goForTheFinal = true ;
+    baseGame.players.forEach(function(player){
+        if(!scenarioFind(baseGame,player.username)){
+            goForTheFinal = false;
+            break;
+        }
+    });
+    return goForTheFinal;
+}
+
+/**
+ * verifie qu'un joueur a trouvé tout son scenario
+ * @param {object} baseGame 
+ * @param {string} username 
+ * @returns {boolean} youFindIt indique 
+ */
+function scenarioFind(baseGame,username){
+    let youFindIt = true;
+    let player = baseGame.players.find(player => player.username === username);
+    if(player.state < 3){
+        youFindIt = false ;
+    }
+    return youFindIt;
+}

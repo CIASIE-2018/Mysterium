@@ -4,3 +4,4 @@ mochawesome-report/
 .DS_Store
 .idea
 *.css
+*.map
