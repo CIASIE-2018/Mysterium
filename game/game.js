@@ -423,8 +423,10 @@ function canPlay(baseGame, username){
  * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
  */
 function areAllScenariosFound (game){
-    let canGoToTheFinal = true ;
-    game.players.every(isScenarioFound(game, player.username));
+    let canGoToTheFinal = game.mediums.every((medium) => {
+        return isScenarioFound(game, medium.username);
+    });
+    
     return canGoToTheFinal;
 }
 
@@ -435,7 +437,6 @@ function areAllScenariosFound (game){
  * @returns {boolean} youFindIt indique 
  */
 function isScenarioFound(game,username){
-    let youFindIt = true;
-    let player = game.players.find(player => player.username === username);
-    return player.state === FINAL;
+    let player = game.mediums.find(player => player.username == username);
+    return player.state == FINAL;
 }
