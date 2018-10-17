@@ -418,19 +418,14 @@ function canPlay(baseGame, username){
 }
 
 /**
- * vérifie que tout les joueurs ont trouvé leur scénario
- *  @param {object} game Instance courrante de jeu
+ * vérifie que tous les joueurs ont trouvé leur scénario
+ *  @param {object} game Instance courante de jeu
  * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
  */
 function areAllScenariosFound (game){
-    let canGoForTheFinal = true ;
-    game.players.forEach(function(player){
-        if(!isScenarioFind(game,player.username)){
-            canGoForTheFinal = false;
-            break;
-        }
-    });
-    return canGoForTheFinal;
+    let canGoToTheFinal = true ;
+    game.players.every(isScenarioFound(game, player.username));
+    return canGoToTheFinal;
 }
 
 /**
@@ -442,5 +437,5 @@ function areAllScenariosFound (game){
 function isScenarioFound(game,username){
     let youFindIt = true;
     let player = game.players.find(player => player.username === username);
-    return player.state != FINAL;
+    return player.state === FINAL;
 }
