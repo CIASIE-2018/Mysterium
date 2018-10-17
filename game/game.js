@@ -7,6 +7,11 @@ const config = require('../config/config');
 
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(256); 
+
+const PERSO = 0;
+const LIEU = 1;
+const ARME = 2;
+const FINAL = 3;
  
 /** PUBLIC FUNCTIONS */
 
@@ -410,4 +415,28 @@ function canPlay(baseGame, username){
         let medium = baseGame.mediums.find(medium => medium.username == username);
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
+}
+
+/**
+ * vérifie que tous les joueurs ont trouvé leur scénario
+ *  @param {object} game Instance courante de jeu
+ * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
+ */
+function areAllScenariosFound (game){
+    let canGoToTheFinal = game.mediums.every((medium) => {
+        return isScenarioFound(game, medium.username);
+    });
+    
+    return canGoToTheFinal;
+}
+
+/**
+ * verifie qu'un joueur a trouvé tout son scenario
+ * @param {object} game instance courrante du jeu 
+ * @param {string} username pseudo du joueur 
+ * @returns {boolean} youFindIt indique 
+ */
+function isScenarioFound(game,username){
+    let player = game.mediums.find(player => player.username == username);
+    return player.state == FINAL;
 }

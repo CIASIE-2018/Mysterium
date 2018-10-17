@@ -29,7 +29,5 @@ game = play(game, game.mediums[2].username, game.persos[0]);
 //en fonction de leur scenario
 game = verifyChoicePlayers(game);
 
+
 console.log(game);
-
-
-// console.log(game);
