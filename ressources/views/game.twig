@@ -48,17 +48,7 @@
                 </div>
             </div>
         </div>
-        <div id="chat">
-            <ul id="msg_box"> 
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            <form id="msg_form" method="" action="/">
-                <input id="msg_writing" autocomplete="off"><button id="send">send</button>
-            </form>
-        </div>
-    </div>
+{% include 'partials/chat.twig' %}
 {% endblock %}
 
 
