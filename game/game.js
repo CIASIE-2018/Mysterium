@@ -413,7 +413,7 @@ function getCards(type, nb_cards){
             cards = cards.slice(0, nb_cards);
     }
     return cards;
-
+}
   
 /**
  * vérifie que tous les joueurs ont trouvé leur scénario
