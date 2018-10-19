@@ -147,6 +147,7 @@ function play(baseGame, username, chosenCard){
     });
 }
 
+
 /**
  * Renvoie l'état du joueur 
  * @param {object} baseGame Instance de jeu
@@ -154,58 +155,38 @@ function play(baseGame, username, chosenCard){
  */
 function getInformations(baseGame, username) {
 
-    let player         = null;
-    let playerIsGhost  = false;
-    if(baseGame.ghost.username === username){
-        playerIsGhost = true;
-        player = baseGame.ghost;
-    }else
-        player =  baseGame.mediums.find(player => player.username == username);
-
-    if(player != null){
-
-        let infosPlayer = {
-            type : playerIsGhost ? 'ghost' : 'medium',
-            turn : baseGame.turn
-        };
-
-        infosPlayer.mediums = baseGame.mediums.map(medium => {
-            
-            let state = {
-                username         : medium.username,
-                hasPlayed        : medium.hasPlayed,
-                state            : medium.state,
-                initial          : medium.username.slice(0,2),
-                hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id)
-            };
-
-            if(playerIsGhost){
-                let cardType = medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme' );
-                state.card   = medium.scenario[cardType];
-            }
-
-            return state;
-        });
-
-        if(playerIsGhost){
-            infosPlayer.hand   = player.hand;
-            infosPlayer.persos = baseGame.persos;
-            infosPlayer.lieux  = baseGame.lieux;
-            infosPlayer.armes  = baseGame.armes;
-            
-        }else{
-            infosPlayer.visions = player.visions
-            let cardType = player.state == 0 ? 'persos' : (player.state == 1 ? 'lieux' : 'armes' );
-            infosPlayer.cards = baseGame[cardType];
-        }
-
-        return infosPlayer;
-    }else{
+    let type   = getPlayerType(baseGame, username);
+    let player = type == 'ghost' ? baseGame.ghost : baseGame.mediums.find(player => player.username == username);
+    
+    if(player == null)
         throw new errors.PlayerAlreadyInGameError();
-    }
 
+    let infosPlayer = {
+        type     : type,
+        username : player.username,
+        turn     : baseGame.turn
+    };
 
+    if(type == 'ghost')
+        infosPlayer.hand = baseGame.ghost.hand;
 
+    infosPlayer.mediums = baseGame.mediums.map(medium => {
+        let state = {
+            state            : medium.state,
+            username         : medium.username,
+            initial          : medium.username.slice(0,2),
+            hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id),
+            hasPlayed        : medium.hasPlayed,
+            visions          : medium.visions
+        };
+        state.cards = baseGame[medium.state == 0 ? 'persos' : (medium.state == 1 ? 'lieux' : 'armes')];
+        if(type == 'ghost')
+            state.card  = medium.scenario[medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme')];
+    
+        return state;
+    });
+
+    return infosPlayer;
 }
 
 /**
@@ -250,7 +231,6 @@ function giveVisionsToMedium(baseGame, username, cards){
  * Verifie si les joueurs ont choisis la bonne carte sur 
  * le plateau en fonction de leur scenario
  * @param {object} baseGame Instance de jeu
- * @return {array} Tableau contenant les joueurs ayants choisis la bonne carte
 */
 function verifyChoicePlayers(baseGame) {
 
@@ -279,8 +259,10 @@ function verifyChoicePlayers(baseGame) {
             medium.hasPlayed  = false;
         })
 
-        if(baseGame.turn < baseGame.max_turn)
+        if(baseGame.turn < baseGame.max_turn){
             draftGame.turn += 1;
+            draftGame.ghost.mediumsHasCards = [];
+        }
     });
 }
 
@@ -351,11 +333,13 @@ function generateCards(baseGame) {
         break;
     }
     return produce(baseGame, draftGame => {
-        draftGame.persos = helpers.getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
-        draftGame.lieux  = helpers.getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
-        draftGame.armes  = helpers.getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
+        draftGame.persos = getCards("persos", nb_scenarios);
+        draftGame.lieux  = getCards("lieux", nb_scenarios);
+        draftGame.armes  = getCards("armes", nb_scenarios);
     });
 }
+
+
 
 /**
  * Génère différents scénarios en fonction des cartes du jeu,
@@ -389,7 +373,7 @@ function initScenarios(baseGame) {
  * @param {object} baseGame Instance de jeu
  */
 function initVisions(baseGame) {
-    let visions    = helpers.getRandomFiles(config.directory.images + '/visions');
+    let visions    = getCards("visions");
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
 
@@ -399,6 +383,10 @@ function initVisions(baseGame) {
     });
 }
 
+
+function getPlayerType(baseGame, username){
+    return baseGame.ghost.username === username ? 'ghost' : 'medium';
+}
 
 /**
  * Verifie si un joueur peut jouer
@@ -416,7 +404,17 @@ function canPlay(baseGame, username){
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
 }
+function getCards(type, nb_cards){
+    let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+    let cards = json[type];
+    if(cards != undefined){
+        cards = helpers.shuffle(cards);
+        if(nb_cards >= 0)
+            cards = cards.slice(0, nb_cards);
+    }
+    return cards;
 
+  
 /**
  * vérifie que tous les joueurs ont trouvé leur scénario
  *  @param {object} game Instance courante de jeu
