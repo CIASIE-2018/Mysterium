@@ -1,16 +1,16 @@
 const { createGame, init, join,giveVisionsToMedium, verifyChoicePlayers, play, setReady, allIsReady, getInformations } = require('./game');
 
 let game = createGame();
-game = join(game, "j1");
-game = join(game, "j2");
-game = join(game, "j3");
-game = join(game, "j4");
+game = join(game, "johan");
+game = join(game, "anthony");
+game = join(game, "alex");
+game = join(game, "benji");
 
 //tous les joueurs sont reeady
-game = setReady(game, "j1");
-game = setReady(game, "j2");
-game = setReady(game, "j3");
-game = setReady(game, "j4");
+game = setReady(game, "johan");
+game = setReady(game, "anthony");
+game = setReady(game, "alex");
+game = setReady(game, "benji");
 
 //init ju jeux
 game = init(game);
@@ -29,7 +29,9 @@ game = play(game, game.mediums[2].username, game.persos[0]);
 //en fonction de leur scenario
 game = verifyChoicePlayers(game);
 
-console.log(game);
+//console.log(game);
+
+console.log(getInformations(game, game.ghost.username));
 
 
 // console.log(game);

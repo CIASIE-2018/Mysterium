@@ -157,7 +157,7 @@ function getInformations(baseGame, username) {
         throw new errors.PlayerAlreadyInGameError();
 
     let infosPlayer = {
-        type     : playerIsGhost ? 'ghost' : 'medium',
+        type     : type,
         username : player.username,
         turn     : baseGame.turn
     };
@@ -175,7 +175,7 @@ function getInformations(baseGame, username) {
             visions          : medium.visions
         };
         state.cards = baseGame[medium.state == 0 ? 'persos' : (medium.state == 1 ? 'lieux' : 'armes')];
-        if(playerIsGhost)
+        if(type == 'ghost')
             state.card  = medium.scenario[medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme')];
     
         return state;
@@ -328,11 +328,13 @@ function generateCards(baseGame) {
         break;
     }
     return produce(baseGame, draftGame => {
-        draftGame.persos = helpers.getRandomFiles(config.directory.images + '/personnage', nb_scenarios);
-        draftGame.lieux  = helpers.getRandomFiles(config.directory.images + '/lieux'     , nb_scenarios);
-        draftGame.armes  = helpers.getRandomFiles(config.directory.images + '/armes'     , nb_scenarios);
+        draftGame.persos = getCards("persos", nb_scenarios);
+        draftGame.lieux  = getCards("lieux", nb_scenarios);
+        draftGame.armes  = getCards("armes", nb_scenarios);
     });
 }
+
+
 
 /**
  * Génère différents scénarios en fonction des cartes du jeu,
@@ -366,7 +368,7 @@ function initScenarios(baseGame) {
  * @param {object} baseGame Instance de jeu
  */
 function initVisions(baseGame) {
-    let visions    = helpers.getRandomFiles(config.directory.images + '/visions');
+    let visions    = getCards("visions");
     let ghost_hand = visions.slice(visions.length-7,visions.length);
     visions        = visions.slice(0, -7);
 
@@ -396,4 +398,15 @@ function canPlay(baseGame, username){
         let medium = baseGame.mediums.find(medium => medium.username == username);
         return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
+}
+
+function getCards(type, nb_cards){
+    let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+    let cards = json[type];
+    if(cards != undefined){
+        cards = helpers.shuffle(cards);
+        if(nb_cards >= 0)
+            cards = cards.slice(0, nb_cards);
+    }
+    return cards;
 }
