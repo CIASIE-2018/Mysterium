@@ -47,7 +47,7 @@ describe('Rejoindre une partie', function(){
         for(i = 1; i < 4; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         let startedGame = init(newGame);
         assert.equal(startedGame.started, true);
@@ -67,7 +67,7 @@ describe('Lancer une partie', function(){
         for(i = 1; i < 8; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         expect(function(){
             init(newGame);
@@ -76,9 +76,9 @@ describe('Lancer une partie', function(){
 
     it('impossible lorsque le nombre de joueur <= 2', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         newGame = join(newGame, 'joueur2');
-        newGame = setReady(newGame, newGame.players[1].id, true);
+        newGame = setReady(newGame, newGame.players[1].username, true);
         assert.equal(newGame.players.length, 2);
         expect(function(){
             init(newGame);
@@ -90,7 +90,7 @@ describe('Lancer une partie', function(){
         for(i = 1; i < 5; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         startedGame = init(newGame);
         assert.equal(startedGame.started, true);
@@ -100,15 +100,15 @@ describe('Lancer une partie', function(){
 describe('Mettre son statut a prêt', function () {
     it('Se mettre prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(newGame.players[0].ready, true);
     });
 
     it('Changer de prêt à pas prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(newGame.players[0].ready, true);
-        newGame = setReady(newGame, newGame.players[0].id, false);
+        newGame = setReady(newGame, newGame.players[0].username, false);
         assert.equal(newGame.players[0].ready, false);
     });
 
@@ -117,10 +117,10 @@ describe('Mettre son statut a prêt', function () {
         for(i = 1; i < 8; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         assert.equal(allIsReady(newGame), false);
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(allIsReady(newGame), true);
 
     });
@@ -130,11 +130,11 @@ describe('test au commencement d\'une partie', function () {
 
     beforeEach(function(){
         newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         for(i = 2; i < 8; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, newGame.players[i-1].id, true);
+            newGame = setReady(newGame, newGame.players[i-1].username, true);
         }
         startedGame = init(newGame);
     });
@@ -237,9 +237,12 @@ describe('test au commencement d\'une partie', function () {
     });
 
     it('cartes visions correctement chargées ', function () {
+
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        let nbTotalVisions   = json['visions'].length;
+
         let nbCartesVisionsFantomes = startedGame.ghost.hand.length;
         let nbCcartesVisions = startedGame.visions.length;
-        let nbTotalVisions   = fs.readdirSync(__dirname + '/../public/images/visions').length;
         for(var i = 0; i < nbCartesVisionsFantomes; i++) {
             assert.equal(startedGame.visions.includes(startedGame.ghost.hand[i]), false);
         }
