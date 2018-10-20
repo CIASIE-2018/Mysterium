@@ -1,7 +1,8 @@
 let fs                                             = require('fs');
 let errors                                         = require('./Error');
 let {assert, expect}                               = require('chai');
-let {join, createGame, init, setReady, allIsReady} = require('./game')
+let {join, createGame, init, setReady, allIsReady, canPlay, play, getCards, getPlayerType} = require('./game')
+let helpers  = require('../helpers');
 
 beforeEach(function(){
     this.game = createGame();
@@ -251,5 +252,80 @@ describe('test au commencement d\'une partie', function () {
 });
 
 describe('tests fonctionnalités InGame', function () {
+
+    beforeEach(function(){
+        newGame = join(this.game, 'joueur1');
+        newGame = setReady(newGame, newGame.players[0].username, true);
+        for(i = 2; i < 8; i++){
+            idJoueur = 'joueur' + i;
+            newGame = join(newGame, idJoueur);
+            newGame = setReady(newGame, newGame.players[i-1].username, true);
+        }
+        startedGame = init(newGame);
+    });
+
+    it('Le joueur peut jouer', function(){
+        assert.isTrue(canPlay(startedGame, startedGame.mediums[0].username));
+    });
+
+    it('Le joueur a dèjà jouer', function(){
+        game = play(startedGame, startedGame.mediums[0].username, startedGame.persos[0])
+        
+        assert.isTrue(game.mediums[0].hasPlayed);
+        assert.exists(game.mediums[0].chosenCard)
+        assert.isFalse(canPlay(game, game.mediums[0].username))
+        
+    });
+
+    it('Retourne le bon type du joueur', function(){
+        assert.equal(getPlayerType(startedGame, startedGame.mediums[0].username), 'medium')
+        assert.equal(getPlayerType(startedGame, startedGame.ghost.username), 'ghost')
+    })
+
+    it('Donne des cartes de type personnages', function(){
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        
+        let cards = getCards('persos', 5);
+        let allPersosCards = json['persos'];        
+
+        assert.isTrue(helpers.include(allPersosCards, cards));
+
+    })
     
+    it('Donne des cartes de type lieux', function(){
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        
+        let cards = getCards('lieux', 5);
+        let allLieuxCards = json['lieux'];        
+
+        assert.isTrue(helpers.include(allLieuxCards, cards));
+
+    })
+    
+    it('Donne des cartes de type armes', function(){
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        
+        let cards = getCards('armes', 5);
+        let allArmesCards = json['armes'];        
+
+        assert.isTrue(helpers.include(allArmesCards, cards));
+
+    })
+
+    it('Donne le bon nombre de carte', function(){
+        let cards = getCards('armes', 5);
+        let cards2 = getCards('visions', 2);
+
+        assert.equal(cards.length, 5)
+        assert.equal(cards2.length, 2)
+    })
+
+    it('Donne toutes les cartes', function(){
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        
+        let cards = getCards('armes');
+        let allArmesCards = json['armes']; 
+
+        assert.equal(cards.length, allArmesCards.length)
+    })
 })

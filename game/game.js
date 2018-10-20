@@ -276,7 +276,10 @@ module.exports = {
     allIsReady,
     play,
     giveVisionsToMedium,
-    getInformations
+    getInformations,
+    getPlayerType,
+    getCards,
+    canPlay
 }
 
 /** PRIVATE FUNCTIONS */
@@ -401,7 +404,16 @@ function canPlay(baseGame, username){
     }else{
         //Medium
         let medium = baseGame.mediums.find(medium => medium.username == username);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
+        
+        if(medium.hasPlayed)
+            return false
+
+        if(baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined)
+            return false
+
+        return true;
+
+        //return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
     }
 }
 function getCards(type, nb_cards){
