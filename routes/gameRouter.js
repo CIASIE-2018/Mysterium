@@ -69,7 +69,8 @@ module.exports = function(io){
     
     router.get('/game', (req, res) => {
         res.render('game', {
-            infos : getInformations(game, req.user.username)
+            infos : getInformations(game, req.user.username),
+            messages
         });
     });
     
