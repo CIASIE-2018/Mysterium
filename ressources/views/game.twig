@@ -81,11 +81,13 @@
                 </div>
             </div>
         </div>
-    </div>
+{% include 'partials/chat.twig' %}
 {% endblock %}
 
 
 {% block scripts %}
+<script>var username = "{{user.username}}"</script>
+<script src="/js/client_chat.js"></script>
 <script>
     $(function(){
         let swiper = new Swiper('.swiper-container', {

@@ -13,23 +13,12 @@
         <input type="hidden" name="username" value="{{ user.username }}">
         <input type="submit" value="se mettre pret">
     </form>
-     <div id="chat">
-            <ul id="msg_box"> 
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            <form id="msg_form" method="" action="/">
-                <input id="msg_writing" autocomplete="off"><button id="send">send</button>
-            </form>
-        </div>
+{% include 'partials/chat.twig' %}
 {% endblock %}
 {% block scripts %}
 <script>var username = "{{user.username}}"</script>
 <script src="/js/client_chat.js"></script>
 <script>
-    //let socketChat  = io('/chat');
-
     let gameSocket = io('/game');
     
     gameSocket.on('reload', function(){
