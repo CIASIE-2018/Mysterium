@@ -1,0 +1,15 @@
+ {% if infos.type == "ghost" %}
+    {% for card in infos.hand %}
+        <div class="cards_hand_list_item">
+            <img src="/images/cards/{{card}}.png">
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if infos.type == "medium" %}
+    {% for card in me.visions %}
+        <div class="cards_hand_list_item">
+            <img src="/images/cards/{{card}}.png">
+        </div>
+    {% endfor %}
+{% endif %}
