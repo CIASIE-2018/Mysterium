@@ -165,11 +165,26 @@ body{
                     border-radius: 20px;
                     padding: 20px 0;
                     height: 100%;
+
+                    form{
+                        position: relative;
+                        width: 100%;
+                        display: flex;
+                        flex-wrap: wrap;
+                        height: 100%;
+                    }
                     
                     .cards_hand_list_item{
                         flex:1 1 50%;
                         height: calc(100% / 4);
                         text-align: center;
+                        position: relative;
+
+                        .box{
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                        }
                         img{
                             max-width: 100%;
                             height: auto;

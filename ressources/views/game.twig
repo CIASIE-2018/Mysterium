@@ -44,11 +44,17 @@
 
                 <div class="cards_hand_list">
                     {% if infos.type == "ghost" %}
-                        {% for card in infos.hand %}
-                            <div class="cards_hand_list_item">
-                                <img src="/images/cards/{{card}}.png">
-                            </div>
-                        {% endfor %}
+                        <form id="hand_form">
+                            {% for card in infos.hand %}
+                                <div class="cards_hand_list_item">
+                                    <input class="box" type="checkbox" value="{{card}}" name="cards_hand"/>
+                                    <img src="/images/cards/{{card}}.png">
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="cards_hand_list_item">
+                                <img src="/images/check.svg">
+                            </button>
+                        </form>
                     {% endif %}
 
                     {% if infos.type == "medium" %}
@@ -94,6 +100,15 @@
             slidesPerView : 6,
             spaceBetween : 30
         });
+
+        {% if infos.type == 'ghost' %}
+            $('#hand_form').on('submit', function(e){
+                e.preventDefault();
+                $('input[name=cards_hand]:checked').each(function(i,card){
+                    console.log($(card).val());
+                });
+            });
+        {% endif %}
 
         function initZoom(img){
             let zoom = img.magnify({
