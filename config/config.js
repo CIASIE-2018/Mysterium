@@ -6,11 +6,9 @@ module.exports = {
         mode : process.env.APP_MODE || 'prod'
     },
     db : {
-        host     : process.env.DB_HOST     || 'localhost',
-        port     : process.env.DB_PORT     || '3306',
-        database : process.env.DB_DATABASE || 'db',
-        username : process.env.DB_USERNAME || 'root',
-        password : process.env.DB_PASSWORD || ''
+        host     : process.env.DB_HOST     || 'mongo',
+        port     : process.env.DB_PORT     || '27017',
+        database : process.env.DB_DATABASE || 'docker-node-mongo'
     },
     directory : {
         images   : __dirname + '/../public/images'
