@@ -18,7 +18,7 @@ const mongoose         = require('mongoose');
 
 
 /***** MONGODB *****/
-mongoose.connect('mongodb://localhost/loginapp', {
+mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.database}`, {
     useCreateIndex: true,
     useNewUrlParser: true
 });
