@@ -75,6 +75,15 @@
             spaceBetween : 30
         });
 
+        {% if infos.type == 'ghost' %}
+            $('#hand_form').on('submit', function(e){
+                e.preventDefault();
+                $('input[name=cards_hand]:checked').each(function(i,card){
+                    console.log($(card).val());
+                });
+            });
+        {% endif %}
+
         function initZoom(img){
             let zoom = img.magnify({
                 src : img.prop('src')
