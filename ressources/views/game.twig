@@ -17,13 +17,7 @@
         </div>
         <div class="game_content">
             <div class="player_list">
-            {% for medium in infos.mediums %}
-                <div class="player_list_item  
-                            {% if medium.username == me.username %} me {% endif %}
-                            {% if medium.hasPlayed %} played {% endif %}">
-                    <div class="player_list_item_pseudo">{{ medium.initial|upper }}</div>
-                </div>
-            {% endfor %}
+            {% include 'partials/playerList.twig' %}
             </div>
 
             <div class="card_selected">
@@ -43,21 +37,7 @@
                 </div>
 
                 <div class="cards_hand_list">
-                    {% if infos.type == "ghost" %}
-                        {% for card in infos.hand %}
-                            <div class="cards_hand_list_item">
-                                <img src="/images/cards/{{card}}.png">
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if infos.type == "medium" %}
-                        {% for card in me.visions %}
-                            <div class="cards_hand_list_item">
-                                <img src="/images/cards/{{card}}.png">
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                    {% include 'partials/playerHand.twig' %}
                 </div>
             </div>
         </div>

@@ -1,0 +1,7 @@
+{% for medium in infos.mediums %}
+    <div class="player_list_item  
+        {% if medium.username == me.username %} me {% endif %}
+        {% if medium.hasPlayed %} played {% endif %}">
+        <div class="player_list_item_pseudo">{{ medium.initial|upper }}</div>
+    </div>
+{% endfor %}
