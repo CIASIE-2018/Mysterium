@@ -6,9 +6,8 @@ module.exports = {
         mode : process.env.APP_MODE || 'prod'
     },
     db : {
-        host     : process.env.DB_HOST     || 'mongo',
-        port     : process.env.DB_PORT     || '27017',
-        database : process.env.DB_DATABASE || 'docker-node-mongo'
+        host     : process.env.DB_HOST     || 'mongodb:27017',
+        database : process.env.DB_DATABASE || 'mysterium'
     },
     directory : {
         images   : __dirname + '/../public/images'

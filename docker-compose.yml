@@ -1,20 +1,25 @@
 version: '3'
 
 services:
-  node:
-    image : node:10
-    working_dir : "/app"
+  web:
+    image: node:10
+    working_dir: "/app"
     volumes:
         - .:/app
     ports:
       - '3000:3000'
-    command : ['npm', 'start']
-    links:
-      - mongo
+    command: npm start
+    depends_on:
+      - mongodb
     environment:
       APP_PORT: 3000
 
-  mongo:
+  mongodb:
     image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: mysterium
+    volumes:
+        - ./config/data.js:/docker-entrypoint-initdb.d/data.js
     ports:
-      - '27019:27017'
+      - '27017:27017'

@@ -34,11 +34,9 @@
     "node-sass": "^4.9.3"
   },
   "scripts": {
-    "start": "node server.js",
-    "compile-sass" : "sass ressources/scss/index.scss public/css/index.css",
-    "testbrowser": "mocha --reporter mochawesome --reporter-options autoOpen=true",
-    "test": "mocha game/testGame.js",
-    "scss": "node-sass --output-style compressed --watch ressources/scss --output public/css"
+    "start"       : "node server.js",
+    "testbrowser" : "mocha --reporter mochawesome --reporter-options autoOpen=true",
+    "test"        : "mocha game/testGame.js"
   },
   "author": "",
   "license": "ISC"
