@@ -75,12 +75,66 @@
             spaceBetween : 30
         });
 
+
+        function init_plateau(cards){
+            let swiper = $('.swiper-container')[0].swiper;
+            swiper.removeAllSlides();
+            let tab = cards.map(function(card){
+                return `
+                <div class='swiper-slide'>
+                    <img src='/images/cards/${card}.png'>
+                </div>`
+            });
+            swiper.addSlide(1,tab);
+
+        }
+
+        function set_scenario_card_zoom(card){
+            $('.card_selected_content img').attr('src', `/images/cards/${card}.png`);
+        }
+
+        let socketGame = io('/game');
+
+        socketGame.on('reload', function(){
+            window.location.reload();
+        });
+
+        let mediums = {};
+         {% for medium in infos.mediums %}
+            mediums.{{medium.username}} = {
+                    visions: [{{medium.visions}}],
+                    cards  : [{{medium.cards}}],
+                {% if infos.type == "ghost" %}
+                    card : {{medium.card}}
+                {% endif %}
+            }
+        {% endfor %}
+
         {% if infos.type == 'ghost' %}
+
+            $('.player_list_item').on('click', function(){
+                let username = $(this).data('username');
+                $('input[name=player-receiver]').val(username);
+                let data = mediums[username]; 
+                init_plateau(data.cards);
+                set_scenario_card_zoom(data.card);
+            });
+
             $('#hand_form').on('submit', function(e){
                 e.preventDefault();
+                let cards = [];
                 $('input[name=cards_hand]:checked').each(function(i,card){
-                    console.log($(card).val());
+                    cards.push(parseInt($(card).val()));
                 });
+                if(cards.length > 0){
+                    let username = $('input[name=player-receiver]').val();
+                    socketGame.emit('send_card_to_player', {
+                        receiver : username,
+                        cards    : cards
+                    });
+                }
+
+                
             });
         {% endif %}
 
