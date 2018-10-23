@@ -1,5 +1,6 @@
  {% if infos.type == "ghost" %}
     <form id="hand_form">
+        <input type="hidden" name="player-receiver" value="{{ infos.mediums[0].username }}" >
         {% for card in infos.hand %}
             <div class="cards_hand_list_item">
                 <input class="box" type="checkbox" value="{{card}}" name="cards_hand"/>

@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, allIsReady, getInformations } = require('../game/game');
+const { createGame, init, join, setReady, allIsReady, getInformations, giveVisionsToMedium } = require('../game/game');
 
 
 /* Instance du jeu */
@@ -13,7 +13,10 @@ module.exports = function(io){
     /***** WEBSOCKETS SOCKET.IO *****/
     let gameSocket = io.of('/game');
     gameSocket.on('connection', socket => {
-        console.log(`[lobby] - connection ${socket.id}`);
+        socket.on('send_card_to_player', data =>{
+            game = giveVisionsToMedium(game, data.receiver, data.cards);
+            gameSocket.emit('reload');
+        });
     });
 
     let chatSocket = io.of('/chat');
