@@ -3,15 +3,16 @@ $(function(){
 
     $("#msg_form").submit(function (event) {
         event.preventDefault();
-        socket.emit("chat message",{// transmission du message avec son contenu et son auteur
-            msg_content : $("#msg_writing").val(),
-            author : username,
-        })
-        $("#msg_writing").val('').focus();
+        if($("#msg_writing").val() != '')
+        {
+            socket.emit("chat message",$("#msg_writing").val());
+            $("#msg_writing").val('').focus();
+        }
         return false;
     });
 
     socket.on('chat message', (msg) => {
         $('#msg_box').append($('<li>').html(msg));
+        $('#msg_box').animate({scrollTop : $('#msg_box li:last-child').offset().top }, 500);
     });
 });
