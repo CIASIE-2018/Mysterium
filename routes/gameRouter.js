@@ -18,7 +18,18 @@ module.exports = function(io, session){
     gameSocket.on('connection', socket => {
         socket.on('send_card_to_player', data =>{
             game = giveVisionsToMedium(game, data.receiver, data.cards);
-            gameSocket.emit('reload');
+        
+            let mediumSocket = null;
+            for(let socketId in gameSocket.sockets){
+                if(gameSocket.sockets[socketId].handshake.session.username == data.receiver){
+                    mediumSocket = gameSocket.sockets[socketId];
+                    break;
+                }
+            }
+            if(mediumSocket != null){
+                mediumSocket.emit('reload');
+                socket.emit('reload');
+            }
         });
     });
 
