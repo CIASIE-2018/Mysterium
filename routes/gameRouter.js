@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
 const { createGame, init, join, setReady, allIsReady, getInformations, giveVisionsToMedium } = require('../game/game');
-const sharedsession = require("express-socket.io-session");
+const sharedSession = require("express-socket.io-session");
 
 
 /* Instance du jeu */
@@ -12,7 +12,7 @@ let messages = [];
 module.exports = function(io, session){
 
     /***** WEBSOCKETS SOCKET.IO *****/
-    let gameSocket = io.of('/game').use(sharedsession(session, {
+    let gameSocket = io.of('/game').use(sharedSession(session, {
         autoSave: true
     }));
     gameSocket.on('connection', socket => {
@@ -22,7 +22,7 @@ module.exports = function(io, session){
         });
     });
 
-    let chatSocket = io.of('/chat').use(sharedsession(session, {
+    let chatSocket = io.of('/chat').use(sharedSession(session, {
         autoSave: true
     }));
     chatSocket.on('connection', socket => {
