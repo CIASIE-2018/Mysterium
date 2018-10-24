@@ -1,0 +1,17 @@
+body.game{
+    #chat{
+        width  : 100%;
+        background-color: #fff;
+        position: fixed;
+        bottom: 0;
+
+        #msg_box{
+            max-height: 200px;
+            overflow: auto;
+        }
+        
+        #msg_box li:nth-child(odd) { 
+            background: #eee; 
+        }
+    }
+}

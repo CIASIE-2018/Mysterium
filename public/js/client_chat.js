@@ -13,6 +13,6 @@ $(function(){
 
     socket.on('chat message', (msg) => {
         $('#msg_box').append($('<li>').html(msg));
-        $('#msg_box').animate({scrollTop : $('#msg_box li:last-child').offset().top }, 500);
+        $('#msg_box').scrollTop($('#msg_box li:last-child').offset().top);
     });
 });
