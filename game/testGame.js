@@ -1,7 +1,22 @@
 let fs                                             = require('fs');
 let errors                                         = require('./Error');
+const config                                       = require('../config/config');
 let {assert, expect}                               = require('chai');
-let {join, createGame, init, setReady, allIsReady} = require('./game')
+let helpers                                        = require('../helpers');
+let {
+    join, 
+    createGame, 
+    init, 
+    setReady, 
+    allIsReady, 
+    play, 
+    getCards, 
+    getPlayerType, 
+    canPlay,
+    getInformations,
+    giveVisionsToMedium,
+    verifyChoicePlayers
+} = require('./game')
 
 beforeEach(function(){
     this.game = createGame();
@@ -47,7 +62,7 @@ describe('Rejoindre une partie', function(){
         for(i = 1; i < 4; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         let startedGame = init(newGame);
         assert.equal(startedGame.started, true);
@@ -58,8 +73,6 @@ describe('Rejoindre une partie', function(){
     });
 });
 
-
-
 describe('Lancer une partie', function(){
 
     it('impossible lorsqu\'une personne n\'est pas pret', function(){
@@ -67,7 +80,7 @@ describe('Lancer une partie', function(){
         for(i = 1; i < 8; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         expect(function(){
             init(newGame);
@@ -76,9 +89,9 @@ describe('Lancer une partie', function(){
 
     it('impossible lorsque le nombre de joueur <= 2', function(){
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         newGame = join(newGame, 'joueur2');
-        newGame = setReady(newGame, newGame.players[1].id, true);
+        newGame = setReady(newGame, newGame.players[1].username, true);
         assert.equal(newGame.players.length, 2);
         expect(function(){
             init(newGame);
@@ -90,7 +103,7 @@ describe('Lancer une partie', function(){
         for(i = 1; i < 5; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         startedGame = init(newGame);
         assert.equal(startedGame.started, true);
@@ -100,15 +113,15 @@ describe('Lancer une partie', function(){
 describe('Mettre son statut a prêt', function () {
     it('Se mettre prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(newGame.players[0].ready, true);
     });
 
     it('Changer de prêt à pas prêt', function () {
         let newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(newGame.players[0].ready, true);
-        newGame = setReady(newGame, newGame.players[0].id, false);
+        newGame = setReady(newGame, newGame.players[0].username, false);
         assert.equal(newGame.players[0].ready, false);
     });
 
@@ -117,24 +130,24 @@ describe('Mettre son statut a prêt', function () {
         for(i = 1; i < 8; i++) {
             nomJoueur = 'joueur' + i;
             newGame = join(newGame, nomJoueur);
-            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].id, true);
+            if(i != 1) newGame = setReady(newGame, newGame.players[i - 1].username, true);
         }
         assert.equal(allIsReady(newGame), false);
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         assert.equal(allIsReady(newGame), true);
 
     });
 });
 
-describe('test au commencement d\'une partie', function () {
+describe('Test au commencement d\'une partie', function () {
 
     beforeEach(function(){
         newGame = join(this.game, 'joueur1');
-        newGame = setReady(newGame, newGame.players[0].id, true);
+        newGame = setReady(newGame, newGame.players[0].username, true);
         for(i = 2; i < 8; i++){
             idJoueur = 'joueur' + i;
             newGame = join(newGame, idJoueur);
-            newGame = setReady(newGame, newGame.players[i-1].id, true);
+            newGame = setReady(newGame, newGame.players[i-1].username, true);
         }
         startedGame = init(newGame);
     });
@@ -239,7 +252,12 @@ describe('test au commencement d\'une partie', function () {
     it('cartes visions correctement chargées ', function () {
         let nbCartesVisionsFantomes = startedGame.ghost.hand.length;
         let nbCcartesVisions = startedGame.visions.length;
-        let nbTotalVisions   = fs.readdirSync(__dirname + '/../public/images/visions').length;
+
+        let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
+        let cards = json["visions"];
+
+
+        let nbTotalVisions   = cards.length;
         for(var i = 0; i < nbCartesVisionsFantomes; i++) {
             assert.equal(startedGame.visions.includes(startedGame.ghost.hand[i]), false);
         }
@@ -247,6 +265,125 @@ describe('test au commencement d\'une partie', function () {
     });
 });
 
-describe('tests fonctionnalités InGame', function () {
+describe('Methodes in game', function () {
+
+    beforeEach(function(){
+        newGame = join(this.game, 'joueur1');
+        newGame = setReady(newGame, newGame.players[0].username, true);
+        for(i = 2; i < 4; i++){
+            idJoueur = 'joueur' + i;
+            newGame = join(newGame, idJoueur);
+            newGame = setReady(newGame, newGame.players[i-1].username, true);
+        }
+        startedGame = init(newGame);
+    });
+
+    it('les informations du ghost', function(){
+        let infos = getInformations(startedGame, startedGame.ghost.username);
+
+        assert.equal(infos.type, 'ghost')
+        assert.equal(infos.username, startedGame.ghost.username);
+        assert.equal(infos.turn, 0);
+        assert.equal(infos.hand, startedGame.ghost.hand);
+        assert.equal(infos.mediums.length, startedGame.mediums.length);
+    });
+
+    it('les informations du medium', function(){
+        let infos = getInformations(startedGame, startedGame.mediums[0].username);
+
+        assert.equal(infos.type, 'medium')
+        assert.equal(infos.username, startedGame.mediums[0].username);
+        assert.equal(infos.turn, 0);
+    });
+
+    it('Verifier le choix des joueurs - tous les joueurs n\'ont pas joué', function(){
+        expect(function(){
+            verifyChoicePlayers(startedGame);
+        }).to.throw();
+    });
+
+    it('Verifier le choix des joueurs - 1 joueurs a trouvé la bonne carte', function(){
+
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[3]]);
+
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso)
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[0].scenario.perso)
+
+        startedGame = verifyChoicePlayers(startedGame);
+
+        assert.equal(startedGame.mediums[0].state, 1);
+        assert.equal(startedGame.mediums[0].visions.length,0);
+        assert.isUndefined(startedGame.choosenCard);
+
+        assert.equal(startedGame.mediums[1].state, 0);
+        assert.equal(startedGame.mediums[1].visions.length,1);
+        assert.isUndefined(startedGame.choosenCard);
+    });
+
+    it('Verifier le choix des joueurs - tous joueurs ont trouvé la bonne carte', function(){
+
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[3]]);
+
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso)
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.perso)
+
+        startedGame = verifyChoicePlayers(startedGame);
+
+        assert.equal(startedGame.mediums[0].state, 1);
+        assert.equal(startedGame.mediums[0].visions.length,0);
+        assert.isUndefined(startedGame.choosenCard);
+
+        assert.equal(startedGame.mediums[1].state, 1);
+        assert.equal(startedGame.mediums[1].visions.length,0);
+        assert.isUndefined(startedGame.choosenCard);
+    });
+});
+
+if(config.app.mode == 'dev'){
+
+    describe('Test des fonctions privées', function () {
+
+        beforeEach(function(){
+            newGame = join(this.game, 'joueur1');
+            newGame = setReady(newGame, newGame.players[0].username, true);
+            for(i = 2; i < 4; i++){
+                idJoueur = 'joueur' + i;
+                newGame = join(newGame, idJoueur);
+                newGame = setReady(newGame, newGame.players[i-1].username, true);
+            }
+            startedGame = init(newGame);
+        });
+
+
+        it('type du joueur', function(){
+            assert.equal(getPlayerType(startedGame, startedGame.mediums[0].username), "medium");
+            assert.equal(getPlayerType(startedGame, startedGame.ghost.username), "ghost");
+        })  
+
+        it('type du joueur ne peux pas etre retourné', function(){
+            expect(function(){
+                getPlayerType(startedGame, "inexistant")
+            }).to.throw();
+        }) 
+
+        it('le joueur peut jouer car c\'est son tour', function(){
+            assert.isTrue(canPlay(startedGame, startedGame.mediums[0].username))
+        });
+
+        it('le joueur ne peut pas jouer', function(){
+            startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.persos[0])
+            assert.isTrue(canPlay(startedGame, startedGame.mediums[0].username))
+        });
+
+        it('les cartes données sont bonnes', function(){
+
+            let cards = getCards('visions', 7);
+
+            assert.equal(cards.length, 7);
+            assert.isTrue(helpers.include(startedGame.visions, cards));
+        });
+    })
     
-})
+}

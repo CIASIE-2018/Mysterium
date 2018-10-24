@@ -267,7 +267,7 @@ function verifyChoicePlayers(baseGame) {
 }
 
 
-module.exports = {
+let function_exports = {
     createGame,
     join,
     setReady,
@@ -276,8 +276,18 @@ module.exports = {
     allIsReady,
     play,
     giveVisionsToMedium,
-    getInformations
+    getInformations,
 }
+
+if(config.app.mode == 'dev'){
+    function_exports.getPlayerType = getPlayerType
+    function_exports.canPlay = canPlay
+    function_exports.getCards = getCards
+    function_exports.getInformations = getInformations
+    function_exports.isScenarioFound = getInformations
+}
+
+module.exports = function_exports
 
 /** PRIVATE FUNCTIONS */
 
@@ -385,6 +395,11 @@ function initVisions(baseGame) {
 
 
 function getPlayerType(baseGame, username){
+    let medium = baseGame.mediums.find(medium => medium.username == username);
+    
+    if(typeof medium !== 'object' && baseGame.ghost.username !== username)
+        throw new Error('Le type du joueur ne peux pas etre retourné')
+
     return baseGame.ghost.username === username ? 'ghost' : 'medium';
 }
 
@@ -401,9 +416,14 @@ function canPlay(baseGame, username){
     }else{
         //Medium
         let medium = baseGame.mediums.find(medium => medium.username == username);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
+
+        if(medium.hasPlayed && baseGame.ghost.mediumsHasCards.find(username => username == medium.username))
+            return false;
+
+        return true;
     }
 }
+
 function getCards(type, nb_cards){
     let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
     let cards = json[type];
