@@ -376,14 +376,6 @@ if(config.app.mode == 'dev'){
             startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.persos[0])
             assert.isTrue(canPlay(startedGame, startedGame.mediums[0].username))
         });
-
-        it('les cartes données sont bonnes', function(){
-
-            let cards = getCards('visions', 7);
-
-            assert.equal(cards.length, 7);
-            assert.isTrue(helpers.include(startedGame.visions, cards));
-        });
     })
     
 }
