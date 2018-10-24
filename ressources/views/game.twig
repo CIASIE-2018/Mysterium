@@ -129,7 +129,7 @@
                 });
                 if(cards.length > 0){
                     let username = $('input[name=player-receiver]').val();
-                    socketGame.emit('send_card_to_player', {
+                    socketGame.emit('send_card_to_medium', {
                         receiver : username,
                         cards    : cards
                     });

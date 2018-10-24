@@ -5,37 +5,61 @@ const { createGame, init, join, setReady, allIsReady, getInformations, giveVisio
 const sharedSession = require("express-socket.io-session");
 
 
+function getSocket(namespace, username){
+    let socket = null;
+    for(let socketId in namespace.sockets){
+        let currentSocket = namespace.sockets[socketId];
+
+        if(currentSocket.handshake                  != undefined
+        && currentSocket.handshake.session          != undefined
+        && currentSocket.handshake.session.username != undefined
+        && currentSocket.handshake.session.username == username){
+
+            socket = currentSocket;
+            break;
+        }
+    }
+    return socket;
+}
+
+function createNamespaceWithExpressSession(io, namespace, session){
+    return io.of(namespace).use(sharedSession(session, {
+        autoSave: true
+    }));
+}
+
 /* Instance du jeu */
 let game     = createGame();
 let messages = [];
 
+
 module.exports = function(io, session){
 
     /***** WEBSOCKETS SOCKET.IO *****/
-    let gameSocket = io.of('/game').use(sharedSession(session, {
-        autoSave: true
-    }));
+    let gameSocket = createNamespaceWithExpressSession(io, '/game', session);
+   
     gameSocket.on('connection', socket => {
-        socket.on('send_card_to_player', data =>{
-            game = giveVisionsToMedium(game, data.receiver, data.cards);
         
-            let mediumSocket = null;
-            for(let socketId in gameSocket.sockets){
-                if(gameSocket.sockets[socketId].handshake.session.username == data.receiver){
-                    mediumSocket = gameSocket.sockets[socketId];
-                    break;
+        socket.on('send_card_to_medium', data => {
+            
+            let ghostUsername  = game.ghost.username;
+            let socketUsername = socket.handshake.session.username;
+
+            if(socketUsername === ghostUsername){
+
+                game = giveVisionsToMedium(game, data.receiver, data.cards);
+                let mediumSocket = getSocket(gameSocket, data.receiver);
+    
+                if(mediumSocket != null){
+                    mediumSocket.emit('reload');
+                    socket.emit('reload');
                 }
-            }
-            if(mediumSocket != null){
-                mediumSocket.emit('reload');
-                socket.emit('reload');
             }
         });
     });
 
-    let chatSocket = io.of('/chat').use(sharedSession(session, {
-        autoSave: true
-    }));
+    let chatSocket = createNamespaceWithExpressSession(io, '/chat', session);
+
     chatSocket.on('connection', socket => {
 
         socket.on('chat message', message => {
