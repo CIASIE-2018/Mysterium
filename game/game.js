@@ -302,7 +302,7 @@ function chooseScenarioFinal(baseGame, username, scenario_number){
  * @param {object} baseGame 
  */
 function allMediumHasChooseScenario(baseGame){
-    return baseGame.mediums.every((medium) => typeof medium.chooseScenarioFinal !== undefined);
+    return baseGame.mediums.every((medium) => medium.scenarioFinalChoose !== undefined);
 }
 
 /**
@@ -311,20 +311,19 @@ function allMediumHasChooseScenario(baseGame){
  */
 function mediumHasWin(baseGame){
     if(allMediumHasChooseScenario(baseGame)){
-        let results = getAllScenario(baseGame)
+        let scenario_gagnant = baseGame.scenario_final;
 
-        let choices = [];
-        results.forEach(result => {
-            choices.push({
-                result,
-                nb : results.indexOf(result)
-            });
+        let choosenScenarios = []
+        baseGame.mediums.forEach(medium => {
+            choosenScenarios.push(medium.scenarioFinalChoose)
         })
 
-        let scenarioMoreChoose = choices.sort( (a,b) => b.nb-a.nb )[0];
+        let i = choosenScenarios.filter(scenario => scenario == scenario_gagnant);
 
-        return scenarioMoreChoose.result == baseGame.scenario_final ? true : false;
+        if(i.length <= 1)
+            return false;
 
+        return true;        
     }
 }
 
