@@ -2,16 +2,19 @@ const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
 const { createGame, init, join, setReady, allIsReady, getInformations, giveVisionsToMedium } = require('../game/game');
+const sharedsession = require("express-socket.io-session");
 
 
 /* Instance du jeu */
 let game     = createGame();
 let messages = [];
 
-module.exports = function(io){
+module.exports = function(io, session){
 
     /***** WEBSOCKETS SOCKET.IO *****/
-    let gameSocket = io.of('/game');
+    let gameSocket = io.of('/game').use(sharedsession(session, {
+        autoSave: true
+    }));
     gameSocket.on('connection', socket => {
         socket.on('send_card_to_player', data =>{
             game = giveVisionsToMedium(game, data.receiver, data.cards);
@@ -19,12 +22,14 @@ module.exports = function(io){
         });
     });
 
-    let chatSocket = io.of('/chat');
+    let chatSocket = io.of('/chat').use(sharedsession(session, {
+        autoSave: true
+    }));
     chatSocket.on('connection', socket => {
 
-        socket.on('chat message', (data) => {
+        socket.on('chat message', message => {
             //TODO ATTENTION INJECTION CODE !
-            let msg = moment().format('HH:mm') + " <span class='pseudo'>" + data.author +"</span>  : " + data.msg_content;
+            let msg = moment().format('HH:mm') + ` <span class='pseudo'>${socket.handshake.session.username}</span>  : ${message}`;
             messages.push(msg);
             chatSocket.emit('chat message',msg);
         });

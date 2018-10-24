@@ -8,7 +8,6 @@ const io         = require('socket.io').listen(server);
 
 const bodyParser = require('body-parser');
 
-const session    = require('express-session');
 
 const cookieParser     = require('cookie-parser');
 const expressValidator = require('express-validator');
@@ -35,11 +34,14 @@ if(config.app.mode == 'dev')
 
 
 /***** MIDDLEWARES *****/
-app.use(session({
+let session = require('express-session')({
     secret: 'mysterium2018',
     saveUninitialized: true,
     resave: true
-}));
+});
+
+app.use(session);
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -80,7 +82,7 @@ app.use(function (req, res, next) {
 
   app.use('/', (req, res, next) => {
     req.isAuthenticated() ? next() : res.redirect('/login');
-  }, require('./routes/gameRouter')(io));
+  }, require('./routes/gameRouter')(io, session));
 
 /*******************/
 
