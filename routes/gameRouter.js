@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, allIsReady, play, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, init, join, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
 
 
@@ -57,6 +57,16 @@ module.exports = function(app, io, session){
             app.render('partials/playerList', {mediums : game.mediums} , (err, html) => {
                 if(!err) gameSocket.emit('player_list', html);
             });
+
+            if(allMediumPlayed(game)){
+                game = verifyChoicePlayers(game);
+                gameSocket.emit('message', {
+                    type    : 'success',
+                    content : 'Tu viens de passer un tour'
+                });
+                
+            }
+
             socket.emit('message', {
                 type    : 'success',
                 content : 'Vous venez de jouer votre tour...'
