@@ -1,25 +1,23 @@
-let fs                                             = require('fs');
-let errors                                         = require('./Error');
-const config                                       = require('../config/config');
-let {assert, expect}                               = require('chai');
-let helpers                                        = require('../helpers');
-let {
-    join, 
-    createGame, 
-    init, 
-    setReady, 
-    allIsReady, 
-    play, 
-    getCards, 
-    getPlayerType, 
-    canPlay,
+const fs                             = require('fs');
+const errors                         = require('./Error');
+const config                         = require('../config/config');
+const {assert, expect}               = require('chai');
+const helpers                        = require('../helpers');
+const {
+    allIsReady,
+    allMediumHasChooseScenario,
+    allMediumPlayed,
+    chooseScenarioFinal,
+    createGame,
+    getAllScenario,
     getInformations,
     giveVisionsToMedium,
-    verifyChoicePlayers,
-    getAllScenario,
-    chooseScenarioFinal,
-    allMediumHasChooseScenario,
-    mediumHasWin
+    init,
+    join,
+    mediumHasWin,
+    play,
+    setReady,
+    verifyChoicePlayers
 } = require('./game')
 
 beforeEach(function(){
@@ -343,6 +341,29 @@ describe('Methodes in game', function () {
         assert.equal(startedGame.mediums[1].visions.length,0);
         assert.isUndefined(startedGame.choosenCard);
     });
+
+    it('Tous les joueurs ont joués', function(){
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[0]]);
+
+        //les joueurs choisisent une carte du plateau   
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso);
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.perso);
+
+        assert.isTrue(allMediumPlayed(startedGame))
+
+    })
+
+    it('Tous les joueurs ont joués - 1 n\'a pas joué', function(){
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[0]]);
+
+        //les joueurs choisisent une carte du plateau   
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso);
+
+        assert.isFalse(allMediumPlayed(startedGame))
+
+    })
 });
 
 describe('Phase finale', function(){
