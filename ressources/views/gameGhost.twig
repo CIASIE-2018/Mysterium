@@ -1,16 +1,6 @@
 {% extends "layouts/master.twig" %}
 
 {% block content %}
-
-    {% if infos.type == 'medium' %}
-        {% set me = null %}
-        {% for medium in infos.mediums %}
-            {% if medium.username == infos.username %}
-                {% set me = medium %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
     <div class="game_container">
         <div class="menu_container">
             <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
@@ -22,21 +12,13 @@
 
             <div class="card_selected">
                 <div class="card_selected_content">
-                    {% if infos.type == 'medium' %}
-                        <img src="/images/cards/{{ me.cards[0] }}.png">
-                        <form id="selected_card_form">
-                            <input type="hidden" name="selected-card" value="{{ me.cards[0] }}">
-                            <button type="submit" class="card_selected_btn">Choisir</button>
-                        </form>
-                    {% else %}
-                        <img src="/images/cards/{{ infos.mediums[0].cards[0] }}.png">
-                    {% endif %}
+                    <img src="/images/cards/{{ infos.mediums[0].cards[0] }}.png">
                 </div>
             </div>
 
             <div class="cards_hand">
                 <div class="cards_hand_detail">
-                    <img src="/images/cards/{{ infos.type == 'medium' ? me.visions[0]|default('default') : infos.hand[0] }}.png">
+                    <img src="/images/cards/{{ infos.hand[0] }}.png">
                 </div>
 
                 <div class="cards_hand_list">
@@ -47,20 +29,11 @@
         <div class="game_plateau">
             <div class="swiper-container">
                 <div class="swiper-wrapper">
-                    {% if infos.type == 'medium' %}
-                        {% for card in me.cards %}
-                            <div data-idcard="{{ card }}" class="swiper-slide">
-                                <img src="/images/cards/{{ card }}.png">
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% if infos.type == 'ghost' %}
-                        {% for card in infos.mediums[0].cards %}
-                            <div class="swiper-slide">
-                                <img src="/images/cards/{{ card }}.png">
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                    {% for card in infos.mediums[0].cards %}
+                        <div class="swiper-slide">
+                            <img src="/images/cards/{{ card }}.png">
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -156,45 +129,24 @@
 
         let socketGame = io('/game');
 
-
-        socketGame.on('reload', function(){
-            window.location.reload();
-        });
-
         socketGame.on('message', function(data){
             console.log(data.type + ' : ' + data.content);
         });
 
         socketGame.on('player_list', function(html){
             $('.player_list').html(html);
-            {% if infos.type == 'ghost' %}
-                init_player_list();
-            {% endif %}
+            init_player_list();
         });
 
-        
-        {% if infos.type == 'ghost' %}
-
-            init_player_list();
+        socketGame.on('hand', function(html){
+            $('.cards_hand_list').html(html);
+            init_hand();
             init_ghost_hand_form(socketGame);
+        });
 
-        {% else %}
-
-            $('.game_plateau .swiper-slide').on('click', function(e){
-                let cardId = $(e.currentTarget).data('idcard');
-                $('input[name=selected-card]').val(cardId);
-                set_scenario_card_zoom(cardId);
-            });
-            $('#selected_card_form').on('submit', function(e){
-                e.preventDefault();
-                let cardId = $('input[name=selected-card]').val();
-                socketGame.emit('choice_card', parseInt(cardId));
-            })
-
-        {% endif %}
-
-
+        init_player_list();
         init_hand();
+        init_ghost_hand_form(socketGame);
     });
 </script>
 {% endblock %}
