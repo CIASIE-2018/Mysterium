@@ -254,8 +254,9 @@ function verifyChoicePlayers(baseGame) {
                 medium.visions  = [];
             }
             
-            medium.chosenCard = '';
-            medium.hasPlayed  = false;
+            medium.chosenCard       = '';
+            medium.hasPlayed        = false;
+            medium.hasReceivedCards = false;
         })
 
         if(baseGame.turn < baseGame.max_turn){
