@@ -1,6 +1,5 @@
-{% for medium in infos.mediums %}
+{% for medium in mediums %}
     <div data-username="{{medium.username}}" class="player_list_item  
-        {% if medium.username == me.username %} me {% endif %}
         {% if medium.hasPlayed %} played {% endif %}">
         <div class="player_list_item_pseudo">{{ medium.initial|upper }}</div>
     </div>
