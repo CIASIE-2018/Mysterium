@@ -182,7 +182,10 @@ function getInformations(baseGame, username) {
         state.cards = baseGame[medium.state == 0 ? 'persos' : (medium.state == 1 ? 'lieux' : 'armes')];
         if(type == 'ghost')
             state.card  = medium.scenario[medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme')];
-    
+        
+        if(medium.username == infosPlayer.username)
+            infosPlayer.me = state;
+
         return state;
     });
 
