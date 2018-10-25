@@ -1,16 +1,15 @@
 const { produce } = require('immer'); /* https://github.com/mweststrate/immer */
 const errors      = require('./Error.js');
-
-let fs       = require('fs');
-let helpers  = require('../helpers');
-const config = require('../config/config');
+const fs          = require('fs');
+const helpers     = require('../helpers');
+const config      = require('../config/config');
 
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(256); 
 
 const PERSO = 0;
-const LIEU = 1;
-const ARME = 2;
+const LIEU  = 1;
+const ARME  = 2;
 const FINAL = 3;
  
 /** PUBLIC FUNCTIONS */
@@ -267,6 +266,14 @@ function verifyChoicePlayers(baseGame) {
 }
 
 /**
+ * Retourne True si les médiums ont tous joué
+ * @param {object} baseGame 
+ */
+function allMediumPlayed(baseGame){
+    return baseGame.mediums.every(medium => medium.hasPlayed == true);
+}
+
+/**
  * Retourne tous les scénarios des médiums
  * @param {object} baseGame Instance de jeu
  */
@@ -302,7 +309,7 @@ function chooseScenarioFinal(baseGame, username, scenario_number){
  * @param {object} baseGame 
  */
 function allMediumHasChooseScenario(baseGame){
-    return baseGame.mediums.every((medium) => medium.scenarioFinalChoose !== undefined);
+    return baseGame.mediums.every(medium => medium.scenarioFinalChoose !== undefined);
 }
 
 /**
@@ -312,24 +319,22 @@ function allMediumHasChooseScenario(baseGame){
 function mediumHasWin(baseGame){
     if(allMediumHasChooseScenario(baseGame)){
         let scenario_gagnant = baseGame.scenario_final;
-
-        let choosenScenarios = []
+        
+        let count = 0;
         baseGame.mediums.forEach(medium => {
-            choosenScenarios.push(medium.scenarioFinalChoose)
+            let scenario = medium.scenarioFinalChoose;
+            if(scenario.perso == scenario_gagnant.perso && scenario.lieu == scenario_gagnant.lieu && scenario.arme == scenario_gagnant.arme)
+                count++;
         })
 
-        let i = choosenScenarios.filter(scenario => scenario == scenario_gagnant);
-
-        if(i.length <= 1)
-            return false;
-
-        return true;        
+        return count > Math.floor(baseGame.mediums.length / 2);
     }
 }
 
 let function_exports = {
     allIsReady,
     allMediumHasChooseScenario,
+    allMediumPlayed,
     chooseScenarioFinal,
     createGame,
     getAllScenario,
