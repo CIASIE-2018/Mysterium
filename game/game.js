@@ -198,32 +198,31 @@ function getInformations(baseGame, username) {
  * @param {array} cards     Cartes visions a donner
  */
 function giveVisionsToMedium(baseGame, username, cards){
-    if(canPlay(baseGame,baseGame.ghost.username)){
-        if(!baseGame.ghost.mediumsHasCards.includes(username)){
-            if(helpers.include(baseGame.ghost.hand, cards)){
-
-                return produce(baseGame, draftGame => {
-                    let ghost  = draftGame.ghost;
-                    let medium = draftGame.mediums.find(medium => medium.username == username);
-    
-                    let visions            = draftGame.visions;
-                    let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
-                    draftGame.visions      = visions.slice(0, -cards.length);
-
-                    //Retire les cartes a donner de la main du fantome
-                    ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
-                    //Complete la main du fantome avec le nombre de cartes manquantes
-                    ghost.hand  = ghost.hand.concat(newVisionsForGhost);
-                    
-                    medium.visions = medium.visions.concat(cards);
-                    ghost.mediumsHasCards.push(username);
-                });
-            }else
-                throw new Error('Le fantome n\'a pas les cartes visions');
-        }else
-            throw new Error('Le fantome a deja donne des cartes a ce joueur');
-    }else
+    if(!canPlay(baseGame,baseGame.ghost.username))
         throw new Error('Le fantome ne peut pas jouer maintenant');
+
+    if(baseGame.ghost.mediumsHasCards.includes(username))
+        throw new Error('Le fantome a deja donne des cartes a ce joueur');
+        
+    if(!helpers.include(baseGame.ghost.hand, cards))
+        throw new Error('Le fantome n\'a pas les cartes visions');
+
+    return produce(baseGame, draftGame => {
+        let ghost  = draftGame.ghost;
+        let medium = draftGame.mediums.find(medium => medium.username == username);
+
+        let visions            = draftGame.visions;
+        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+        draftGame.visions      = visions.slice(0, -cards.length);
+
+        //Retire les cartes a donner de la main du fantome
+        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+        //Complete la main du fantome avec le nombre de cartes manquantes
+        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+        
+        medium.visions = medium.visions.concat(cards);
+        ghost.mediumsHasCards.push(username);
+    });   
 }
 
 /**
