@@ -280,7 +280,7 @@ describe('Methodes in game', function () {
         startedGame = init(newGame);
     });
 
-    it('les informations du ghost', function(){
+    it('les informations du joueur - ghost', function(){
         let infos = getInformations(startedGame, startedGame.ghost.username);
 
         assert.equal(infos.type, 'ghost')
@@ -290,12 +290,18 @@ describe('Methodes in game', function () {
         assert.equal(infos.mediums.length, startedGame.mediums.length);
     });
 
-    it('les informations du medium', function(){
+    it('les informations du joueur - medium', function(){
         let infos = getInformations(startedGame, startedGame.mediums[0].username);
 
         assert.equal(infos.type, 'medium')
         assert.equal(infos.username, startedGame.mediums[0].username);
         assert.equal(infos.turn, 0);
+    });
+
+    it('les informations du joueur - joueur inexistant', function(){
+        expect(function(){
+            getInformations(startedGame, 'toto');
+        }).to.throw()
     });
 
     it('Verifier le choix des joueurs - tous les joueurs n\'ont pas joué', function(){
@@ -340,6 +346,19 @@ describe('Methodes in game', function () {
         assert.equal(startedGame.mediums[1].state, 1);
         assert.equal(startedGame.mediums[1].visions.length,0);
         assert.isUndefined(startedGame.choosenCard);
+    });
+
+    it('Verifier le choix des joueurs - le tour du jeu augmente', function(){
+
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[3]]);
+
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso)
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.perso)
+
+        startedGame = verifyChoicePlayers(startedGame);
+
+        assert.equal(startedGame.turn, 1);
     });
 
     it('Tous les joueurs ont joués', function(){
