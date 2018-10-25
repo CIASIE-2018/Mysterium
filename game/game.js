@@ -1,16 +1,15 @@
 const { produce } = require('immer'); /* https://github.com/mweststrate/immer */
 const errors      = require('./Error.js');
-
-let fs       = require('fs');
-let helpers  = require('../helpers');
-const config = require('../config/config');
+const fs          = require('fs');
+const helpers     = require('../helpers');
+const config      = require('../config/config');
 
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(256); 
 
 const PERSO = 0;
-const LIEU = 1;
-const ARME = 2;
+const LIEU  = 1;
+const ARME  = 2;
 const FINAL = 3;
  
 /** PUBLIC FUNCTIONS */
@@ -200,32 +199,31 @@ function getInformations(baseGame, username) {
  * @param {array} cards     Cartes visions a donner
  */
 function giveVisionsToMedium(baseGame, username, cards){
-    if(canPlay(baseGame,baseGame.ghost.username)){
-        if(!baseGame.ghost.mediumsHasCards.includes(username)){
-            if(helpers.include(baseGame.ghost.hand, cards)){
-
-                return produce(baseGame, draftGame => {
-                    let ghost  = draftGame.ghost;
-                    let medium = draftGame.mediums.find(medium => medium.username == username);
-    
-                    let visions            = draftGame.visions;
-                    let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
-                    draftGame.visions      = visions.slice(0, -cards.length);
-
-                    //Retire les cartes a donner de la main du fantome
-                    ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
-                    //Complete la main du fantome avec le nombre de cartes manquantes
-                    ghost.hand  = ghost.hand.concat(newVisionsForGhost);
-                    
-                    medium.visions = medium.visions.concat(cards);
-                    ghost.mediumsHasCards.push(username);
-                });
-            }else
-                throw new Error('Le fantome n\'a pas les cartes visions');
-        }else
-            throw new Error('Le fantome a deja donne des cartes a ce joueur');
-    }else
+    if(!canPlay(baseGame,baseGame.ghost.username))
         throw new Error('Le fantome ne peut pas jouer maintenant');
+
+    if(baseGame.ghost.mediumsHasCards.includes(username))
+        throw new Error('Le fantome a deja donne des cartes a ce joueur');
+        
+    if(!helpers.include(baseGame.ghost.hand, cards))
+        throw new Error('Le fantome n\'a pas les cartes visions');
+
+    return produce(baseGame, draftGame => {
+        let ghost  = draftGame.ghost;
+        let medium = draftGame.mediums.find(medium => medium.username == username);
+
+        let visions            = draftGame.visions;
+        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+        draftGame.visions      = visions.slice(0, -cards.length);
+
+        //Retire les cartes a donner de la main du fantome
+        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+        //Complete la main du fantome avec le nombre de cartes manquantes
+        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+        
+        medium.visions = medium.visions.concat(cards);
+        ghost.mediumsHasCards.push(username);
+    });   
 }
 
 /**
@@ -268,6 +266,14 @@ function verifyChoicePlayers(baseGame) {
 }
 
 /**
+ * Retourne True si les médiums ont tous joué
+ * @param {object} baseGame 
+ */
+function allMediumPlayed(baseGame){
+    return baseGame.mediums.every(medium => medium.hasPlayed == true);
+}
+
+/**
  * Retourne tous les scénarios des médiums
  * @param {object} baseGame Instance de jeu
  */
@@ -303,7 +309,7 @@ function chooseScenarioFinal(baseGame, username, scenario_number){
  * @param {object} baseGame 
  */
 function allMediumHasChooseScenario(baseGame){
-    return baseGame.mediums.every((medium) => medium.scenarioFinalChoose !== undefined);
+    return baseGame.mediums.every(medium => medium.scenarioFinalChoose !== undefined);
 }
 
 /**
@@ -313,24 +319,22 @@ function allMediumHasChooseScenario(baseGame){
 function mediumHasWin(baseGame){
     if(allMediumHasChooseScenario(baseGame)){
         let scenario_gagnant = baseGame.scenario_final;
-
-        let choosenScenarios = []
+        
+        let count = 0;
         baseGame.mediums.forEach(medium => {
-            choosenScenarios.push(medium.scenarioFinalChoose)
+            let scenario = medium.scenarioFinalChoose;
+            if(scenario.perso == scenario_gagnant.perso && scenario.lieu == scenario_gagnant.lieu && scenario.arme == scenario_gagnant.arme)
+                count++;
         })
 
-        let i = choosenScenarios.filter(scenario => scenario == scenario_gagnant);
-
-        if(i.length <= 1)
-            return false;
-
-        return true;        
+        return count > Math.floor(baseGame.mediums.length / 2);
     }
 }
 
 let function_exports = {
     allIsReady,
     allMediumHasChooseScenario,
+    allMediumPlayed,
     chooseScenarioFinal,
     createGame,
     getAllScenario,
