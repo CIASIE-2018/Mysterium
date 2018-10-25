@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, allIsReady, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, init, join, setReady, allIsReady, play, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
 
 
@@ -33,20 +33,16 @@ let game     = createGame();
 let messages = [];
 
 
-module.exports = function(io, session){
+module.exports = function(app, io, session){
 
     /***** WEBSOCKETS SOCKET.IO *****/
     let gameSocket = createNamespaceWithExpressSession(io, '/game', session);
    
     gameSocket.on('connection', socket => {
+        let socketUsername = socket.handshake.session.username;
         
         socket.on('send_card_to_medium', data => {
-            
-            let ghostUsername  = game.ghost.username;
-            let socketUsername = socket.handshake.session.username;
-
-            if(socketUsername === ghostUsername){
-
+            if(socketUsername === game.ghost.username){
                 game = giveVisionsToMedium(game, data.receiver, data.cards);
                 let mediumSocket = getSocket(gameSocket, data.receiver);
     
@@ -56,6 +52,18 @@ module.exports = function(io, session){
                 }
             }
         });
+        socket.on('choice_card', cardId => {
+            game = play(game, socketUsername, cardId);
+            app.render('partials/playerList', {mediums : game.mediums} , (err, html) => {
+                if(!err) gameSocket.emit('player_list', html);
+            });
+            socket.emit('message', {
+                type    : 'success',
+                content : 'Vous venez de jouer votre tour...'
+            });
+        });
+
+        
     });
 
     let chatSocket = createNamespaceWithExpressSession(io, '/chat', session);
