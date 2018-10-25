@@ -175,7 +175,7 @@ function getInformations(baseGame, username) {
             state            : medium.state,
             username         : medium.username,
             initial          : medium.initial,
-            hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id),
+            hasReceivedCards : medium.hasReceivedCards,
             hasPlayed        : medium.hasPlayed,
             visions          : medium.visions
         };
@@ -222,6 +222,7 @@ function giveVisionsToMedium(baseGame, username, cards){
         ghost.hand  = ghost.hand.concat(newVisionsForGhost);
         
         medium.visions = medium.visions.concat(cards);
+        medium.hasReceivedCards = true;
         ghost.mediumsHasCards.push(username);
     });   
 }
@@ -253,8 +254,9 @@ function verifyChoicePlayers(baseGame) {
                 medium.visions  = [];
             }
             
-            medium.chosenCard = '';
-            medium.hasPlayed  = false;
+            medium.chosenCard       = '';
+            medium.hasPlayed        = false;
+            medium.hasReceivedCards = false;
         })
 
         if(baseGame.turn < baseGame.max_turn){
