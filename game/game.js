@@ -233,10 +233,9 @@ function giveVisionsToMedium(baseGame, username, cards){
 */
 function verifyChoicePlayers(baseGame) {
 
-    baseGame.mediums.map(medium => {
-        if(!medium.hasPlayed)
-            throw new Error("Tous les joueurs n'ont pas joués")
-    });
+    if(!allMediumPlayed(baseGame))
+        throw new Error("Tous les joueurs n'ont pas joués")
+
 
     let hasGoodCards = [];
 
