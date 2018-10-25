@@ -52,6 +52,7 @@ function join(baseGame, username) {
         draftGame.players.push({
             id        : uidgen.generateSync(),
             username  : username,
+            initial   : username.slice(0,2),
             ready     : false
         });
     });
@@ -174,7 +175,7 @@ function getInformations(baseGame, username) {
         let state = {
             state            : medium.state,
             username         : medium.username,
-            initial          : medium.username.slice(0,2),
+            initial          : medium.initial,
             hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id),
             hasPlayed        : medium.hasPlayed,
             visions          : medium.visions
@@ -302,12 +303,14 @@ function initRoles(baseGame) {
             if(aleaGhost === i){
                 draftGame.ghost = {
                     username        : player.username,
+                    initial         : player.initial,
                     hand            : [],
                     mediumsHasCards : []
                 };
             }else{
                 draftGame.mediums.push({
                     username  : player.username,
+                    initial   : player.initial,
                     state     : 0,
                     visions   : [],
                     hasPlayed : false
