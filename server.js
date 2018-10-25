@@ -82,7 +82,7 @@ app.use(function (req, res, next) {
 
   app.use('/', (req, res, next) => {
     req.isAuthenticated() ? next() : res.redirect('/login');
-  }, require('./routes/gameRouter')(io, session));
+  }, require('./routes/gameRouter')(app, io, session));
 
 /*******************/
 

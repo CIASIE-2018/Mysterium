@@ -17,14 +17,17 @@
         </div>
         <div class="game_content">
             <div class="player_list">
-            {% include 'partials/playerList.twig' %}
+            {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
             </div>
 
             <div class="card_selected">
                 <div class="card_selected_content">
                     {% if infos.type == 'medium' %}
                         <img src="/images/cards/{{ me.cards[0] }}.png">
-                        <div class="card_selected_btn">Choisir</div>
+                        <form id="selected_card_form">
+                            <input type="hidden" name="selected-card" value="{{ me.cards[0] }}">
+                            <button type="submit" class="card_selected_btn">Choisir</button>
+                        </form>
                     {% else %}
                         <img src="/images/cards/{{ infos.mediums[0].cards[0] }}.png">
                     {% endif %}
@@ -46,7 +49,7 @@
                 <div class="swiper-wrapper">
                     {% if infos.type == 'medium' %}
                         {% for card in me.cards %}
-                            <div class="swiper-slide">
+                            <div data-idcard="{{ card }}" class="swiper-slide">
                                 <img src="/images/cards/{{ card }}.png">
                             </div>
                         {% endfor %}
@@ -77,29 +80,6 @@
         });
 
 
-        function init_plateau(cards){
-            let swiper = $('.swiper-container')[0].swiper;
-            swiper.removeAllSlides();
-            let tab = cards.map(function(card){
-                return `
-                <div class='swiper-slide'>
-                    <img src='/images/cards/${card}.png'>
-                </div>`
-            });
-            swiper.addSlide(1,tab);
-
-        }
-
-        function set_scenario_card_zoom(card){
-            $('.card_selected_content img').attr('src', `/images/cards/${card}.png`);
-        }
-
-        let socketGame = io('/game');
-
-        socketGame.on('reload', function(){
-            window.location.reload();
-        });
-
         let mediums = {};
          {% for medium in infos.mediums %}
             mediums.{{medium.username}} = {
@@ -111,16 +91,53 @@
             }
         {% endfor %}
 
-        {% if infos.type == 'ghost' %}
+        function set_zoom(img){
+            return img.magnify({
+                src : img.prop('src')
+            });
+        }
 
-            $('.player_list_item').on('click', function(){
-                let username = $(this).data('username');
+        function set_plateau(cards){
+            let swiper = $('.swiper-container')[0].swiper;
+            swiper.removeAllSlides();
+            let tab = cards.map(function(card){
+                return `
+                <div class='swiper-slide'>
+                    <img src='/images/cards/${card}.png'>
+                </div>`
+            });
+            swiper.addSlide(1,tab);
+        }
+
+        function set_scenario_card_zoom(card){
+            $('.card_selected_content img').attr('src', `/images/cards/${card}.png`);
+        }
+
+        function init_player_list(){
+            $('.player_list_item').on('click', function(e){
+                let username = $(e.currentTarget).data('username');
                 $('input[name=player-receiver]').val(username);
                 let data = mediums[username]; 
-                init_plateau(data.cards);
+                set_plateau(data.cards);
                 set_scenario_card_zoom(data.card);
             });
+        }
 
+        function init_hand(){
+            set_zoom($('.cards_hand_detail img'));
+            $('.cards_hand_list_item').on('click', function(e){
+                let pictureUrl    = $(e.target).prop('src');
+                let detailElement = $('.cards_hand_detail img');
+                detailElement.fadeOut('fast', function () {
+                    detailElement.prop('src', pictureUrl);
+                    detailElement.fadeIn('fast', function(){
+                        set_zoom(detailElement);
+                    });
+                });
+            });
+        }
+
+        function init_ghost_hand_form(socket){
             $('#hand_form').on('submit', function(e){
                 e.preventDefault();
                 let cards = [];
@@ -129,42 +146,55 @@
                 });
                 if(cards.length > 0){
                     let username = $('input[name=player-receiver]').val();
-                    socketGame.emit('send_card_to_medium', {
+                    socket.emit('send_card_to_medium', {
                         receiver : username,
                         cards    : cards
                     });
                 }
-
-                
             });
-        {% endif %}
-
-        function initZoom(img){
-            let zoom = img.magnify({
-                src : img.prop('src')
-            });
-            return zoom;
         }
 
-        initZoom($('.cards_hand_detail img'));
+        let socketGame = io('/game');
 
-        {% if infos.type == 'medium' %}
-            $('.game_plateau .swiper-slide').on('click', function(e){
-                let pictureUrl = $(e.target).prop('src');
-                $('.card_selected img').prop('src', pictureUrl);
-            });
-        {% endif %}
-        
-        $('.cards_hand_list_item').on('click', function(e){
-            let pictureUrl    = $(e.target).prop('src');
-            let detailElement = $('.cards_hand_detail img');
-            detailElement.fadeOut('fast', function () {
-                detailElement.prop('src', pictureUrl);
-                detailElement.fadeIn('fast', function(){
-                    initZoom(detailElement);
-                });
-            });
+
+        socketGame.on('reload', function(){
+            window.location.reload();
         });
-    })
+
+        socketGame.on('message', function(data){
+            console.log(data.type + ' : ' + data.content);
+        });
+
+        socketGame.on('player_list', function(html){
+            $('.player_list').html(html);
+            {% if infos.type == 'ghost' %}
+                init_player_list();
+            {% endif %}
+        });
+
+        
+        {% if infos.type == 'ghost' %}
+
+            init_player_list();
+            init_ghost_hand_form(socketGame);
+
+        {% else %}
+
+            $('.game_plateau .swiper-slide').on('click', function(e){
+                let cardId = $(e.currentTarget).data('idcard');
+                $('input[name=selected-card]').val(cardId);
+                set_scenario_card_zoom(cardId);
+            });
+            $('#selected_card_form').on('submit', function(e){
+                e.preventDefault();
+                let cardId = $('input[name=selected-card]').val();
+                socketGame.emit('choice_card', parseInt(cardId));
+            })
+
+        {% endif %}
+
+
+        init_hand();
+    });
 </script>
 {% endblock %}
