@@ -76,16 +76,16 @@ function setReady(baseGame, username) {
  */
 function init(baseGame) {
     let game = {};
-    if(allIsReady(baseGame)){
-        if(baseGame.players.length >= 3) {
-            game = initRoles(baseGame)
-            game = generateCards(game);
-            game = initScenarios(game);
-            game = initVisions(game);
-        }else
-            throw new errors.NotEnoughPlayerError();
-    }else
+    if(!allIsReady(baseGame))
         throw new errors.NotAllAreReady();
+    
+    if(baseGame.players.length < 3) 
+        throw new errors.NotEnoughPlayerError();
+
+    game = initRoles(baseGame)
+    game = generateCards(game);
+    game = initScenarios(game);
+    game = initVisions(game);  
 
     return produce(game, draftGame => {
         draftGame.started = true;
