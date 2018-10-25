@@ -266,17 +266,81 @@ function verifyChoicePlayers(baseGame) {
     });
 }
 
+/**
+ * Retourne tous les scénarios des médiums
+ * @param {object} baseGame Instance de jeu
+ */
+function getAllScenario(baseGame){
+    let scenario = [];
+    baseGame.mediums.forEach(medium => {
+        scenario.push(medium.scenario);
+    })
+
+    return scenario;
+}
+
+/**
+ * Permet à un joueur de choisir un scénario final
+ * @param {object} baseGame 
+ * @param {string} username 
+ * @param {number} scenario_number 
+ */
+function chooseScenarioFinal(baseGame, username, scenario_number){
+
+    let scenarios = getAllScenario(baseGame);
+    if(scenario_number >= scenarios.length )
+        throw new Error('Le scenario ne peut pas etre choisis')
+    
+    return produce(baseGame, draftGame => {
+        let medium = draftGame.mediums.find(medium => medium.username == username);
+        medium.scenarioFinalChoose = scenarios[scenario_number];
+    });
+}
+
+/**
+ * Retourne True si tous les médiums ont choisi un scénario final
+ * @param {object} baseGame 
+ */
+function allMediumHasChooseScenario(baseGame){
+    return baseGame.mediums.every((medium) => medium.scenarioFinalChoose !== undefined);
+}
+
+/**
+ * Indique si les mediums ont choisis le bon scenario final
+ * @param {object} baseGame 
+ */
+function mediumHasWin(baseGame){
+    if(allMediumHasChooseScenario(baseGame)){
+        let scenario_gagnant = baseGame.scenario_final;
+
+        let choosenScenarios = []
+        baseGame.mediums.forEach(medium => {
+            choosenScenarios.push(medium.scenarioFinalChoose)
+        })
+
+        let i = choosenScenarios.filter(scenario => scenario == scenario_gagnant);
+
+        if(i.length <= 1)
+            return false;
+
+        return true;        
+    }
+}
 
 let function_exports = {
+    allIsReady,
+    allMediumHasChooseScenario,
+    chooseScenarioFinal,
     createGame,
+    getAllScenario,
+    getInformations,
+    giveVisionsToMedium,
+    init,
     join,
+    mediumHasWin,
+    play,
     setReady,
     verifyChoicePlayers,
-    init,
-    allIsReady,
-    play,
-    giveVisionsToMedium,
-    getInformations,
 }
 
 if(config.app.mode == 'dev'){
@@ -349,8 +413,6 @@ function generateCards(baseGame) {
     });
 }
 
-
-
 /**
  * Génère différents scénarios en fonction des cartes du jeu,
  * associe un scénario à chaque medium,
@@ -393,7 +455,11 @@ function initVisions(baseGame) {
     });
 }
 
-
+/**
+ * Retourne le type d'un joueur
+ * @param {object} baseGame 
+ * @param {string} username 
+ */
 function getPlayerType(baseGame, username){
     let medium = baseGame.mediums.find(medium => medium.username == username);
     

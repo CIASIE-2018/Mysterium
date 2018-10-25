@@ -15,7 +15,11 @@ let {
     canPlay,
     getInformations,
     giveVisionsToMedium,
-    verifyChoicePlayers
+    verifyChoicePlayers,
+    getAllScenario,
+    chooseScenarioFinal,
+    allMediumHasChooseScenario,
+    mediumHasWin
 } = require('./game')
 
 beforeEach(function(){
@@ -340,6 +344,118 @@ describe('Methodes in game', function () {
         assert.isUndefined(startedGame.choosenCard);
     });
 });
+
+describe('Phase finale', function(){
+
+    beforeEach(function(){
+        newGame = join(this.game, 'joueur1');
+        newGame = setReady(newGame, newGame.players[0].username, true);
+        for(i = 2; i < 5; i++){
+            idJoueur = 'joueur' + i;
+            newGame = join(newGame, idJoueur);
+            newGame = setReady(newGame, newGame.players[i-1].username, true);
+        }
+        startedGame = init(newGame);
+
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[0].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[1].username, [startedGame.ghost.hand[0]]);
+        startedGame = giveVisionsToMedium(startedGame, startedGame.mediums[2].username, [startedGame.ghost.hand[0]]);
+
+        //les joueurs choisisent une carte du plateau   
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.perso);
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.perso);
+        startedGame = play(startedGame, startedGame.mediums[2].username, startedGame.mediums[2].scenario.perso);
+
+        //verifie si les joueurs ont choisis la bonne carte sur le plateau 
+        //en fonction de leur scenario
+        startedGame = verifyChoicePlayers(startedGame);
+
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.lieu);
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.lieu);
+        startedGame = play(startedGame, startedGame.mediums[2].username, startedGame.mediums[2].scenario.lieu);
+
+        startedGame = verifyChoicePlayers(startedGame);
+
+        startedGame = play(startedGame, startedGame.mediums[0].username, startedGame.mediums[0].scenario.arme);
+        startedGame = play(startedGame, startedGame.mediums[1].username, startedGame.mediums[1].scenario.arme);
+        startedGame = play(startedGame, startedGame.mediums[2].username, startedGame.mediums[2].scenario.arme);
+
+        startedGame = verifyChoicePlayers(startedGame);
+    });
+
+    it('Avoir tous les scénarios des joueurs', function(){
+        let scenarios = getAllScenario(startedGame);
+        assert.equal(scenarios.length, 3);
+    })
+
+    it('Un joueur peut choisir un scénario', function(){
+        game = chooseScenarioFinal(startedGame, startedGame.mediums[0].username, 0);
+        
+        let medium = game.mediums.find(medium => medium.username == startedGame.mediums[0].username);
+        
+        assert.isObject(medium.scenarioFinalChoose);
+        
+    })
+
+    it('Un joueur peut choisir un scénario - scenario faux', function(){
+        expect(function(){
+            chooseScenarioFinal(startedGame, startedGame.mediums[0].username, 4);
+        }).to.throw();
+    })
+
+    it('Savoir si tous les mediums ont choisis un scenario', function(){
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[0].username, 0);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[1].username, 0);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[2].username, 0);
+        
+        assert.isTrue(allMediumHasChooseScenario(startedGame));
+    })
+
+    it('Savoir si tous les mediums ont choisis un scenario - 1 medium n\'a pas choisi', function(){
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[0].username, 0);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[1].username, 0)
+        
+        assert.isFalse(allMediumHasChooseScenario(startedGame));
+    })
+
+    it('Les mediums ont gagné', function(){
+
+
+        let scenarios = getAllScenario(startedGame);
+        let scenario_gagnant = startedGame.scenario_final;
+
+        let index = scenarios.indexOf(scenario_gagnant);     
+
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[0].username, index);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[1].username, index);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[2].username, 0);
+        
+        assert.isTrue(mediumHasWin(startedGame));
+    })
+
+    it('Les mediums ont perdus', function(){
+
+        let scenarios = getAllScenario(startedGame);
+        let scenario_gagnant = startedGame.scenario_final;
+
+        let index = scenarios.indexOf(scenario_gagnant);     
+
+        let otherIndex = 0;
+        if(index == 0)
+            otherIndex = 1
+        else if(index == 1)
+            otherIndex = 2
+        else
+            otherIndex = 0;
+
+
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[0].username, index);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[1].username, otherIndex);
+        startedGame = chooseScenarioFinal(startedGame, startedGame.mediums[2].username, otherIndex);
+        
+        assert.isFalse(mediumHasWin(startedGame));
+    })
+})
 
 if(config.app.mode == 'dev'){
 
