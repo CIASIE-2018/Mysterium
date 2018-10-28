@@ -7,7 +7,7 @@
         </div>
         <div class="game_content">
             <div class="player_list">
-            {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
+                {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
             </div>
 
             <div class="card_selected">
@@ -27,15 +27,7 @@
             </div>
         </div>
         <div class="game_plateau">
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    {% for card in infos.mediums[0].cards %}
-                        <div class="swiper-slide">
-                            <img src="/images/cards/{{ card }}.png">
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
+            {% include 'partials/playerBoard.twig' with {cards : infos.mediums[0].cards} %}
         </div>
     </div>
 {% include 'partials/chat.twig' %}
@@ -47,11 +39,6 @@
 <script src="/js/client_chat.js"></script>
 <script>
     $(function(){
-        let swiper = new Swiper('.swiper-container', {
-            slidesPerView : 6,
-            spaceBetween : 30
-        });
-
 
         let mediums = {};
          {% for medium in infos.mediums %}
@@ -80,6 +67,7 @@
                 </div>`
             });
             swiper.addSlide(1,tab);
+            set_scenario_card_zoom(cards[0]);
         }
 
         function set_scenario_card_zoom(card){
@@ -107,6 +95,13 @@
                         set_zoom(detailElement);
                     });
                 });
+            });
+        }
+
+        function init_board(){
+            new Swiper('.game_plateau .swiper-container', {
+                slidesPerView : 6,
+                spaceBetween : 30
             });
         }
 
@@ -144,6 +139,7 @@
             init_ghost_hand_form(socketGame);
         });
 
+        init_board();
         init_player_list();
         init_hand();
         init_ghost_hand_form(socketGame);

@@ -48,11 +48,17 @@ function sendPlayerList(app, game, namespace){
     });
 }
 
-/*function sendBoard(app, game, socket){
-    app.render('partials/playerList', {mediums : game.mediums} , (err, html) => {
-        if(!err) namespace.emit('player_list', html);
-    });
-}*/
+function sendBoard(app, game, socket){
+    let username = getUsername(socket);
+    let infos    = getInformations(game, username);
+    console.log(socket);
+    if(infos.type == "medium"){
+        app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
+            if(!err) socket.emit('board', html);
+        });
+    }   
+    
+}
 
 
 /* Instance du jeu */
@@ -87,9 +93,10 @@ module.exports = function(app, io, session){
             if(allMediumPlayed(game)){
                 game = verifyChoicePlayers(game);
 
-                for(let id in gameSocket.sockets)
+                for(let id in gameSocket.sockets){
                     sendPlayerHand(app, game, gameSocket.sockets[id]);
-                
+                    sendBoard(app, game, gameSocket.sockets[id]);
+                }
                 sendPlayerList(app, game, gameSocket);
             }
         });

@@ -7,7 +7,7 @@
         </div>
         <div class="game_content">
             <div class="player_list">
-            {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
+                {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
             </div>
 
             <div class="card_selected">
@@ -31,15 +31,7 @@
             </div>
         </div>
         <div class="game_plateau">
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    {% for card in infos.me.cards %}
-                        <div data-idcard="{{ card }}" class="swiper-slide">
-                            <img src="/images/cards/{{ card }}.png">
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
+            {% include 'partials/playerBoard.twig' with {cards : infos.me.cards} %}
         </div>
     </div>
 {% include 'partials/chat.twig' %}
@@ -51,19 +43,19 @@
 <script src="/js/client_chat.js"></script>
 <script>
     $(function(){
-        let swiper = new Swiper('.swiper-container', {
-            slidesPerView : 6,
-            spaceBetween : 30
-        });
+        
+        function init_board(){
+            $('.game_plateau .swiper-slide').on('click', function(e){
+                let cardId = $(e.currentTarget).data('idcard');
+                $('input[name=selected-card]').val(cardId);
+                set_scenario_card_zoom(cardId);
+            });
 
-
-        let mediums = {};
-         {% for medium in infos.mediums %}
-            mediums.{{medium.username}} = {
-                    visions: [{{medium.visions}}],
-                    cards  : [{{medium.cards}}]
-            }
-        {% endfor %}
+            new Swiper('.game_plateau .swiper-container', {
+                slidesPerView : 6,
+                spaceBetween : 30
+            });
+        }
 
         function set_zoom(img){
             return img.magnify({
@@ -106,20 +98,21 @@
             init_hand();
         });
 
-        
-      
-        $('.game_plateau .swiper-slide').on('click', function(e){
-            let cardId = $(e.currentTarget).data('idcard');
-            $('input[name=selected-card]').val(cardId);
-            set_scenario_card_zoom(cardId);
+        socketGame.on('board', function(html){
+            console.log(html);
+            $('.game_plateau').html(html);
+            init_board();
         });
 
+        
         $('#selected_card_form').on('submit', function(e){
             e.preventDefault();
             let cardId = $('input[name=selected-card]').val();
             socketGame.emit('choice_card', parseInt(cardId));
         });
 
+
+        init_board();
         init_hand();
     });
 </script>
