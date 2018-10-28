@@ -1,0 +1,119 @@
+{% extends "layouts/master.twig" %}
+
+{% block content %}
+    <div class="game_container">
+        <div class="menu_container">
+            <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
+        </div>
+        <div class="game_content">
+            <div class="player_list">
+                {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
+            </div>
+
+            <div class="card_selected">
+                <div class="card_selected_content">
+                    <img src="/images/cards/{{ infos.me.cards[0] }}.png">
+                    <form id="selected_card_form" method="POST">
+                        <input  type="hidden" name="selected-card" value="{{ infos.me.cards[0] }}">
+                        <button type="submit" class="card_selected_btn">Choisir</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="cards_hand">
+                <div class="cards_hand_detail">
+                    <img src="/images/cards/{{ infos.me.visions[0]|default('default') }}.png">
+                </div>
+
+                <div class="cards_hand_list">
+                    {% include 'partials/playerHand.twig' %}
+                </div>
+            </div>
+        </div>
+        <div class="game_plateau">
+            {% include 'partials/playerBoard.twig' with {cards : infos.me.cards} %}
+        </div>
+    </div>
+{% include 'partials/chat.twig' %}
+{% endblock %}
+
+
+{% block scripts %}
+<script>var username = "{{user.username}}"</script>
+<script src="/js/client_chat.js"></script>
+<script>
+    $(function(){
+        
+        function init_board(){
+            $('.game_plateau .swiper-slide').on('click', function(e){
+                let cardId = $(e.currentTarget).data('idcard');
+                $('input[name=selected-card]').val(cardId);
+                set_scenario_card_zoom(cardId);
+            });
+
+            new Swiper('.game_plateau .swiper-container', {
+                slidesPerView : 6,
+                spaceBetween : 30
+            });
+        }
+
+        function set_zoom(img){
+            return img.magnify({
+                src : img.prop('src')
+            });
+        }
+
+        function set_scenario_card_zoom(card){
+            $('.card_selected_content img').attr('src', `/images/cards/${card}.png`);
+        }
+
+        function init_hand(){
+            set_zoom($('.cards_hand_detail img'));
+            $('.cards_hand_list_item').on('click', function(e){
+                let pictureUrl    = $(e.target).prop('src');
+                let detailElement = $('.cards_hand_detail img');
+                detailElement.fadeOut('fast', function () {
+                    detailElement.prop('src', pictureUrl);
+                    detailElement.fadeIn('fast', function(){
+                        set_zoom(detailElement);
+                    });
+                });
+            });
+        }
+
+        
+
+        let socketGame = io('/game');
+
+        socketGame.on('message', function(data){
+            console.log(data.type + ' : ' + data.content);
+        });
+
+        socketGame.on('player_list', function(html){
+            $('.player_list').html(html);
+        });
+
+        socketGame.on('hand', function(html){
+            $('.cards_hand_list').html(html);
+            init_hand();
+        });
+
+        socketGame.on('board', function(html){
+            console.log(html);
+            $('.game_plateau').html(html);
+            init_board();
+        });
+
+        
+        $('#selected_card_form').on('submit', function(e){
+            e.preventDefault();
+            let cardId = $('input[name=selected-card]').val();
+            socketGame.emit('choice_card', parseInt(cardId));
+        });
+
+
+        init_board();
+        init_hand();
+    });
+</script>
+{% endblock %}

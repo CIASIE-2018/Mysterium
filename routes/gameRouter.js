@@ -4,17 +4,24 @@ const moment = require("moment");
 const { createGame, init, join, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
 
+function getUsername(socket){
+    let username = undefined;
+    if(socket.handshake                  != undefined
+    && socket.handshake.session          != undefined
+    && socket.handshake.session.username != undefined){
+        username = socket.handshake.session.username;
+    }
+    return username;
+}
 
 function getSocket(namespace, username){
     let socket = null;
     for(let socketId in namespace.sockets){
-        let currentSocket = namespace.sockets[socketId];
 
-        if(currentSocket.handshake                  != undefined
-        && currentSocket.handshake.session          != undefined
-        && currentSocket.handshake.session.username != undefined
-        && currentSocket.handshake.session.username == username){
+        let currentSocket  = namespace.sockets[socketId];
+        let usernameSocket = getUsername(currentSocket);
 
+        if(usernameSocket == username){
             socket = currentSocket;
             break;
         }
@@ -27,6 +34,32 @@ function createNamespaceWithExpressSession(io, namespace, session){
         autoSave: true
     }));
 }
+
+function sendPlayerHand(app, game, socket){
+    let username = getUsername(socket);
+    app.render('partials/playerHand', {infos : getInformations(game, username)}, (err, html) => {
+        if(!err) socket.emit('hand', html);
+    });
+}
+
+function sendPlayerList(app, game, namespace){
+    app.render('partials/playerList', {mediums : game.mediums} , (err, html) => {
+        if(!err) namespace.emit('player_list', html);
+    });
+}
+
+function sendBoard(app, game, socket){
+    let username = getUsername(socket);
+    let infos    = getInformations(game, username);
+    console.log(socket);
+    if(infos.type == "medium"){
+        app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
+            if(!err) socket.emit('board', html);
+        });
+    }   
+    
+}
+
 
 /* Instance du jeu */
 let game     = createGame();
@@ -47,30 +80,25 @@ module.exports = function(app, io, session){
                 let mediumSocket = getSocket(gameSocket, data.receiver);
     
                 if(mediumSocket != null){
-                    mediumSocket.emit('reload');
-                    socket.emit('reload');
+                    sendPlayerHand(app, game, socket);
+                    sendPlayerHand(app, game, mediumSocket);
+                    sendPlayerList(app, game, gameSocket);
                 }
             }
         });
         socket.on('choice_card', cardId => {
             game = play(game, socketUsername, cardId);
-            app.render('partials/playerList', {mediums : game.mediums} , (err, html) => {
-                if(!err) gameSocket.emit('player_list', html);
-            });
-
+            sendPlayerList(app, game, gameSocket);
+        
             if(allMediumPlayed(game)){
                 game = verifyChoicePlayers(game);
-                gameSocket.emit('message', {
-                    type    : 'success',
-                    content : 'Tu viens de passer un tour'
-                });
-                
-            }
 
-            socket.emit('message', {
-                type    : 'success',
-                content : 'Vous venez de jouer votre tour...'
-            });
+                for(let id in gameSocket.sockets){
+                    sendPlayerHand(app, game, gameSocket.sockets[id]);
+                    sendBoard(app, game, gameSocket.sockets[id]);
+                }
+                sendPlayerList(app, game, gameSocket);
+            }
         });
 
         
@@ -129,7 +157,8 @@ module.exports = function(app, io, session){
     });
     
     router.get('/game', (req, res) => {
-        res.render('game', {
+        let userIsGhost = game.ghost.username === req.user.username;
+        res.render(userIsGhost ? 'gameGhost' : 'gameMedium', {
             infos : getInformations(game, req.user.username),
             messages
         });
