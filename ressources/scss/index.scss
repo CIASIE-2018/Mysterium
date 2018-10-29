@@ -77,6 +77,23 @@ body{
         .game_content{
             flex:1;
             display: flex;
+            position: relative;
+
+            .messages{
+                position: absolute;
+                width: 100%;
+                color: white;
+                z-index: 10;
+                
+                p{
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    padding: 10px 0;
+                    background-color: green;
+
+                }
+            }
 
             .player_list{
                 display: flex;
