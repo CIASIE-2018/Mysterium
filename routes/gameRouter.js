@@ -51,13 +51,22 @@ function sendPlayerList(app, game, namespace){
 function sendBoard(app, game, socket){
     let username = getUsername(socket);
     let infos    = getInformations(game, username);
-    console.log(socket);
     if(infos.type == "medium"){
         app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
             if(!err) socket.emit('board', html);
         });
     }   
     
+}
+
+function resetSendMessage(app, namespace){
+    namespace.emit('resetSendMessage');
+}
+
+function sendMessage(app, messages, namespace){
+    app.render('partials/message', {info__messages:messages}, (err, html) => {
+        if(!err) namespace.emit('messages', html);
+    });
 }
 
 
@@ -70,7 +79,6 @@ module.exports = function(app, io, session){
 
     /***** WEBSOCKETS SOCKET.IO *****/
     let gameSocket = createNamespaceWithExpressSession(io, '/game', session);
-   
     gameSocket.on('connection', socket => {
         let socketUsername = socket.handshake.session.username;
         
@@ -89,6 +97,7 @@ module.exports = function(app, io, session){
         socket.on('choice_card', cardId => {
             game = play(game, socketUsername, cardId);
             sendPlayerList(app, game, gameSocket);
+            sendMessage(app, "vous avez joué", socket);
         
             if(allMediumPlayed(game)){
                 game = verifyChoicePlayers(game);
@@ -98,6 +107,10 @@ module.exports = function(app, io, session){
                     sendBoard(app, game, gameSocket.sockets[id]);
                 }
                 sendPlayerList(app, game, gameSocket);
+
+                setTimeout(()=> {
+                    resetSendMessage(app, gameSocket);
+                }, 500)
             }
         });
 
