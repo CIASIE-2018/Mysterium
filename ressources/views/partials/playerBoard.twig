@@ -1,0 +1,9 @@
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        {% for card in cards %}
+            <div data-idcard="{{ card }}" class="swiper-slide">
+                <img src="/images/cards/{{ card }}.png">
+            </div>
+        {% endfor %}
+    </div>
+</div>

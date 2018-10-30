@@ -1,16 +1,15 @@
 const { produce } = require('immer'); /* https://github.com/mweststrate/immer */
 const errors      = require('./Error.js');
-
-let fs       = require('fs');
-let helpers  = require('../helpers');
-const config = require('../config/config');
+const fs          = require('fs');
+const helpers     = require('../helpers');
+const config      = require('../config/config');
 
 const UIDGenerator = require('uid-generator');
 const uidgen = new UIDGenerator(256); 
 
 const PERSO = 0;
-const LIEU = 1;
-const ARME = 2;
+const LIEU  = 1;
+const ARME  = 2;
 const FINAL = 3;
  
 /** PUBLIC FUNCTIONS */
@@ -52,6 +51,7 @@ function join(baseGame, username) {
         draftGame.players.push({
             id        : uidgen.generateSync(),
             username  : username,
+            initial   : username.slice(0,2),
             ready     : false
         });
     });
@@ -76,16 +76,16 @@ function setReady(baseGame, username) {
  */
 function init(baseGame) {
     let game = {};
-    if(allIsReady(baseGame)){
-        if(baseGame.players.length >= 3) {
-            game = initRoles(baseGame)
-            game = generateCards(game);
-            game = initScenarios(game);
-            game = initVisions(game);
-        }else
-            throw new errors.NotEnoughPlayerError();
-    }else
+    if(!allIsReady(baseGame))
         throw new errors.NotAllAreReady();
+    
+    if(baseGame.players.length < 3) 
+        throw new errors.NotEnoughPlayerError();
+
+    game = initRoles(baseGame)
+    game = generateCards(game);
+    game = initScenarios(game);
+    game = initVisions(game);  
 
     return produce(game, draftGame => {
         draftGame.started = true;
@@ -174,15 +174,18 @@ function getInformations(baseGame, username) {
         let state = {
             state            : medium.state,
             username         : medium.username,
-            initial          : medium.username.slice(0,2),
-            hasReceivedCards : baseGame.ghost.mediumsHasCards.includes(medium.id),
+            initial          : medium.initial,
+            hasReceivedCards : medium.hasReceivedCards,
             hasPlayed        : medium.hasPlayed,
             visions          : medium.visions
         };
         state.cards = baseGame[medium.state == 0 ? 'persos' : (medium.state == 1 ? 'lieux' : 'armes')];
         if(type == 'ghost')
             state.card  = medium.scenario[medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme')];
-    
+        
+        if(medium.username == infosPlayer.username)
+            infosPlayer.me = state;
+
         return state;
     });
 
@@ -199,32 +202,32 @@ function getInformations(baseGame, username) {
  * @param {array} cards     Cartes visions a donner
  */
 function giveVisionsToMedium(baseGame, username, cards){
-    if(canPlay(baseGame,baseGame.ghost.username)){
-        if(!baseGame.ghost.mediumsHasCards.includes(username)){
-            if(helpers.include(baseGame.ghost.hand, cards)){
-
-                return produce(baseGame, draftGame => {
-                    let ghost  = draftGame.ghost;
-                    let medium = draftGame.mediums.find(medium => medium.username == username);
-    
-                    let visions            = draftGame.visions;
-                    let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
-                    draftGame.visions      = visions.slice(0, -cards.length);
-
-                    //Retire les cartes a donner de la main du fantome
-                    ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
-                    //Complete la main du fantome avec le nombre de cartes manquantes
-                    ghost.hand  = ghost.hand.concat(newVisionsForGhost);
-                    
-                    medium.visions = medium.visions.concat(cards);
-                    ghost.mediumsHasCards.push(username);
-                });
-            }else
-                throw new Error('Le fantome n\'a pas les cartes visions');
-        }else
-            throw new Error('Le fantome a deja donne des cartes a ce joueur');
-    }else
+    if(!canPlay(baseGame,baseGame.ghost.username))
         throw new Error('Le fantome ne peut pas jouer maintenant');
+
+    if(baseGame.ghost.mediumsHasCards.includes(username))
+        throw new Error('Le fantome a deja donne des cartes a ce joueur');
+        
+    if(!helpers.include(baseGame.ghost.hand, cards))
+        throw new Error('Le fantome n\'a pas les cartes visions');
+
+    return produce(baseGame, draftGame => {
+        let ghost  = draftGame.ghost;
+        let medium = draftGame.mediums.find(medium => medium.username == username);
+
+        let visions            = draftGame.visions;
+        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+        draftGame.visions      = visions.slice(0, -cards.length);
+
+        //Retire les cartes a donner de la main du fantome
+        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+        //Complete la main du fantome avec le nombre de cartes manquantes
+        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+        
+        medium.visions = medium.visions.concat(cards);
+        medium.hasReceivedCards = true;
+        ghost.mediumsHasCards.push(username);
+    });   
 }
 
 /**
@@ -234,10 +237,9 @@ function giveVisionsToMedium(baseGame, username, cards){
 */
 function verifyChoicePlayers(baseGame) {
 
-    baseGame.mediums.map(medium => {
-        if(!medium.hasPlayed)
-            throw new Error("Tous les joueurs n'ont pas joués")
-    });
+    if(!allMediumPlayed(baseGame))
+        throw new Error("Tous les joueurs n'ont pas joués")
+
 
     let hasGoodCards = [];
 
@@ -255,8 +257,9 @@ function verifyChoicePlayers(baseGame) {
                 medium.visions  = [];
             }
             
-            medium.chosenCard = '';
-            medium.hasPlayed  = false;
+            medium.chosenCard       = '';
+            medium.hasPlayed        = false;
+            medium.hasReceivedCards = false;
         })
 
         if(baseGame.turn < baseGame.max_turn){
@@ -266,18 +269,98 @@ function verifyChoicePlayers(baseGame) {
     });
 }
 
+/**
+ * Retourne True si les médiums ont tous joué
+ * @param {object} baseGame 
+ */
+function allMediumPlayed(baseGame){
+    return baseGame.mediums.every(medium => medium.hasPlayed == true);
+}
 
-module.exports = {
+/**
+ * Retourne tous les scénarios des médiums
+ * @param {object} baseGame Instance de jeu
+ */
+function getAllScenario(baseGame){
+    let scenario = [];
+    baseGame.mediums.forEach(medium => {
+        scenario.push(medium.scenario);
+    })
+
+    return scenario;
+}
+
+/**
+ * Permet à un joueur de choisir un scénario final
+ * @param {object} baseGame 
+ * @param {string} username 
+ * @param {number} scenario_number 
+ */
+function chooseScenarioFinal(baseGame, username, scenario_number){
+
+    let scenarios = getAllScenario(baseGame);
+    if(scenario_number >= scenarios.length )
+        throw new Error('Le scenario ne peut pas etre choisis')
+    
+    return produce(baseGame, draftGame => {
+        let medium = draftGame.mediums.find(medium => medium.username == username);
+        medium.scenarioFinalChoose = scenarios[scenario_number];
+    });
+}
+
+/**
+ * Retourne True si tous les médiums ont choisi un scénario final
+ * @param {object} baseGame 
+ */
+function allMediumHasChooseScenario(baseGame){
+    return baseGame.mediums.every(medium => medium.scenarioFinalChoose !== undefined);
+}
+
+/**
+ * Indique si les mediums ont choisis le bon scenario final
+ * @param {object} baseGame 
+ */
+function mediumHasWin(baseGame){
+    if(allMediumHasChooseScenario(baseGame)){
+        let scenario_gagnant = baseGame.scenario_final;
+        
+        let count = 0;
+        baseGame.mediums.forEach(medium => {
+            let scenario = medium.scenarioFinalChoose;
+            if(scenario.perso == scenario_gagnant.perso && scenario.lieu == scenario_gagnant.lieu && scenario.arme == scenario_gagnant.arme)
+                count++;
+        })
+
+        return count > Math.floor(baseGame.mediums.length / 2);
+    }
+}
+
+let function_exports = {
+    allIsReady,
+    allMediumHasChooseScenario,
+    allMediumPlayed,
+    chooseScenarioFinal,
     createGame,
+    getAllScenario,
+    getInformations,
+    giveVisionsToMedium,
+    init,
     join,
+    mediumHasWin,
+    play,
     setReady,
     verifyChoicePlayers,
-    init,
-    allIsReady,
-    play,
-    giveVisionsToMedium,
-    getInformations
 }
+
+if(config.app.mode == 'dev'){
+    function_exports.getPlayerType = getPlayerType
+    function_exports.canPlay = canPlay
+    function_exports.getCards = getCards
+    function_exports.getInformations = getInformations
+    function_exports.isScenarioFound = getInformations
+}
+
+module.exports = function_exports
 
 /** PRIVATE FUNCTIONS */
 
@@ -302,12 +385,14 @@ function initRoles(baseGame) {
             if(aleaGhost === i){
                 draftGame.ghost = {
                     username        : player.username,
+                    initial         : player.initial,
                     hand            : [],
                     mediumsHasCards : []
                 };
             }else{
                 draftGame.mediums.push({
                     username  : player.username,
+                    initial   : player.initial,
                     state     : 0,
                     visions   : [],
                     hasPlayed : false
@@ -338,8 +423,6 @@ function generateCards(baseGame) {
         draftGame.armes  = getCards("armes", nb_scenarios);
     });
 }
-
-
 
 /**
  * Génère différents scénarios en fonction des cartes du jeu,
@@ -383,8 +466,17 @@ function initVisions(baseGame) {
     });
 }
 
-
+/**
+ * Retourne le type d'un joueur
+ * @param {object} baseGame 
+ * @param {string} username 
+ */
 function getPlayerType(baseGame, username){
+    let medium = baseGame.mediums.find(medium => medium.username == username);
+    
+    if(typeof medium !== 'object' && baseGame.ghost.username !== username)
+        throw new Error('Le type du joueur ne peux pas etre retourné')
+
     return baseGame.ghost.username === username ? 'ghost' : 'medium';
 }
 
@@ -401,9 +493,14 @@ function canPlay(baseGame, username){
     }else{
         //Medium
         let medium = baseGame.mediums.find(medium => medium.username == username);
-        return medium.hasPlayed ? false : (baseGame.ghost.mediumsHasCards.find(username => username == medium.username) != undefined);
+
+        if(medium.hasPlayed && baseGame.ghost.mediumsHasCards.find(username => username == medium.username))
+            return false;
+
+        return true;
     }
 }
+
 function getCards(type, nb_cards){
     let json  = JSON.parse(fs.readFileSync(__dirname + '/cards.json', 'utf8'));
     let cards = json[type];
