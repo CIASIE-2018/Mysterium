@@ -16,3 +16,12 @@ $(function(){
         $('#msg_box').scrollTop($('#msg_box li:last-child').offset().top);
     });
 });
+
+$('#hideChat').click (() => {
+    $('#chat').slideUp();
+    if($('#chat').css('display') == 'none'){
+        $('#chat').slideDown(function(){
+            $(window).scrollTop($('#msg_box li:last-child').offset().top);
+        });
+    }
+})
