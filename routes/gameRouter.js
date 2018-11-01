@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, init, join, getInformationsMediums, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
 
 function getUsername(socket){
@@ -59,6 +59,11 @@ function sendBoard(app, game, socket){
     
 }
 
+function sendArrayMediums(app, game, socket){
+    let mediums = getInformationsMediums(game)
+    socket.emit('tableau', mediums)
+}
+
 function resetSendMessage(app, namespace){
     namespace.emit('resetSendMessage');
 }
@@ -81,7 +86,7 @@ module.exports = function(app, io, session){
     let gameSocket = createNamespaceWithExpressSession(io, '/game', session);
     gameSocket.on('connection', socket => {
         let socketUsername = socket.handshake.session.username;
-        
+
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
                 game = giveVisionsToMedium(game, data.receiver, data.cards);
@@ -103,6 +108,11 @@ module.exports = function(app, io, session){
                 game = verifyChoicePlayers(game);
 
                 for(let id in gameSocket.sockets){
+                    if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
+                        //envoie du tableau
+                        sendArrayMediums(app, game, gameSocket)
+                    }
+                    
                     sendPlayerHand(app, game, gameSocket.sockets[id]);
                     sendBoard(app, game, gameSocket.sockets[id]);
                 }
