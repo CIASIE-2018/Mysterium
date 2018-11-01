@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
 
 function getUsername(socket){
@@ -69,6 +69,11 @@ function sendMessage(app, messages, namespace){
     });
 }
 
+function initBoardForFinalScneario(app, scenarios, namespace){
+    app.render('partials/finalScenarios', {scenarios}, (err, html) => {
+        if(!err) namespace.emit('finalScenario', html);
+    });
+}
 
 /* Instance du jeu */
 let game     = createGame();
@@ -102,6 +107,11 @@ module.exports = function(app, io, session){
             if(allMediumPlayed(game)){
                 game = verifyChoicePlayers(game);
 
+                if(allMediumFoundScenario(game)){
+                    let scenarios = getAllScenario(game)
+                    initBoardForFinalScneario(app, scenarios, gameSocket)
+                }
+
                 for(let id in gameSocket.sockets){
                     sendPlayerHand(app, game, gameSocket.sockets[id]);
                     sendBoard(app, game, gameSocket.sockets[id]);
@@ -113,6 +123,24 @@ module.exports = function(app, io, session){
                 }, 500)
             }
         });
+
+        socket.on('choice_final_scenario', scenarioId => {
+
+            let username = getUsername(socket)
+
+            game = chooseScenarioFinal(game, username, scenarioId)
+
+            if(allMediumHasChooseScenario(game)){
+                let message = '';
+                if(mediumHasWin(game))
+                    message = "Felicitaion ! Vous avez gagné"
+                else
+                    message = "Dommage ! Vous êtes nul"
+
+                sendMessage(app, message, gameSocket)
+                    
+            }
+        })
 
         
     });

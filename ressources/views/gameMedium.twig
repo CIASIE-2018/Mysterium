@@ -87,7 +87,13 @@
             });
         }
 
-        
+        function init_form_final(){
+            $('#form_final').on('submit', function(e){
+                e.preventDefault();
+                let checkbox = $('input[type=checkbox]:checked');
+                socketGame.emit('choice_final_scenario', checkbox.attr('name'));
+            });
+        }
 
         let socketGame = io('/game');
 
@@ -111,6 +117,12 @@
         socketGame.on('board', function(html){
             $('.game_plateau').html(html);
             init_board();
+        });
+
+        socketGame.on('finalScenario', function(html){
+            $('.game_plateau').remove();
+            $('.card_selected').html(html);
+            init_form_final();
         });
 
         
