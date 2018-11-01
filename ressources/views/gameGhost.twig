@@ -39,17 +39,26 @@
 <script src="/js/client_chat.js"></script>
 <script>
     $(function(){
-
         let mediums = {};
-         {% for medium in infos.mediums %}
-            mediums.{{medium.username}} = {
-                    visions: [{{medium.visions}}],
-                    cards  : [{{medium.cards}}],
-                {% if infos.type == "ghost" %}
-                    card : {{medium.card}}
-                {% endif %}
-            }
-        {% endfor %}
+        
+        function init(mediums, socketGame){
+            init_board();
+            init_player_list();
+            init_hand();
+            init_ghost_hand_form(socketGame);
+        }
+
+        function init_mediums(){
+            {% for medium in infos.mediums %}
+                mediums.{{medium.username}} = {
+                        visions: [{{medium.visions}}],
+                        cards  : [{{medium.cards}}],
+                    {% if infos.type == "ghost" %}
+                        card : {{medium.card}}
+                    {% endif %}
+                }
+            {% endfor %}
+        }
 
         function set_zoom(img){
             return img.magnify({
@@ -139,10 +148,14 @@
             init_ghost_hand_form(socketGame);
         });
 
-        init_board();
-        init_player_list();
-        init_hand();
-        init_ghost_hand_form(socketGame);
+        socketGame.on('tableau', function(m){
+            mediums = m;
+            init(mediums, socketGame)
+            location.reload();
+        });
+
+        init_mediums();
+        init(mediums, socketGame)
     });
 </script>
 {% endblock %}
