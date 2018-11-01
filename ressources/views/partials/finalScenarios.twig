@@ -1,0 +1,14 @@
+<form id="form_final" method="post" style="display:flex;flex-direction:column;align-items:center">
+    <div style="width:100%;display:flex;justify-content:space-around">
+        {% for scenario in scenarios %}
+            <div style="display:flex;flex-direction:column">
+                <img style="width:200px" src="/images/cards/{{ scenario.perso }}.png" />
+                <img style="width:200px" src="/images/cards/{{ scenario.lieu }}.png" />
+                <img style="width:200px" src="/images/cards/{{ scenario.arme }}.png" />
+                <input type="checkbox" name="{{ scenarios.indexOf(scenario) }}" value="Selectionner">
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit">Faire son choix</button>
+</form>
