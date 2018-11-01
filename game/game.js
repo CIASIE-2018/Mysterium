@@ -193,6 +193,29 @@ function getInformations(baseGame, username) {
 }
 
 /**
+ * Renvoie les informations des mediums 
+ * (se base sur l'objet que l'on avait dans la vue du fantome)
+ * @param {object} baseGame Instance de jeu
+ */
+function getInformationsMediums(baseGame){
+    let mediums = {};
+    
+    baseGame.mediums.forEach((medium) => {
+        let state = medium.state == 0 ? 'perso' : (medium.state == 1 ? 'lieu' : 'arme');
+        let state2 = medium.state == 0 ? 'persos' : (medium.state == 1 ? 'lieux' : 'armes');
+        
+
+        mediums[medium.username] = {
+            visions : medium.visions,
+            cards   : baseGame[state2],
+            card    : medium.scenario[state]
+        }
+    });
+
+    return mediums;
+}
+
+/**
  * Retire de la main du fantome les cartes 'cards' pour les donner au joueur
  * qui a pour identifiant 'playerId'.
  * La main du fantome est automatiquement complete par de nouvelles cartes
@@ -343,6 +366,7 @@ let function_exports = {
     createGame,
     getAllScenario,
     getInformations,
+    getInformationsMediums,
     giveVisionsToMedium,
     init,
     join,
