@@ -93,6 +93,14 @@
                 let checkbox = $('input[type=checkbox]:checked');
                 socketGame.emit('choice_final_scenario', checkbox.attr('name'));
             });
+
+            $('.checkbox_final').on('click', function(e){
+                $('.checkbox_final').each(function() {
+                    if(this !== e.target){
+                        $(this).prop('checked', false)
+                    }
+                })
+            });
         }
 
         let socketGame = io('/game');
