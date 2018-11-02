@@ -88,12 +88,6 @@
         }
 
         function init_form_final(){
-            $('#form_final').on('submit', function(e){
-                e.preventDefault();
-                let checkbox = $('input[type=checkbox]:checked');
-                socketGame.emit('choice_final_scenario', checkbox.attr('name'));
-            });
-
             $('.checkbox_final').on('click', function(e){
                 $('.checkbox_final').each(function() {
                     if(this !== e.target){
@@ -101,6 +95,17 @@
                     }
                 })
             });
+
+            $('#form_final').on('submit', function(e){
+                e.preventDefault();
+                $('#form_final_submit').attr("disabled", "disabled");
+                $('.checkbox_final').each(function() {
+                    $(this).attr("disabled", true);
+                })
+                let checkbox = $('input[type=checkbox]:checked');
+                socketGame.emit('choice_final_scenario', checkbox.attr('name'));
+            });
+
         }
 
         let socketGame = io('/game');

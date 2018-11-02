@@ -130,10 +130,13 @@ module.exports = function(app, io, session){
 
             game = chooseScenarioFinal(game, username, scenarioId)
 
+            sendMessage(app, "Vous avez fait votre choix!", socket)
+
+
             if(allMediumHasChooseScenario(game)){
                 let message = '';
                 let bgColor = 'green';
-                
+
                 if(mediumHasWin(game))
                     message = "Felicitaion ! Vous avez gagné"
                 else{
