@@ -63,8 +63,8 @@ function resetSendMessage(app, namespace){
     namespace.emit('resetSendMessage');
 }
 
-function sendMessage(app, messages, namespace){
-    app.render('partials/message', {info__messages:messages}, (err, html) => {
+function sendMessage(app, messages, namespace, backgroundColor = "green"){
+    app.render('partials/message', {info__messages:messages, backgroundColor}, (err, html) => {
         if(!err) namespace.emit('messages', html);
     });
 }
@@ -132,12 +132,16 @@ module.exports = function(app, io, session){
 
             if(allMediumHasChooseScenario(game)){
                 let message = '';
+                let bgColor = 'green';
+                
                 if(mediumHasWin(game))
                     message = "Felicitaion ! Vous avez gagné"
-                else
+                else{
                     message = "Dommage ! Vous êtes nul"
+                    bgColor = 'red';
+                }
 
-                sendMessage(app, message, gameSocket)
+                sendMessage(app, message, gameSocket, bgColor)
                     
             }
         })
