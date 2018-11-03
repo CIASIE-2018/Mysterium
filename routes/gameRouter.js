@@ -71,10 +71,7 @@ function sendArrayMediums(app, game, socket){
     socket.emit('mediums', mediums);
 }
 
-function resetSendMessage(app, namespace){
-    namespace.emit('resetSendMessage');
-}
-
+00
 function sendMessage(app, message, socket){
     app.render('partials/message', {message}, (err, html) => {
         if(!err) socket.emit('messages', html);
@@ -104,30 +101,29 @@ module.exports = function(app, io, session){
 
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
-              try{
-                if(allMediumFoundScenario(game)){
-                    game = giveVisionsToMedium(game, data.receiver, data.cards, true);  
-                    game.mediums.forEach(medium => {
-                        let mediumSocket = getSocket(gameSocket, medium.username);
-                        
+                try{
+                    if(allMediumFoundScenario(game)){
+                        game = giveVisionsToMedium(game, data.receiver, data.cards, true);  
+                        game.mediums.forEach(medium => {
+                            let mediumSocket = getSocket(gameSocket, medium.username);
+                            
+                            if(mediumSocket != null){
+                                sendPlayerHand(app, game, socket);
+                                sendPlayerHand(app, game, mediumSocket);
+                                sendPlayerList(app, game, gameSocket);
+                            }
+                        });
+                    }else{
+                        game = giveVisionsToMedium(game, data.receiver, data.cards);
+                        let mediumSocket = getSocket(gameSocket, data.receiver);
+
                         if(mediumSocket != null){
                             sendPlayerHand(app, game, socket);
                             sendPlayerHand(app, game, mediumSocket);
                             sendPlayerList(app, game, gameSocket);
                         }
-                    });
-
-                }else{
-                    game = giveVisionsToMedium(game, data.receiver, data.cards);
-                    let mediumSocket = getSocket(gameSocket, data.receiver);
-
-                    if(mediumSocket != null){
-                        sendPlayerHand(app, game, socket);
-                        sendPlayerHand(app, game, mediumSocket);
-                        sendPlayerList(app, game, gameSocket);
                     }
-                }
-               }catch(err){
+                }catch(err){
                     sendMessage(app, {type:'error', content: err.message}, socket);
                 }
                 
@@ -141,9 +137,9 @@ module.exports = function(app, io, session){
                 if(allMediumPlayed(game)){
                     game = verifyChoicePlayers(game);
                   
-                  if(allMediumFoundScenario(game)){
-                      initBoardForFinalScenario(app, game, gameSocket)
-                  }
+                    if(allMediumFoundScenario(game)){
+                        initBoardForFinalScenario(app, game, gameSocket)
+                    }
     
                     for(let id in gameSocket.sockets){
                         if(getUsername(gameSocket.sockets[id]) === game.ghost.username){

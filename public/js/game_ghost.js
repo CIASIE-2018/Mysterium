@@ -87,6 +87,14 @@ function resetBoard(mediums){
     $($('.player_list_item')[0]).addClass('selected');
 }
 
+function initFormFinal(){
+    $('#form_final_submit').attr("disabled", "disabled");
+    
+    $('.checkbox_final').each(function() {
+        $(this).attr("disabled", true);
+    })
+}
+
 $(function(){
     new Swiper('.game_plateau .swiper-container', {
             slidesPerView : 6,
@@ -123,6 +131,12 @@ $(function(){
             socketGame.on('mediums', function(m){
                 mediums = m;
                 resetBoard(mediums);
+            });
+
+            socketGame.on('finalScenario', function(html){
+                $('.game_plateau').remove();
+                $('.card_selected').html(html);
+                initFormFinal();
             });
         }
     });
