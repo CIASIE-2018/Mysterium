@@ -18,10 +18,8 @@ $(function(){
 });
 
 $('#hideChat').click (() => {
-    $('#chat').slideUp();
-    if($('#chat').css('display') == 'none'){
-        $('#chat').slideDown(function(){
-            $(window).scrollTop($('#msg_box li:last-child').offset().top);
-        });
+    $('#chat_box').slideUp();
+    if($('#chat_box').css('display') == 'none'){
+        $('#chat_box').slideDown();
     }
 })

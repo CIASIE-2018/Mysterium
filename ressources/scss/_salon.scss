@@ -1,22 +1,26 @@
 body.salon{
 
-    #hideChat{
-        display: none;
-    }
-
+   
     #chat{
         width  : 100%;
         background-color: #fff;
         position: fixed;
         bottom: 0;
-
-        #msg_box{
-            max-height: 200px;
-            overflow: auto;
+        
+        #hideChat{
+                display: none;
         }
         
-        #msg_box li:nth-child(odd) { 
-            background: #eee; 
+        #chat_box{
+
+            #msg_box{
+                max-height: 200px;
+                overflow: auto;
+            }
+        
+            #msg_box li:nth-child(odd) { 
+                background: #eee; 
+            }
         }
     }
 }
