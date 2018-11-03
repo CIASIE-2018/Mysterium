@@ -37,8 +37,20 @@ function getRandomFiles(path, nb_files = -1) {
     return files;
 }
 
+function escapeHtml(text) {
+    var map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 module.exports = {
     shuffle,
     include,
-    getRandomFiles
+    getRandomFiles,
+    escapeHtml
 }

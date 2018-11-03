@@ -3,6 +3,7 @@ const router  = express.Router();
 const moment = require("moment");
 const { createGame, init, join, getInformationsMediums, setReady, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 const sharedSession = require("express-socket.io-session");
+const helpers       = require('../helpers');
 
 function getUsername(socket){
     let username = undefined;
@@ -134,7 +135,7 @@ module.exports = function(app, io, session){
     chatSocket.on('connection', socket => {
 
         socket.on('chat message', message => {
-            //TODO ATTENTION INJECTION CODE !
+            message = helpers.escapeHtml(message);
             let msg = moment().format('HH:mm') + ` <span class='pseudo'>${socket.handshake.session.username}</span>  : ${message}`;
             messages.push(msg);
             chatSocket.emit('chat message',msg);
