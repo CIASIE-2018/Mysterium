@@ -6,6 +6,12 @@
             <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
         </div>
         <div class="game_content">
+            <div class="messages">
+                {% if message %}
+                    {% include 'partials/message.twig' with {message} %}
+                {% endif %}
+            </div>
+
             <div class="player_list">
                 {% include 'partials/playerList.twig' with {mediums : infos.mediums} %}
             </div>

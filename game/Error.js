@@ -20,7 +20,7 @@ class PlayerAlreadyInGameError  extends Error{
 
 class NotEnoughPlayerError  extends Error{
     constructor(){
-        super('Il n\'y a pas asser de joueurs')
+        super('Il n\'y a pas assez de joueurs')
     }
 }
 
