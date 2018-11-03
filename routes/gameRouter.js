@@ -38,9 +38,12 @@ function createNamespaceWithExpressSession(io, namespace, session){
 
 function sendPlayerHand(app, game, socket){
     let username = getUsername(socket);
-    app.render('partials/playerHand', {infos : getInformations(game, username)}, (err, html) => {
-        if(!err) socket.emit('hand', html);
-    });
+    if(username != undefined){
+        app.render('partials/playerHand', {infos : getInformations(game, username)}, (err, html) => {
+            if(!err) socket.emit('hand', html);
+        });
+    }
+    
 }
 
 function sendPlayerList(app, game, namespace){
@@ -51,18 +54,19 @@ function sendPlayerList(app, game, namespace){
 
 function sendBoard(app, game, socket){
     let username = getUsername(socket);
-    let infos    = getInformations(game, username);
-    if(infos.type == "medium"){
-        app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
-            if(!err) socket.emit('board', html);
-        });
-    }   
-    
+    if(username != undefined){
+        let infos = getInformations(game, username);
+        if(infos.type == "medium"){
+            app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
+                if(!err) socket.emit('board', html);
+            });
+        }   
+    }
 }
 
 function sendArrayMediums(app, game, socket){
-    let mediums = getInformationsMediums(game)
-    socket.emit('tableau', mediums)
+    let mediums = getInformationsMediums(game);
+    socket.emit('mediums', mediums);
 }
 
 function resetSendMessage(app, namespace){
@@ -102,7 +106,6 @@ module.exports = function(app, io, session){
         });
         socket.on('choice_card', cardId => {
             game = play(game, socketUsername, cardId);
-            sendPlayerList(app, game, gameSocket);
             sendMessage(app, "vous avez joué", socket);
         
             if(allMediumPlayed(game)){
@@ -110,19 +113,18 @@ module.exports = function(app, io, session){
 
                 for(let id in gameSocket.sockets){
                     if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
-                        //envoie du tableau
-                        sendArrayMediums(app, game, gameSocket)
+                        sendArrayMediums(app, game, gameSocket.sockets[id]);
+                    }else{
+                        sendBoard(app, game, gameSocket.sockets[id]); 
                     }
-                    
                     sendPlayerHand(app, game, gameSocket.sockets[id]);
-                    sendBoard(app, game, gameSocket.sockets[id]);
                 }
-                sendPlayerList(app, game, gameSocket);
 
                 setTimeout(()=> {
                     resetSendMessage(app, gameSocket);
                 }, 500)
             }
+            sendPlayerList(app, game, gameSocket);
         });
 
         
@@ -186,6 +188,14 @@ module.exports = function(app, io, session){
             infos : getInformations(game, req.user.username),
             messages
         });
+    });
+
+    router.post('/ajax/mediums', (req, res) => {
+        try{
+            res.json(getInformationsMediums(game));
+        }catch(err){
+            res.json(null);
+        }
     });
     
     return router;    

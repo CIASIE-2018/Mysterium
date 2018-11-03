@@ -4,7 +4,7 @@
         {% for card in infos.hand %}
             <div class="cards_hand_list_item">
                 <input class="box" type="checkbox" value="{{card}}" name="cards_hand"/>
-                <img src="/images/cards/{{card}}.png">
+                <img data-idcard="{{card}}" src="/images/cards/{{card}}.png">
             </div>
         {% endfor %}
         <button type="submit" class="cards_hand_list_item">
@@ -16,7 +16,7 @@
 {% if infos.type == "medium" %}
     {% for card in infos.me.visions %}
         <div class="cards_hand_list_item">
-            <img src="/images/cards/{{card}}.png">
+            <img data-idcard="{{card}}" src="/images/cards/{{card}}.png">
         </div>
     {% endfor %}
 {% endif %}
