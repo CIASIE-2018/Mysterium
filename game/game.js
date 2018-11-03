@@ -216,33 +216,55 @@ function getInformationsMediums(baseGame){
  * @param {string} username Identifiant du joueur qui recoit les cartes visions
  * @param {array} cards     Cartes visions a donner
  */
-function giveVisionsToMedium(baseGame, username, cards){
-    if(!canPlay(baseGame,baseGame.ghost.username))
-        throw new Error('Vous ne pouvez pas jouer pour le moment. Les mediums doivent choisir une carte.');
-
-    if(baseGame.ghost.mediumsHasCards.includes(username))
-        throw new Error('Vous avez déjà donné des cartes à ce medium.');
+function giveVisionsToMedium(baseGame, username, cards, allMediums = false){
         
     if(!helpers.include(baseGame.ghost.hand, cards))
-        throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
+        throw new Error('Vous n\'avez pas ces cartes visions dans votre main.'); 
 
     return produce(baseGame, draftGame => {
         let ghost  = draftGame.ghost;
-        let medium = draftGame.mediums.find(medium => medium.username == username);
 
-        let visions            = draftGame.visions;
-        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
-        draftGame.visions      = visions.slice(0, -cards.length);
+        if(allMediums){
+            let mediums = draftGame.mediums;
+    
+            let visions            = draftGame.visions;
+            let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+            draftGame.visions      = visions.slice(0, -cards.length);
+    
+            //Retire les cartes a donner de la main du fantome
+            ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+            //Complete la main du fantome avec le nombre de cartes manquantes
+            ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+            
+            mediums.forEach(medium => {
+                medium.visions = medium.visions.concat(cards);
+                medium.hasReceivedCards = true;
+                ghost.mediumsHasCards.push(medium.username);
+            })
+            
+        }else{
+            if(!canPlay(baseGame,baseGame.ghost.username))
+                throw new Error('Vous ne pouvez pas jouer pour le moment. Les mediums doivent choisir une carte.');
 
-        //Retire les cartes a donner de la main du fantome
-        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
-        //Complete la main du fantome avec le nombre de cartes manquantes
-        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
-        
-        medium.visions = medium.visions.concat(cards);
-        medium.hasReceivedCards = true;
-        ghost.mediumsHasCards.push(username);
-    });   
+            if(baseGame.ghost.mediumsHasCards.includes(username))
+                throw new Error('Vous avez déjà donné des cartes à ce medium.');
+            
+                let medium = draftGame.mediums.find(medium => medium.username == username);
+    
+            let visions            = draftGame.visions;
+            let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+            draftGame.visions      = visions.slice(0, -cards.length);
+    
+            //Retire les cartes a donner de la main du fantome
+            ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+            //Complete la main du fantome avec le nombre de cartes manquantes
+            ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+            
+            medium.visions = medium.visions.concat(cards);
+            medium.hasReceivedCards = true;
+            ghost.mediumsHasCards.push(username);
+        }
+    });  
 }
 
 /**
