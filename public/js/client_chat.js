@@ -3,9 +3,9 @@ $(function(){
 
     $("#msg_form").submit(function (event) {
         event.preventDefault();
-        if($("#msg_writing").val() != '')
+        if($("#msg_writing").val().trim() != '')
         {
-            socket.emit("chat message",$("#msg_writing").val().trim());
+            socket.emit("chat message",$("#msg_writing").val());
             $("#msg_writing").val('').focus();
         }
         return false;
