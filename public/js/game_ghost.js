@@ -101,8 +101,12 @@ $(function(){
             initPlayerList(mediums);
             initHand(socketGame);
 
-            socketGame.on('message', function(data){
-                console.log(data.type + ' : ' + data.content);
+            socketGame.on('messages', function(html){
+                let element = $(html);
+                $('.messages').append(element);
+                setTimeout(function(){
+                    element.fadeOut();
+                }, 3000);
             });
 
             socketGame.on('player_list', function(html){

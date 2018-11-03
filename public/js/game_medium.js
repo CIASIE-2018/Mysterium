@@ -57,11 +57,11 @@ $(function(){
     initHand();
 
     socketGame.on('messages', function(html){
-        $('.messages').html(html);
-    });
-
-    socketGame.on('resetSendMessage', function(){
-        $('.messages p').remove();
+        let element = $(html);
+        $('.messages').append(element);
+        setTimeout(function(){
+            element.fadeOut();
+        }, 3000);
     });
 
     socketGame.on('player_list', function(html){

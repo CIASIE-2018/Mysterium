@@ -73,9 +73,9 @@ function resetSendMessage(app, namespace){
     namespace.emit('resetSendMessage');
 }
 
-function sendMessage(app, messages, namespace){
-    app.render('partials/message', {info__messages:messages}, (err, html) => {
-        if(!err) namespace.emit('messages', html);
+function sendMessage(app, message, socket){
+    app.render('partials/message', {message}, (err, html) => {
+        if(!err) socket.emit('messages', html);
     });
 }
 
@@ -94,37 +94,43 @@ module.exports = function(app, io, session){
 
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
-                game = giveVisionsToMedium(game, data.receiver, data.cards);
-                let mediumSocket = getSocket(gameSocket, data.receiver);
-    
-                if(mediumSocket != null){
-                    sendPlayerHand(app, game, socket);
-                    sendPlayerHand(app, game, mediumSocket);
-                    sendPlayerList(app, game, gameSocket);
+                try{
+                    game = giveVisionsToMedium(game, data.receiver, data.cards);
+                    let mediumSocket = getSocket(gameSocket, data.receiver);
+        
+                    if(mediumSocket != null){
+                        sendPlayerHand(app, game, socket);
+                        sendPlayerHand(app, game, mediumSocket);
+                        sendPlayerList(app, game, gameSocket);
+                    }
+                }catch(err){
+                    sendMessage(app, {type:'error', content: err.message}, socket);
                 }
+                
             }
         });
         socket.on('choice_card', cardId => {
-            game = play(game, socketUsername, cardId);
-            sendMessage(app, "vous avez joué", socket);
-        
-            if(allMediumPlayed(game)){
-                game = verifyChoicePlayers(game);
-
-                for(let id in gameSocket.sockets){
-                    if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
-                        sendArrayMediums(app, game, gameSocket.sockets[id]);
-                    }else{
-                        sendBoard(app, game, gameSocket.sockets[id]); 
+            try{
+                game = play(game, socketUsername, cardId);
+                sendMessage(app, {type:"success", content:"Vous avez joué."}, socket);
+            
+                if(allMediumPlayed(game)){
+                    game = verifyChoicePlayers(game);
+    
+                    for(let id in gameSocket.sockets){
+                        if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
+                            sendArrayMediums(app, game, gameSocket.sockets[id]);
+                        }else{
+                            sendBoard(app, game, gameSocket.sockets[id]); 
+                        }
+                        sendPlayerHand(app, game, gameSocket.sockets[id]);
                     }
-                    sendPlayerHand(app, game, gameSocket.sockets[id]);
+                    sendMessage(app, {type:"info", content:`Tour n°${game.turn}`}, gameSocket);
                 }
-
-                setTimeout(()=> {
-                    resetSendMessage(app, gameSocket);
-                }, 500)
+                sendPlayerList(app, game, gameSocket);
+            }catch(err){
+                sendMessage(app, {type:'error', content: err.message}, socket);
             }
-            sendPlayerList(app, game, gameSocket);
         });
 
         

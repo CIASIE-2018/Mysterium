@@ -72,14 +72,18 @@ body{
                 width: 100%;
                 color: white;
                 z-index: 10;
-                
-                p{
-                    width: 100%;
-                    display: flex;
-                    justify-content: center;
-                    padding: 10px 0;
-                    background-color: green;
-
+                .msg{
+                    text-align: center;
+                    padding: 10px;
+                    &.success{
+                        background:green;
+                    }
+                    &.error{
+                        background: red;
+                    }
+                    &.info{
+                        background: rgb(255, 166, 0);
+                    }
                 }
             }
 

@@ -7,8 +7,8 @@
         </div>
         <div class="game_content">
             <div class="messages">
-                {% if info__messages %}
-                    {% include 'partials/message.twig' with {info__messages} %}
+                {% if message %}
+                    {% include 'partials/message.twig' with {message} %}
                 {% endif %}
             </div>
         

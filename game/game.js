@@ -113,37 +113,29 @@ function allIsReady(baseGame) {
  */
 function play(baseGame, username, chosenCard){
 
-    let canChoose = false;
-
     //verifier que le personnage n'est pas le fantome
-    if(baseGame.ghost.username !== username){
-        let player = baseGame.mediums.find(player => player.username === username);
-        let state  = player.state;
-    
-        //verifier que le personnage peut jouer
-        if(!player.hasPlayed){
-            let type_carte = state == 0 ? 'persos' : (state == 1 ? 'lieux' : 'armes');
+    if(baseGame.ghost.username === username)
+        throw new Error('Le joueur est le fantome.')
 
-            //verifier l'etat d'avancement du joueur sur le plateau
-            if(baseGame[type_carte].find(perso => perso === chosenCard))
-                canChoose = true;
-            else
-                throw new errors.ChosenCardError(`La carte ${type_carte} choisis n'est pas sur le plateau`);
-        }
-    //si le joueur est un fantome
-    }else{
-        throw new Error('Le joueur est le fantome')
-    }
+    let player = baseGame.mediums.find(player => player.username === username);
+
+    if(player.hasPlayed)
+        throw new Error('Vous avez déjà joué.');
+
+    if(!baseGame.ghost.mediumsHasCards.includes(username))
+        throw new Error('Vous ne pouvez pas jouer pour le moment car vous n\'avez pas encore reçu de carte vision durant ce tour.');
+
+    let state  = player.state;
+    let type_carte = state == 0 ? 'persos' : (state == 1 ? 'lieux' : 'armes');
+    
+    //verifier l'etat d'avancement du joueur sur le plateau
+    if(!baseGame[type_carte].find(card => card === chosenCard))
+        throw new errors.ChosenCardError(`La carte ${type_carte} choisis n'est pas sur le plateau`);
 
     return produce(baseGame, draftGame => {
-        //si la carte est presente sur le plateau au bon stade du joueur et que le joueur peut jouer
-        if(canChoose){
-            let player = draftGame.mediums.find(player => player.username === username);
-            player.chosenCard = chosenCard;
-            player.hasPlayed = true;
-        }else{
-            throw new Error('Le joueur ne peux pas choisir de cartes')
-        }
+        let player = draftGame.mediums.find(player => player.username === username);
+        player.chosenCard = chosenCard;
+        player.hasPlayed = true;
     });
 }
 
@@ -226,13 +218,13 @@ function getInformationsMediums(baseGame){
  */
 function giveVisionsToMedium(baseGame, username, cards){
     if(!canPlay(baseGame,baseGame.ghost.username))
-        throw new Error('Le fantome ne peut pas jouer maintenant');
+        throw new Error('Vous ne pouvez pas jouer pour le moment. Les mediums doivent choisir une carte.');
 
     if(baseGame.ghost.mediumsHasCards.includes(username))
-        throw new Error('Le fantome a deja donne des cartes a ce joueur');
+        throw new Error('Vous avez déjà donné des cartes à ce medium.');
         
     if(!helpers.include(baseGame.ghost.hand, cards))
-        throw new Error('Le fantome n\'a pas les cartes visions');
+        throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
 
     return produce(baseGame, draftGame => {
         let ghost  = draftGame.ghost;
