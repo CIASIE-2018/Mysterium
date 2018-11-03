@@ -69,8 +69,11 @@ function sendMessage(app, messages, namespace, backgroundColor = "green"){
     });
 }
 
-function initBoardForFinalScneario(app, scenarios, namespace){
-    app.render('partials/finalScenarios', {scenarios}, (err, html) => {
+function initBoardForFinalScenario(app, game, namespace){
+    let scenarios     = getAllScenario(game)
+    let ghostUsername = game.ghost.username;
+       
+    app.render('partials/finalScenarios', {scenarios, ghostUsername}, (err, html) => {
         if(!err) namespace.emit('finalScenario', html);
     });
 }
@@ -89,13 +92,27 @@ module.exports = function(app, io, session){
         
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
-                game = giveVisionsToMedium(game, data.receiver, data.cards);
-                let mediumSocket = getSocket(gameSocket, data.receiver);
-    
-                if(mediumSocket != null){
-                    sendPlayerHand(app, game, socket);
-                    sendPlayerHand(app, game, mediumSocket);
-                    sendPlayerList(app, game, gameSocket);
+                if(allMediumFoundScenario(game)){
+                    game = giveVisionsToMedium(game, data.receiver, data.cards, true);  
+                    game.mediums.forEach(medium => {
+                        let mediumSocket = getSocket(gameSocket, medium.username);
+                        
+                        if(mediumSocket != null){
+                            sendPlayerHand(app, game, socket);
+                            sendPlayerHand(app, game, mediumSocket);
+                            sendPlayerList(app, game, gameSocket);
+                        }
+                    });
+
+                }else{
+                    let mediumSocket = getSocket(gameSocket, data.receiver);
+                    game = giveVisionsToMedium(game, data.receiver, data.cards);
+        
+                    if(mediumSocket != null){
+                        sendPlayerHand(app, game, socket);
+                        sendPlayerHand(app, game, mediumSocket);
+                        sendPlayerList(app, game, gameSocket);
+                    }
                 }
             }
         });
@@ -108,8 +125,7 @@ module.exports = function(app, io, session){
                 game = verifyChoicePlayers(game);
 
                 if(allMediumFoundScenario(game)){
-                    let scenarios = getAllScenario(game)
-                    initBoardForFinalScneario(app, scenarios, gameSocket)
+                    initBoardForFinalScenario(app, game, gameSocket)
                 }
 
                 for(let id in gameSocket.sockets){
@@ -138,7 +154,7 @@ module.exports = function(app, io, session){
                 let bgColor = 'green';
 
                 if(mediumHasWin(game))
-                    message = "Felicitaion ! Vous avez gagné"
+                    message = "Felicitation ! Vous avez gagné"
                 else{
                     message = "Dommage ! Vous êtes nul"
                     bgColor = 'red';

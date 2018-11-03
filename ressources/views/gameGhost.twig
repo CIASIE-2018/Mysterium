@@ -122,6 +122,14 @@
             });
         }
 
+        function init_form_final(){
+            $('#form_final_submit').attr("disabled", "disabled");
+
+            $('.checkbox_final').each(function() {
+                $(this).attr("disabled", true);
+            })
+        }
+
         let socketGame = io('/game');
 
         socketGame.on('message', function(data){
@@ -137,6 +145,13 @@
             $('.cards_hand_list').html(html);
             init_hand();
             init_ghost_hand_form(socketGame);
+        });
+
+        socketGame.on('finalScenario', function(html){
+            console.log('ghosr')
+            $('.game_plateau').remove();
+            $('.card_selected').html(html);
+            init_form_final();
         });
 
         init_board();
