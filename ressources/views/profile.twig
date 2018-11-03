@@ -2,15 +2,20 @@
 
 {% block content %}
     <div class="profile">
-        <h2 class="profile-header">Dashboard</h2>
-        <p>Welcome to your dashboard {{ user.username }} </p>  
+        <div class="profile_header">
+            <img src="/images/mysterium.png" />
+            <h1>Bienvenue sur le jeu {{ user.username }} </h1>  
+        </div>
+        
+        <div class="profile_content">
+            <a href="/">Rejoindre la partie</a>
+        </div>
 
-        <a href="/">Rejoindre la partie</a>
-        <br><br><br><br><br><br><br><br>
-
-        <form method="post">
-            <input type="submit" value="Supprimer le compte">
-        </form>
+        <div class="profile_bottom">
+            <form method="post">
+                <input type="submit" value="Supprimer le compte">
+            </form>  
+        </div>
 
     </div>
 
