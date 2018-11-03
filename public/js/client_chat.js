@@ -3,7 +3,7 @@ $(function(){
 
     $("#msg_form").submit(function (event) {
         event.preventDefault();
-        if($("#msg_writing").val() != '')
+        if($("#msg_writing").val().trim() != '')
         {
             socket.emit("chat message",$("#msg_writing").val());
             $("#msg_writing").val('').focus();
@@ -18,10 +18,8 @@ $(function(){
 });
 
 $('#hideChat').click (() => {
-    $('#chat').slideUp();
-    if($('#chat').css('display') == 'none'){
-        $('#chat').slideDown(function(){
-            $(window).scrollTop($('#msg_box li:last-child').offset().top);
-        });
+    $('#chat_box').slideUp();
+    if($('#chat_box').css('display') == 'none'){
+        $('#chat_box').slideDown();
     }
 })
