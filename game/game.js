@@ -467,6 +467,10 @@ function initScenarios(baseGame) {
     let index_scenarios_final = Math.floor(Math.random() * baseGame.mediums.length);
 
     return produce(baseGame, draftGame => {
+        draftGame.persos = helpers.shuffle(draftGame.persos);
+        draftGame.lieux  = helpers.shuffle(draftGame.lieux);
+        draftGame.armes  = helpers.shuffle(draftGame.armes);
+        
         draftGame.mediums.forEach((medium, i) => {
             if(i === index_scenarios_final)
                 draftGame.scenario_final = scenarios[i];
@@ -496,11 +500,6 @@ function initVisions(baseGame) {
  * @param {string} username 
  */
 function getPlayerType(baseGame, username){
-    let medium = baseGame.mediums.find(medium => medium.username == username);
-    
-    if(typeof medium !== 'object' && baseGame.ghost.username !== username)
-        throw new Error('Le type du joueur ne peux pas etre retourné')
-
     return baseGame.ghost.username === username ? 'ghost' : 'medium';
 }
 
