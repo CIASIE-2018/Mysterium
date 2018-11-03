@@ -21,11 +21,15 @@ body.game{
 
         #chat_box{
             display : none;
+            width : 50%;
+            background: black;
+            padding-top: 5px;
 
             #msg_box{
                 background-color: #fff;
                 max-height: 200px;
                 overflow: auto;
+                margin : 0 7px 0 4px;
             }
         
             #msg_box li:nth-child(odd) { 

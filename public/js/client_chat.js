@@ -5,7 +5,7 @@ $(function(){
         event.preventDefault();
         if($("#msg_writing").val() != '')
         {
-            socket.emit("chat message",$("#msg_writing").val());
+            socket.emit("chat message",$("#msg_writing").val().trim());
             $("#msg_writing").val('').focus();
         }
         return false;
