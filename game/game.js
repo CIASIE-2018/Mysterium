@@ -293,6 +293,14 @@ function allMediumPlayed(baseGame){
 }
 
 /**
+ * Retourne True si les médiums ont tous trouvé leur scénario
+ * @param {object} baseGame 
+ */
+function allMediumFoundScenario(baseGame){
+    return baseGame.mediums.every(medium => medium.state == 3);
+}
+
+/**
  * Retourne tous les scénarios des médiums
  * @param {object} baseGame Instance de jeu
  */
@@ -352,6 +360,7 @@ function mediumHasWin(baseGame){
 
 let function_exports = {
     allIsReady,
+    allMediumFoundScenario,
     allMediumHasChooseScenario,
     allMediumPlayed,
     chooseScenarioFinal,
