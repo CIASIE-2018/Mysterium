@@ -1,8 +1,11 @@
 const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
-const { createGame, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+
+const { createGame, getInformationsMediums, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+
 const sharedSession = require("express-socket.io-session");
+const helpers       = require('../helpers');
 
 function getUsername(socket){
     let username = undefined;
@@ -37,9 +40,12 @@ function createNamespaceWithExpressSession(io, namespace, session){
 
 function sendPlayerHand(app, game, socket){
     let username = getUsername(socket);
-    app.render('partials/playerHand', {infos : getInformations(game, username)}, (err, html) => {
-        if(!err) socket.emit('hand', html);
-    });
+    if(username != undefined){
+        app.render('partials/playerHand', {infos : getInformations(game, username)}, (err, html) => {
+            if(!err) socket.emit('hand', html);
+        });
+    }
+    
 }
 
 function sendPlayerList(app, game, namespace){
@@ -50,22 +56,28 @@ function sendPlayerList(app, game, namespace){
 
 function sendBoard(app, game, socket){
     let username = getUsername(socket);
-    let infos    = getInformations(game, username);
-    if(infos.type == "medium"){
-        app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
-            if(!err) socket.emit('board', html);
-        });
-    }   
-    
+    if(username != undefined){
+        let infos = getInformations(game, username);
+        if(infos.type == "medium"){
+            app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
+                if(!err) socket.emit('board', html);
+            });
+        }   
+    }
+}
+
+function sendArrayMediums(app, game, socket){
+    let mediums = getInformationsMediums(game);
+    socket.emit('mediums', mediums);
 }
 
 function resetSendMessage(app, namespace){
     namespace.emit('resetSendMessage');
 }
 
-function sendMessage(app, messages, namespace, backgroundColor = "green"){
-    app.render('partials/message', {info__messages:messages, backgroundColor}, (err, html) => {
-        if(!err) namespace.emit('messages', html);
+function sendMessage(app, message, socket){
+    app.render('partials/message', {message}, (err, html) => {
+        if(!err) socket.emit('messages', html);
     });
 }
 
@@ -89,9 +101,10 @@ module.exports = function(app, io, session){
     let gameSocket = createNamespaceWithExpressSession(io, '/game', session);
     gameSocket.on('connection', socket => {
         let socketUsername = socket.handshake.session.username;
-        
+
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
+              try{
                 if(allMediumFoundScenario(game)){
                     game = giveVisionsToMedium(game, data.receiver, data.cards, true);  
                     game.mediums.forEach(medium => {
@@ -105,38 +118,46 @@ module.exports = function(app, io, session){
                     });
 
                 }else{
-                    let mediumSocket = getSocket(gameSocket, data.receiver);
                     game = giveVisionsToMedium(game, data.receiver, data.cards);
-        
+                    let mediumSocket = getSocket(gameSocket, data.receiver);
+
                     if(mediumSocket != null){
                         sendPlayerHand(app, game, socket);
                         sendPlayerHand(app, game, mediumSocket);
                         sendPlayerList(app, game, gameSocket);
                     }
                 }
+               }catch(err){
+                    sendMessage(app, {type:'error', content: err.message}, socket);
+                }
+                
             }
         });
         socket.on('choice_card', cardId => {
-            game = play(game, socketUsername, cardId);
-            sendPlayerList(app, game, gameSocket);
-            sendMessage(app, "vous avez joué", socket);
-        
-            if(allMediumPlayed(game)){
-                game = verifyChoicePlayers(game);
-
-                if(allMediumFoundScenario(game)){
-                    initBoardForFinalScenario(app, game, gameSocket)
-                }
-
-                for(let id in gameSocket.sockets){
-                    sendPlayerHand(app, game, gameSocket.sockets[id]);
-                    sendBoard(app, game, gameSocket.sockets[id]);
+            try{
+                game = play(game, socketUsername, cardId);
+                sendMessage(app, {type:"success", content:"Vous avez joué."}, socket);
+            
+                if(allMediumPlayed(game)){
+                    game = verifyChoicePlayers(game);
+                  
+                  if(allMediumFoundScenario(game)){
+                      initBoardForFinalScenario(app, game, gameSocket)
+                  }
+    
+                    for(let id in gameSocket.sockets){
+                        if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
+                            sendArrayMediums(app, game, gameSocket.sockets[id]);
+                        }else{
+                            sendBoard(app, game, gameSocket.sockets[id]); 
+                        }
+                        sendPlayerHand(app, game, gameSocket.sockets[id]);
+                    }
+                    sendMessage(app, {type:"info", content:`Tour n°${game.turn}`}, gameSocket);
                 }
                 sendPlayerList(app, game, gameSocket);
-
-                setTimeout(()=> {
-                    resetSendMessage(app, gameSocket);
-                }, 500)
+            }catch(err){
+                sendMessage(app, {type:'error', content: err.message}, socket);
             }
         });
 
@@ -145,9 +166,7 @@ module.exports = function(app, io, session){
             let username = getUsername(socket)
 
             game = chooseScenarioFinal(game, username, scenarioId)
-
             sendMessage(app, "Vous avez fait votre choix!", socket)
-
 
             if(allMediumHasChooseScenario(game)){
                 let message = '';
@@ -161,7 +180,6 @@ module.exports = function(app, io, session){
                 }
 
                 sendMessage(app, message, gameSocket, bgColor)
-                    
             }
         })
 
@@ -173,7 +191,7 @@ module.exports = function(app, io, session){
     chatSocket.on('connection', socket => {
 
         socket.on('chat message', message => {
-            //TODO ATTENTION INJECTION CODE !
+            message = helpers.escapeHtml(message);
             let msg = moment().format('HH:mm') + ` <span class='pseudo'>${socket.handshake.session.username}</span>  : ${message}`;
             messages.push(msg);
             chatSocket.emit('chat message',msg);
@@ -226,6 +244,14 @@ module.exports = function(app, io, session){
             infos : getInformations(game, req.user.username),
             messages
         });
+    });
+
+    router.post('/ajax/mediums', (req, res) => {
+        try{
+            res.json(getInformationsMediums(game));
+        }catch(err){
+            res.json(null);
+        }
     });
     
     return router;    

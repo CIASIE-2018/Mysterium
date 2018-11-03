@@ -1,30 +1,40 @@
 body.game{
-    #hideChat{
-        position: relative;
-        bottom: 0;
-        
-        width: 7%;
-        padding: 5px;
-        border : none;
-        background : rgba(rgb(0, 0, 0), 0.7);
-        border-top-right-radius: 20px;
-        font-size:1em;
-        color :white
-    }
 
     #chat{
         width  : 100%;
-        background-color: #fff;
-        position: relative;
+        position: absolute;
         bottom: 0;
-
-        #msg_box{
-            max-height: 200px;
-            overflow: auto;
-        }
+        z-index: 9999;
         
-        #msg_box li:nth-child(odd) { 
-            background: #eee; 
+        #hideChat{
+            position: relative;
+            bottom: 0;
+            
+            width: 7%;
+            padding: 5px;
+            border : none;
+            background : rgba(rgb(0, 0, 0), 0.7);
+            border-top-right-radius: 20px;
+            font-size:1em;
+            color :white
+        }
+
+        #chat_box{
+            display : none;
+            width : 50%;
+            background: black;
+            padding-top: 5px;
+
+            #msg_box{
+                background-color: #fff;
+                max-height: 200px;
+                overflow: auto;
+                margin : 0 7px 0 4px;
+            }
+        
+            #msg_box li:nth-child(odd) { 
+                background: #eee; 
+            }
         }
     }
 }
