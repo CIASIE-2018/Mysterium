@@ -71,7 +71,7 @@ function sendArrayMediums(app, game, socket){
     socket.emit('mediums', mediums);
 }
 
-00
+
 function sendMessage(app, message, socket){
     app.render('partials/message', {message}, (err, html) => {
         if(!err) socket.emit('messages', html);
