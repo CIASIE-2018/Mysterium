@@ -383,6 +383,8 @@ function mediumHasWin(baseGame){
         })
 
         return count > Math.floor(baseGame.mediums.length / 2);
+    }else if(baseGame.turn == 7){
+        return false;
     }
 }
 

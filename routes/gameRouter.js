@@ -141,7 +141,7 @@ module.exports = function(app, io, session){
                         sendMessage(app, {type:"info", content:`Tour finale`}, gameSocket);
 
                     }else if(game.turn === 7){
-                        sendMessage(app, {type:"error", content:`Perdu...`}, gameSocket);
+                        sendFinal(app, game, gameSocket);
 
                     }else{
                         for(let id in gameSocket.sockets){
@@ -183,7 +183,7 @@ module.exports = function(app, io, session){
             if(username != undefined && scenarioId != undefined){
                 try{
                     game = chooseScenarioFinal(game, username, scenarioId);
-                    sendMessage(app, "Vous avez fait votre choix !", socket);
+                    sendMessage(app, {type:"success", content : "Vous avez fait votre choix !"}, socket);
 
                     if(allMediumHasChooseScenario(game)){
                         sendFinal(app, game, gameSocket);
