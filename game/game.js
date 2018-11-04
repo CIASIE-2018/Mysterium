@@ -245,6 +245,33 @@ function giveVisionsToMedium(baseGame, username, cards){
     });   
 }
 
+function giveVisionsToAllMedium(baseGame, cards){
+    if(baseGame.ghost.mediumsHasCards.length === baseGame.mediums.length)
+        throw new Error('Vous avez déjà envoyé les cartes visions aux mediums.')
+        
+    if(!helpers.include(baseGame.ghost.hand, cards))
+        throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
+
+    return produce(baseGame, draftGame => {
+        let ghost  = draftGame.ghost;
+
+        let visions            = draftGame.visions;
+        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+        draftGame.visions      = visions.slice(0, -cards.length);
+
+        //Retire les cartes a donner de la main du fantome
+        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+        //Complete la main du fantome avec le nombre de cartes manquantes
+        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+        
+        draftGame.mediums.forEach(medium => {
+            medium.visions = medium.visions.concat(cards);
+            medium.hasReceivedCards = true;
+            ghost.mediumsHasCards.push(medium.username);
+        });
+    });   
+}
+
 /**
  * Verifie si les joueurs ont choisis la bonne carte sur 
  * le plateau en fonction de leur scenario
@@ -322,11 +349,12 @@ function getAllScenario(baseGame){
 function chooseScenarioFinal(baseGame, username, scenario_number){
 
     let scenarios = getAllScenario(baseGame);
-    if(scenario_number >= scenarios.length )
-        throw new Error('Le scenario ne peut pas etre choisis')
-    
+    if(scenario_number >= scenarios.length)
+        throw new Error('Le scenario ne peut pas etre choisis');
     return produce(baseGame, draftGame => {
         let medium = draftGame.mediums.find(medium => medium.username == username);
+        if(medium.scenarioFinalChoose != undefined)
+            throw new Error('Vous avez déjà choisi un scénario.');
         medium.scenarioFinalChoose = scenarios[scenario_number];
     });
 }
@@ -369,6 +397,7 @@ let function_exports = {
     getInformations,
     getInformationsMediums,
     giveVisionsToMedium,
+    giveVisionsToAllMedium,
     init,
     join,
     mediumHasWin,
