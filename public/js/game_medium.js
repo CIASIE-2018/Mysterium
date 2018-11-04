@@ -48,23 +48,11 @@ function setHandCard(cardId){
     });
 }
     
-function init_form_final(){
-    $('.checkbox_final').on('click', function(e){
-        $('.checkbox_final').each(function() {
-            if(this !== e.target){
-                $(this).prop('checked', false)
-            }
-        })
-    });
-
+function initFormFinal(socket){
     $('#form_final').on('submit', function(e){
         e.preventDefault();
-        $('#form_final_submit').attr("disabled", "disabled");
-        $('.checkbox_final').each(function() {
-            $(this).attr("disabled", true);
-        })
-        let checkbox = $('input[type=checkbox]:checked');
-        socketGame.emit('choice_final_scenario', checkbox.attr('name'));
+        let selectedScenario = $('input[name=scenario]:checked').val();
+        socket.emit('choice_final_scenario', selectedScenario);
     });
 }
 
@@ -97,9 +85,15 @@ $(function(){
         initBoard(socketGame);
     });
 
-    socketGame.on('finalScenario', function(html){
+    socketGame.on('finalScenarios', function(html){
         $('.game_plateau').remove();
         $('.card_selected').html(html);
-        init_form_final();
+        $('.cards_hand_list').html('');
+        setHandCard("default");
+        initFormFinal(socketGame);
+    });
+
+    socketGame.on('final_resultat', function(html){
+        $('.card_selected').html(html);
     });
 });
