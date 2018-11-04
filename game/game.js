@@ -165,6 +165,7 @@ function getInformations(baseGame, username) {
     infosPlayer.mediums = baseGame.mediums.map(medium => {
         let state = {
             state            : medium.state,
+            findScenario     : medium.findScenario,
             username         : medium.username,
             initial          : medium.initial,
             hasReceivedCards : medium.hasReceivedCards,
@@ -303,6 +304,7 @@ function verifyChoicePlayers(baseGame) {
                 medium.visions  = [];
             }
             
+            medium.findScenario     = medium.state == FINAL;
             medium.chosenCard       = '';
             medium.hasPlayed        = false;
             medium.hasReceivedCards = false;
@@ -464,11 +466,12 @@ function initRoles(baseGame) {
                 };
             }else{
                 draftGame.mediums.push({
-                    username  : player.username,
-                    initial   : player.initial,
-                    state     : 0,
-                    visions   : [],
-                    hasPlayed : false
+                    username     : player.username,
+                    initial      : player.initial,
+                    state        : 0,
+                    findScenario : false,
+                    visions      : [],
+                    hasPlayed    : false
                 });
             }
         });
