@@ -6,8 +6,11 @@ Assurez-vous d'avoir téléchargé docker, qu'il est bien installé et lancé. P
 # Telechargement du jeu
 Placez-vous dans le dossier dans lequel vous souhaitez telecharer le jeu puis ouvrez un terminal de commande et lancer la commande : ```git clone https://github.com/CIASIE-2018/Mysterium.git```
 
+# Installation du jeu
+Dans le dossier où vous avez téléchargé le jeu, lancer la commande ```make install```,  cette commande sert à installer tout les modules necessaires au bon fonctionnement du jeu.
+
 # Lancement du jeu
-Dans le dossier du jeu, lancez la commande ```make run```
+Dans le dossier du jeu, lancez la commande ```make run```, cette commande permet de lancer notre serveur web et compiler notre code scss afin d'avoir un rendu visuel du jeu.
 
 # Connexion au serveur et lancement d'une partie
 Pour vous connectez au serveur et lancer une partie, vous aurez besoin de deux navigateurs, un pour lequel vous ouvrirez un onglet standar et un onglet de navigation privée, l'autre avec un onglet standard.
