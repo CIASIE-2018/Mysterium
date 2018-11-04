@@ -1,17 +1,20 @@
 body.game{
 
     #chat{
-        width  : 100%;
+        
         position: absolute;
         bottom: 0;
         z-index: 9999;
-        
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+
         #hideChat{
             position: relative;
             bottom: 0;
-            
-            width: 7%;
-            padding: 5px;
+            flex:1;
+            padding: 5px 10px;
+            align-self: flex-start;
             border : none;
             background : rgba(rgb(0, 0, 0), 0.7);
             border-top-right-radius: 20px;
@@ -21,7 +24,6 @@ body.game{
 
         #chat_box{
             display : none;
-            width : 50%;
             background: black;
             padding-top: 5px;
 
@@ -29,7 +31,7 @@ body.game{
                 background-color: #fff;
                 max-height: 200px;
                 overflow: auto;
-                margin : 0 7px 0 4px;
+                margin : 0 3px;
             }
         
             #msg_box li:nth-child(odd) { 
