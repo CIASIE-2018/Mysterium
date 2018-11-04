@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
 
-const { createGame, getInformationsMediums, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, getInformationsMediums, giveVisionsToAllMedium, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 
 const sharedSession = require("express-socket.io-session");
 const helpers       = require('../helpers');
@@ -78,13 +78,25 @@ function sendMessage(app, message, socket){
     });
 }
 
-function initBoardForFinalScenario(app, game, namespace){
-    let scenarios     = getAllScenario(game)
-    let ghostUsername = game.ghost.username;
-       
-    app.render('partials/finalScenarios', {scenarios, ghostUsername}, (err, html) => {
+function sendFinalScenario(app, game, namespace){ 
+    app.render('partials/finalScenarios', {scenarios : getAllScenario(game)}, (err, html) => {
+        if(!err) namespace.emit('finalScenarios', html);
+    });
+    app.render('partials/finalScenario', {scenario : game.scenario_final}, (err, html) => {
         if(!err) namespace.emit('finalScenario', html);
     });
+}
+
+function sendFinal(app, game, namespace){
+    if(mediumHasWin(game)){
+        app.render('partials/final_gagne', (err, html) => {
+            if(!err) namespace.emit('final_resultat', html);
+        });
+    }else{
+        app.render('partials/final_perdu', (err, html) => {
+            if(!err) namespace.emit('final_resultat', html);
+        });
+    }
 }
 
 /* Instance du jeu */
@@ -102,26 +114,13 @@ module.exports = function(app, io, session){
         socket.on('send_card_to_medium', data => {
             if(socketUsername === game.ghost.username){
                 try{
-                    if(allMediumFoundScenario(game)){
-                        game = giveVisionsToMedium(game, data.receiver, data.cards, true);  
-                        game.mediums.forEach(medium => {
-                            let mediumSocket = getSocket(gameSocket, medium.username);
-                            
-                            if(mediumSocket != null){
-                                sendPlayerHand(app, game, socket);
-                                sendPlayerHand(app, game, mediumSocket);
-                                sendPlayerList(app, game, gameSocket);
-                            }
-                        });
-                    }else{
-                        game = giveVisionsToMedium(game, data.receiver, data.cards);
-                        let mediumSocket = getSocket(gameSocket, data.receiver);
+                    game = giveVisionsToMedium(game, data.receiver, data.cards);
+                    let mediumSocket = getSocket(gameSocket, data.receiver);
 
-                        if(mediumSocket != null){
-                            sendPlayerHand(app, game, socket);
-                            sendPlayerHand(app, game, mediumSocket);
-                            sendPlayerList(app, game, gameSocket);
-                        }
+                    if(mediumSocket != null){
+                        sendPlayerHand(app, game, socket);
+                        sendPlayerHand(app, game, mediumSocket);
+                        sendPlayerList(app, game, gameSocket);
                     }
                 }catch(err){
                     sendMessage(app, {type:'error', content: err.message}, socket);
@@ -138,48 +137,65 @@ module.exports = function(app, io, session){
                     game = verifyChoicePlayers(game);
                   
                     if(allMediumFoundScenario(game)){
-                        initBoardForFinalScenario(app, game, gameSocket)
-                    }
-    
-                    for(let id in gameSocket.sockets){
-                        if(getUsername(gameSocket.sockets[id]) === game.ghost.username){
-                            sendArrayMediums(app, game, gameSocket.sockets[id]);
-                        }else{
-                            sendBoard(app, game, gameSocket.sockets[id]); 
+                        sendFinalScenario(app, game, gameSocket);
+                        sendMessage(app, {type:"info", content:`Tour finale`}, gameSocket);
+
+                    }else if(game.turn === 7){
+                        sendMessage(app, {type:"error", content:`Perdu...`}, gameSocket);
+
+                    }else{
+                        for(let id in gameSocket.sockets){
+                            let isGhost = getUsername(gameSocket.sockets[id]) === game.ghost.username;
+                            if(isGhost){
+                                sendArrayMediums(app, game, gameSocket.sockets[id]);
+                            }else{
+                                sendBoard(app, game, gameSocket.sockets[id]); 
+                            }
+                            sendPlayerHand(app, game, gameSocket.sockets[id]);
                         }
-                        sendPlayerHand(app, game, gameSocket.sockets[id]);
+                        sendMessage(app, {type:"info", content:`Tour n°${game.turn}`}, gameSocket);
                     }
-                    sendMessage(app, {type:"info", content:`Tour n°${game.turn}`}, gameSocket);
                 }
+
                 sendPlayerList(app, game, gameSocket);
             }catch(err){
                 sendMessage(app, {type:'error', content: err.message}, socket);
             }
         });
 
-        socket.on('choice_final_scenario', scenarioId => {
-
-            let username = getUsername(socket)
-
-            game = chooseScenarioFinal(game, username, scenarioId)
-            sendMessage(app, "Vous avez fait votre choix!", socket)
-
-            if(allMediumHasChooseScenario(game)){
-                let message = '';
-                let bgColor = 'green';
-
-                if(mediumHasWin(game))
-                    message = "Felicitation ! Vous avez gagné"
-                else{
-                    message = "Dommage ! Vous êtes nul"
-                    bgColor = 'red';
+        socket.on('send_final_cards', cards => {
+            if(cards.length == 3){
+                try{
+                    game = giveVisionsToAllMedium(game, cards);
+                    for(let id in gameSocket.sockets){
+                        sendPlayerHand(app, game, gameSocket.sockets[id]);
+                    }
+                }catch(err){
+                    sendMessage(app, {type:'error', content: err.message}, socket);
                 }
-
-                sendMessage(app, message, gameSocket, bgColor)
+            }else{
+                sendMessage(app, {type:'error', content: 'Il faut selectionner 3 cartes visions.'}, socket);
             }
         })
 
-        
+        socket.on('choice_final_scenario', scenarioId => {
+            let username = getUsername(socket);
+            if(username != undefined && scenarioId != undefined){
+                try{
+                    game = chooseScenarioFinal(game, username, scenarioId);
+                    sendMessage(app, "Vous avez fait votre choix !", socket);
+
+                    if(allMediumHasChooseScenario(game)){
+                        sendFinal(app, game, gameSocket);
+                        game     = createGame();
+                        messages = [];
+                    }
+
+                }catch(err){
+                    sendMessage(app, {type:'error', content: err.message}, socket);
+                }
+            }
+        });
     });
 
     let chatSocket = createNamespaceWithExpressSession(io, '/chat', session);
