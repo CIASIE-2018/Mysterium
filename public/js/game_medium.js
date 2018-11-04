@@ -5,7 +5,9 @@ function initBoard(socket){
     });
 
     let firstCardId = $($('.game_plateau .swiper-slide')[0]).data('idcard');
-    setScenarioCard(firstCardId);
+    if(firstCardId != undefined){
+        setScenarioCard(firstCardId);
+    }
 
     $('.game_plateau .swiper-slide').off('click');
     $('.game_plateau .swiper-slide').on('click', function(e){

@@ -59,7 +59,7 @@ function sendBoard(app, game, socket){
     if(username != undefined){
         let infos = getInformations(game, username);
         if(infos.type == "medium"){
-            app.render('partials/playerBoard', {cards : infos.me.cards} , (err, html) => {
+            app.render('partials/playerBoard', {cards : infos.me.cards, findScenario : infos.me.findScenario} , (err, html) => {
                 if(!err) socket.emit('board', html);
             });
         }   
