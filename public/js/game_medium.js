@@ -7,6 +7,7 @@ function initBoard(socket){
     let firstCardId = $($('.game_plateau .swiper-slide')[0]).data('idcard');
     if(firstCardId != undefined){
         setScenarioCard(firstCardId);
+        $('input[name=selected-card]').val(firstCardId);
     }
 
     $('.game_plateau .swiper-slide').off('click');
