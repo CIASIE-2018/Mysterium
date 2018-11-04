@@ -1,16 +1,19 @@
 {% extends "layouts/master.twig" %}
 
+{% block bodyClass %}login{% endblock %}
+
 {% block content %}
     <div class="login">
-      <h2 class="login-header">Account Login</h2>
+      <img class="logo" src="/images/mysterium.png">
+      <h2 class="login-header">Connexion</h2>
       <form class="login-form" method="post" action="/login">
         <div class="form-group">
-          <label>Username</label>
-          <input type="text" class="form-control" name="username" placeholder="Username">
+          <label>Nom d'utilisateur</label>
+          <input type="text" class="form-control" name="username" placeholder="Nom d'utilisateur">
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" class="form-control" name="password" placeholder="Password">
+          <label>Mot de passe</label>
+          <input type="password" class="form-control" name="password" placeholder="Mot de passe">
         </div>
         <button type="submit" class="btn">Se connecter</button>
       </form>

@@ -22,7 +22,7 @@ router.post('/register', (req, res) => {
 	req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
 
 	if (req.validationErrors())
-		res.render('register', {errors});
+		res.render('register');
 	else {
 		//checking username are already taken
 		User.findOne({ 
