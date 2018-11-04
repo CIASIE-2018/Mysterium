@@ -222,6 +222,10 @@ function giveVisionsToMedium(baseGame, username, cards){
 
     if(baseGame.ghost.mediumsHasCards.includes(username))
         throw new Error('Vous avez déjà donné des cartes à ce medium.');
+
+    let medium = baseGame.mediums.find(medium => medium.username == username);
+    if(medium != undefined && medium.state == 3)
+        throw new Error('Vous ne pouvez pas donner de carte à ce medium car il a trouvé son scénario.');
         
     if(!helpers.include(baseGame.ghost.hand, cards))
         throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
@@ -316,7 +320,7 @@ function verifyChoicePlayers(baseGame) {
  * @param {object} baseGame 
  */
 function allMediumPlayed(baseGame){
-    return baseGame.mediums.every(medium => medium.hasPlayed == true);
+    return baseGame.mediums.every(medium => (medium.hasPlayed == true) || (medium.state == 3));
 }
 
 /**
@@ -388,6 +392,18 @@ function mediumHasWin(baseGame){
     }
 }
 
+/**
+ * verifie qu'un joueur a trouvé tout son scenario
+ * @param {object} game instance courrante du jeu 
+ * @param {string} username pseudo du joueur 
+ * @returns {boolean} youFindIt indique 
+ */
+function isScenarioFound(game,username){
+    let medium = game.mediums.find(player => player.username == username);
+    if(medium != undefined)
+        return medium.state == FINAL;
+}
+
 let function_exports = {
     allIsReady,
     allMediumFoundScenario,
@@ -401,11 +417,12 @@ let function_exports = {
     giveVisionsToMedium,
     giveVisionsToAllMedium,
     init,
+    isScenarioFound,
     join,
     mediumHasWin,
     play,
     setReady,
-    verifyChoicePlayers,
+    verifyChoicePlayers
 }
 
 if(config.app.mode == 'dev'){
@@ -567,26 +584,4 @@ function getCards(type, nb_cards){
     return cards;
 }
   
-/**
- * vérifie que tous les joueurs ont trouvé leur scénario
- *  @param {object} game Instance courante de jeu
- * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
- */
-function areAllScenariosFound (game){
-    let canGoToTheFinal = game.mediums.every((medium) => {
-        return isScenarioFound(game, medium.username);
-    });
-    
-    return canGoToTheFinal;
-}
 
-/**
- * verifie qu'un joueur a trouvé tout son scenario
- * @param {object} game instance courrante du jeu 
- * @param {string} username pseudo du joueur 
- * @returns {boolean} youFindIt indique 
- */
-function isScenarioFound(game,username){
-    let player = game.mediums.find(player => player.username == username);
-    return player.state == FINAL;
-}
