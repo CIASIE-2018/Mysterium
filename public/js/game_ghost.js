@@ -41,6 +41,7 @@ function setScenarioCard(cardId){
 function initHand(socket){
     let firstCardId = $($('.cards_hand_list_item img')[0]).data('idcard');
     setHandCard(firstCardId);
+    $('.cards_hand_list_item img').off('click');
     $('.cards_hand_list_item img').on('click', function(e){
         let cardId = $(e.currentTarget).data('idcard');
         setHandCard(cardId);
@@ -63,6 +64,7 @@ function setHandCard(cardId){
 
 
 function initGhostHandForm(socket){
+    $('#hand_form').off('submit');
     $('#hand_form').on('submit', function(e){
         e.preventDefault();
         let cards = [];

@@ -115,7 +115,7 @@ function play(baseGame, username, chosenCard){
 
     //verifier que le personnage n'est pas le fantome
     if(baseGame.ghost.username === username)
-        throw new Error('Le joueur est le fantome.')
+        throw new Error('Le joueur est le fantome.');
 
     let player = baseGame.mediums.find(player => player.username === username);
 

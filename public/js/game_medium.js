@@ -7,11 +7,13 @@ function initBoard(socket){
     let firstCardId = $($('.game_plateau .swiper-slide')[0]).data('idcard');
     setScenarioCard(firstCardId);
 
+    $('.game_plateau .swiper-slide').off('click');
     $('.game_plateau .swiper-slide').on('click', function(e){
         let cardId = $(e.currentTarget).data('idcard');
         $('input[name=selected-card]').val(cardId);
         setScenarioCard(cardId);
     });
+    $('#selected_card_form').off('submit');
     $('#selected_card_form').on('submit', function(e){
         e.preventDefault();
         let cardId = $('input[name=selected-card]').val();
@@ -27,6 +29,7 @@ function initHand(){
     if($('.cards_hand_list_item img').length > 0){
         let firstCardId = $($('.cards_hand_list_item img')[0]).data('idcard');
         setHandCard(firstCardId);
+        $('.cards_hand_list_item img').off('click');
         $('.cards_hand_list_item img').on('click', function(e){
             let cardId = $(e.currentTarget).data('idcard');
             setHandCard(cardId);
@@ -49,6 +52,7 @@ function setHandCard(cardId){
 }
     
 function initFormFinal(socket){
+    $('#form_final').off('submit');
     $('#form_final').on('submit', function(e){
         e.preventDefault();
         let selectedScenario = $('input[name=scenario]:checked').val();
