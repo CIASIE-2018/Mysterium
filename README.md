@@ -3,24 +3,11 @@
 ### Docker
 Assurez-vous d'avoir téléchargé docker, qu'il est bien installé et lancé. Pour cela utilisé la commande ```docker version``` depuis n'importe quel dossier.
 
-### MongoDB
-Assurez-vous d'avoir téléchargé MongoDB et qu'il est bien installé.Pour cela utilisé la commande ```mongo version``` depuis n'importe quel dossier.
-
-### Node.js
-
-Assurez-vous d'avoir téléchargé Node.js et qu'il est bien installé. Pour cela utilisé la commande ```node --version``` depuis n'importe quel dossier.
-
 # Telechargement du jeu
 Placez-vous dans le dossier dans lequel vous souhaitez telecharer le jeu puis ouvrez un terminal de commande et lancer la commande : ```git clone https://github.com/CIASIE-2018/Mysterium.git```
 
-# Installation des modules pour pouvoir lancer le jeu
-Pour pouvoir lancer Mysterium, vous aurez besoin de lancer la commande ```npm install``` depuis le dossier du jeu afin de telechargé les modules Node.js necessaire au bon fonctionnement du jeu.
-
-# Compilation du css
-Toujours dans le dossier du jeu, lancez la commande ```sass ressources/scss/index.scss public/css/index.css --watch``` pour avoir le rendu visuel du jeu
-
 # Lancement du jeu
-Dans le dossier du jeu, lancez la commande ```npm run```
+Dans le dossier du jeu, lancez la commande ```make run```
 
 # Connexion au serveur et lancement d'une partie
 Pour vous connectez au serveur et lancer une partie, vous aurez besoin de deux navigateurs, un pour lequel vous ouvrirez un onglet standar et un onglet de navigation privée, l'autre avec un onglet standard.
@@ -42,9 +29,11 @@ Un horrible crime à été commit, le fantôme de la victime hante encore les li
 
 ### Les règles du jeu
 
-Chaque compte se voit assigné un rôle aléatoirement ainsi qu'un scenario, vous êtes soit medium, soit fantôme et il ne peut y avoir qu'un seul fantôme. Un scenario final est également choisit parmit les scenarios générés, vous ne pourrez le trouver qu'une fois que tout les médiums auront résolu leur scénario respectif.
+Chaque compte se voit assigné un rôle aléatoirement ainsi qu'un scenario, vous êtes soit medium, soit fantôme et il ne peut y avoir qu'un seul fantôme. Un scenario final est également choisit parmit les scenarios générés, vous ne pourrez le trouver qu'une fois que tout les médiums auront résolu leur scénario respectif. Vous disposez de 7 tours pour réussir à atteindre le scénario final et le trouver.
 
 ##### Médium
-Au début du jeu, les médium se voient chacun attribuer un scenario qu'ils ne connaissent pas et doivent deviner grâce a des cartes visions distribuées par le fantôme. À chaque élément de scénario trouvé, ils passent au prochain élément, l'ordre étant le suivant : Le criminel -> Lieu du crime -> Arme du crime.
+Au début du jeu, les médium se voient chacun attribuer un scenario qu'ils ne connaissent pas et doivent deviner grâce a des cartes visions distribuées par le fantôme qui doivent, par les éléments présents sur la carte, vous aider à trouver votre élément de scénario. À chaque élément de scénario trouvé, ils passent au prochain élément, l'ordre étant le suivant : Le criminel -> Lieu du crime -> Arme du crime.
 
 ##### Fantôme
+Vous êtes le fantôme, votre but et d'aider les médiums à trouver les éléments qui composent les possibles scénario de votre mort. A chaque tour, vous choisirez, en fonction des cartes visions dans votre main et de l'élément de scénario à trouver pour chaque médium, à quel médium vous souhaitez distribuer des cartes. L'élément de scénario à trouver pour chaque médium est indiqué lorsque vous cliquer sur le pseudo d'un joueur.
+Vous disposez de 7 cartes visions dans votre main, qui sera remplie à chaque distribution de cartes pour un maximum de 7 cartes en main. 
