@@ -142,6 +142,8 @@ module.exports = function(app, io, session){
                         sendMessage(app, {type:"info", content:`Tour finale`}, gameSocket);
 
                     }else if(game.turn === game.max_turn){
+                        game     = createGame();
+                        messages = [];
                         sendFinal(app, game, gameSocket);
 
                     }else{

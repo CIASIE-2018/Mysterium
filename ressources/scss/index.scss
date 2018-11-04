@@ -249,7 +249,7 @@ body{
                         height: 100%;
                     }
                     
-                    .cards_hand_list_item{
+                    .cards_hand_list_item, button[type=submit]{
                         flex:1 1 50%;
                         height: calc(100% / 4);
                         text-align: center;
