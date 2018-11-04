@@ -21,6 +21,7 @@ function initBoard(socket){
     });
 }
 
+
 function setScenarioCard(cardId){
     $('.card_selected_content img').attr('src', `/images/cards/${cardId}.png`);
 }
@@ -87,6 +88,15 @@ $(function(){
     socketGame.on('board', function(html){
         $('.game_plateau').html(html);
         initBoard(socketGame);
+    });
+
+    socketGame.on('wait', function(){
+        let swiper = $('.swiper-container')[0].swiper;
+        swiper.removeAllSlides();
+        $('.cards_hand_list').html("");
+        setHandCard("default");
+        setScenarioCard("wait");
+        $('.selected_card_form .card_selected_btn').remove();
     });
 
     socketGame.on('finalScenarios', function(html){

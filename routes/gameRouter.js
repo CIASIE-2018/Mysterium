@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const moment = require("moment");
 
-const { createGame, getInformationsMediums, giveVisionsToAllMedium, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
+const { createGame, getInformationsMediums, isScenarioFound, giveVisionsToAllMedium, init, join, setReady, mediumHasWin, allMediumHasChooseScenario, chooseScenarioFinal, allMediumFoundScenario, getAllScenario, allIsReady, play, allMediumPlayed, verifyChoicePlayers, getInformations, giveVisionsToMedium } = require('../game/game');
 
 const sharedSession = require("express-socket.io-session");
 const helpers       = require('../helpers');
@@ -65,6 +65,7 @@ function sendBoard(app, game, socket){
         }   
     }
 }
+
 
 function sendArrayMediums(app, game, socket){
     let mediums = getInformationsMediums(game);
@@ -140,18 +141,25 @@ module.exports = function(app, io, session){
                         sendFinalScenario(app, game, gameSocket);
                         sendMessage(app, {type:"info", content:`Tour finale`}, gameSocket);
 
-                    }else if(game.turn === 7){
+                    }else if(game.turn === game.max_turn){
                         sendFinal(app, game, gameSocket);
 
                     }else{
                         for(let id in gameSocket.sockets){
-                            let isGhost = getUsername(gameSocket.sockets[id]) === game.ghost.username;
-                            if(isGhost){
-                                sendArrayMediums(app, game, gameSocket.sockets[id]);
-                            }else{
-                                sendBoard(app, game, gameSocket.sockets[id]); 
+                            let currentSocket = gameSocket.sockets[id];
+                            let username = getUsername(currentSocket);
+                            if(username != undefined){
+                                if(username === game.ghost.username){
+                                    sendArrayMediums(app, game, currentSocket);
+
+                                }else{
+                                    if(isScenarioFound(game, username))
+                                        currentSocket.emit('wait');  
+                                    else
+                                        sendBoard(app, game, currentSocket); 
+                                }
+                                sendPlayerHand(app, game, currentSocket);
                             }
-                            sendPlayerHand(app, game, gameSocket.sockets[id]);
                         }
                         sendMessage(app, {type:"info", content:`Tour n°${game.turn}`}, gameSocket);
                     }
@@ -186,9 +194,10 @@ module.exports = function(app, io, session){
                     sendMessage(app, {type:"success", content : "Vous avez fait votre choix !"}, socket);
 
                     if(allMediumHasChooseScenario(game)){
-                        sendFinal(app, game, gameSocket);
                         game     = createGame();
                         messages = [];
+                        sendFinal(app, game, gameSocket);
+                        
                     }
 
                 }catch(err){
@@ -222,7 +231,8 @@ module.exports = function(app, io, session){
             gameSocket.emit('reload');
             res.redirect('/salon');
         }catch(e){
-            res.redirect('/erreur');
+            res.json(getInformationsMediums(game));
+            //res.redirect('/erreur');
         }
     });
     
