@@ -139,12 +139,12 @@ module.exports = function(app, io, session){
                   
                     if(allMediumFoundScenario(game)){
                         sendFinalScenario(app, game, gameSocket);
-                        sendMessage(app, {type:"info", content:`Tour finale`}, gameSocket);
+                        sendMessage(app, {type:"info", content:`Tour final`}, gameSocket);
 
                     }else if(game.turn === game.max_turn){
+                        sendFinal(app, game, gameSocket);
                         game     = createGame();
                         messages = [];
-                        sendFinal(app, game, gameSocket);
 
                     }else{
                         for(let id in gameSocket.sockets){
@@ -196,10 +196,9 @@ module.exports = function(app, io, session){
                     sendMessage(app, {type:"success", content : "Vous avez fait votre choix !"}, socket);
 
                     if(allMediumHasChooseScenario(game)){
+                        sendFinal(app, game, gameSocket);
                         game     = createGame();
                         messages = [];
-                        sendFinal(app, game, gameSocket);
-                        
                     }
 
                 }catch(err){

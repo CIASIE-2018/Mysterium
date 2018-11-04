@@ -353,12 +353,14 @@ function getAllScenario(baseGame){
  * @param {number} scenario_number 
  */
 function chooseScenarioFinal(baseGame, username, scenario_number){
-
+    
     let scenarios = getAllScenario(baseGame);
     if(scenario_number >= scenarios.length)
         throw new Error('Le scenario ne peut pas etre choisis');
     return produce(baseGame, draftGame => {
         let medium = draftGame.mediums.find(medium => medium.username == username);
+        if(medium.visions.length < 3)
+            throw new Error('Vous ne pouvez pas choisir de scénario pour le moment. Le fantôme doit vous envoyer des cartes visions.');
         if(medium.scenarioFinalChoose != undefined)
             throw new Error('Vous avez déjà choisi un scénario.');
         medium.scenarioFinalChoose = scenarios[scenario_number];
