@@ -17,11 +17,11 @@ Pour vous connectez au serveur et lancer une partie, vous aurez besoin de deux n
 Connectez-vous dans votre barre d'URL à l'adresse http://localhost:3000 Pour arriver sur la page d'accueil.
 Une fois sur cette page, vous disposez déjà de trois comptes pour pouvoir lancer une partie :
 
-Nom d'utilisateur    Mot de passe
-
-eee                  eee
-rrr                  rrr
-ttt                  ttt
+Nom d'utilisateur | Mot de passe
+----------------- | -------------
+eee | eee
+rrr | rrr
+ttt | ttt
 
 
 Une fois les trois comptes connectés dans les trois onglets ouverts, cliquez sur rejoindre une partie et cliquez sur "Prêt" avec les trois comptes.
