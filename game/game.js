@@ -115,7 +115,7 @@ function play(baseGame, username, chosenCard){
 
     //verifier que le personnage n'est pas le fantome
     if(baseGame.ghost.username === username)
-        throw new Error('Le joueur est le fantome.')
+        throw new Error('Le joueur est le fantome.');
 
     let player = baseGame.mediums.find(player => player.username === username);
 
@@ -165,6 +165,7 @@ function getInformations(baseGame, username) {
     infosPlayer.mediums = baseGame.mediums.map(medium => {
         let state = {
             state            : medium.state,
+            findScenario     : medium.findScenario,
             username         : medium.username,
             initial          : medium.initial,
             hasReceivedCards : medium.hasReceivedCards,
@@ -222,6 +223,10 @@ function giveVisionsToMedium(baseGame, username, cards){
 
     if(baseGame.ghost.mediumsHasCards.includes(username))
         throw new Error('Vous avez déjà donné des cartes à ce medium.');
+
+    let medium = baseGame.mediums.find(medium => medium.username == username);
+    if(medium != undefined && medium.state == 3)
+        throw new Error('Vous ne pouvez pas donner de carte à ce medium car il a trouvé son scénario.');
         
     if(!helpers.include(baseGame.ghost.hand, cards))
         throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
@@ -242,6 +247,33 @@ function giveVisionsToMedium(baseGame, username, cards){
         medium.visions = medium.visions.concat(cards);
         medium.hasReceivedCards = true;
         ghost.mediumsHasCards.push(username);
+    });   
+}
+
+function giveVisionsToAllMedium(baseGame, cards){
+    if(baseGame.ghost.mediumsHasCards.length === baseGame.mediums.length)
+        throw new Error('Vous avez déjà envoyé les cartes visions aux mediums.')
+        
+    if(!helpers.include(baseGame.ghost.hand, cards))
+        throw new Error('Vous n\'avez pas ces cartes visions dans votre main.');
+
+    return produce(baseGame, draftGame => {
+        let ghost  = draftGame.ghost;
+
+        let visions            = draftGame.visions;
+        let newVisionsForGhost = visions.slice(visions.length-cards.length,visions.length);
+        draftGame.visions      = visions.slice(0, -cards.length);
+
+        //Retire les cartes a donner de la main du fantome
+        ghost.hand  = ghost.hand.filter(card => !cards.includes(card));
+        //Complete la main du fantome avec le nombre de cartes manquantes
+        ghost.hand  = ghost.hand.concat(newVisionsForGhost);
+        
+        draftGame.mediums.forEach(medium => {
+            medium.visions = medium.visions.concat(cards);
+            medium.hasReceivedCards = true;
+            ghost.mediumsHasCards.push(medium.username);
+        });
     });   
 }
 
@@ -272,6 +304,7 @@ function verifyChoicePlayers(baseGame) {
                 medium.visions  = [];
             }
             
+            medium.findScenario     = medium.state == FINAL;
             medium.chosenCard       = '';
             medium.hasPlayed        = false;
             medium.hasReceivedCards = false;
@@ -289,7 +322,7 @@ function verifyChoicePlayers(baseGame) {
  * @param {object} baseGame 
  */
 function allMediumPlayed(baseGame){
-    return baseGame.mediums.every(medium => medium.hasPlayed == true);
+    return baseGame.mediums.every(medium => (medium.hasPlayed == true) || (medium.state == 3));
 }
 
 /**
@@ -322,11 +355,12 @@ function getAllScenario(baseGame){
 function chooseScenarioFinal(baseGame, username, scenario_number){
 
     let scenarios = getAllScenario(baseGame);
-    if(scenario_number >= scenarios.length )
-        throw new Error('Le scenario ne peut pas etre choisis')
-    
+    if(scenario_number >= scenarios.length)
+        throw new Error('Le scenario ne peut pas etre choisis');
     return produce(baseGame, draftGame => {
         let medium = draftGame.mediums.find(medium => medium.username == username);
+        if(medium.scenarioFinalChoose != undefined)
+            throw new Error('Vous avez déjà choisi un scénario.');
         medium.scenarioFinalChoose = scenarios[scenario_number];
     });
 }
@@ -355,7 +389,21 @@ function mediumHasWin(baseGame){
         })
 
         return count > Math.floor(baseGame.mediums.length / 2);
+    }else if(baseGame.turn == 7){
+        return false;
     }
+}
+
+/**
+ * verifie qu'un joueur a trouvé tout son scenario
+ * @param {object} game instance courrante du jeu 
+ * @param {string} username pseudo du joueur 
+ * @returns {boolean} youFindIt indique 
+ */
+function isScenarioFound(game,username){
+    let medium = game.mediums.find(player => player.username == username);
+    if(medium != undefined)
+        return medium.state == FINAL;
 }
 
 let function_exports = {
@@ -369,12 +417,14 @@ let function_exports = {
     getInformations,
     getInformationsMediums,
     giveVisionsToMedium,
+    giveVisionsToAllMedium,
     init,
+    isScenarioFound,
     join,
     mediumHasWin,
     play,
     setReady,
-    verifyChoicePlayers,
+    verifyChoicePlayers
 }
 
 if(config.app.mode == 'dev'){
@@ -416,11 +466,12 @@ function initRoles(baseGame) {
                 };
             }else{
                 draftGame.mediums.push({
-                    username  : player.username,
-                    initial   : player.initial,
-                    state     : 0,
-                    visions   : [],
-                    hasPlayed : false
+                    username     : player.username,
+                    initial      : player.initial,
+                    state        : 0,
+                    findScenario : false,
+                    visions      : [],
+                    hasPlayed    : false
                 });
             }
         });
@@ -536,26 +587,4 @@ function getCards(type, nb_cards){
     return cards;
 }
   
-/**
- * vérifie que tous les joueurs ont trouvé leur scénario
- *  @param {object} game Instance courante de jeu
- * @returns {boolean} goForTheFinal indique si le scenario final doit être lancé ou non
- */
-function areAllScenariosFound (game){
-    let canGoToTheFinal = game.mediums.every((medium) => {
-        return isScenarioFound(game, medium.username);
-    });
-    
-    return canGoToTheFinal;
-}
 
-/**
- * verifie qu'un joueur a trouvé tout son scenario
- * @param {object} game instance courrante du jeu 
- * @param {string} username pseudo du joueur 
- * @returns {boolean} youFindIt indique 
- */
-function isScenarioFound(game,username){
-    let player = game.mediums.find(player => player.username == username);
-    return player.state == FINAL;
-}

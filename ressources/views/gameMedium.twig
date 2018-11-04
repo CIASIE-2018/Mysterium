@@ -1,6 +1,7 @@
 {% extends "layouts/master.twig" %}
 {% block bodyClass %}game{% endblock %}
 {% block content %}
+
     <div class="game_container">
         <div class="menu_container">
             <img src="http://cdn2.trictrac.net/documents/formats/dynamic/fa/c0/01f57e520baa35836c6cc8db52356fcb/documents/originals/86/15/9b65092f3d01c66b622768c6950a4b722019.png">
@@ -18,26 +19,39 @@
 
             <div class="card_selected">
                 <div class="card_selected_content">
-                    <img src="/images/cards/{{ infos.me.cards[0] }}.png">
+                    {% if not infos.me.findScenario %}
+                        <img src="/images/cards/{{ infos.me.cards[0] }}.png">
+                    {% else %}
+                        <img src="/images/cards/wait.png">
+                    {% endif %}
+                    
                     <form id="selected_card_form" method="POST">
                         <input  type="hidden" name="selected-card" value="{{ infos.me.cards[0] }}">
+                        {% if not infos.me.findScenario %}
                         <button type="submit" class="card_selected_btn">Choisir</button>
+                        {% endif %}
                     </form>
                 </div>
             </div>
 
             <div class="cards_hand">
                 <div class="cards_hand_detail">
+                {% if not infos.me.findScenario %}
                     <img src="/images/cards/{{ infos.me.visions[0]|default('default') }}.png">
+                {% else %}
+                    <img src="/images/cards/default.png">
+                {% endif %}
                 </div>
 
                 <div class="cards_hand_list">
+                {% if not infos.me.findScenario %}
                     {% include 'partials/playerHand.twig' %}
+                {% endif %}
                 </div>
             </div>
         </div>
         <div class="game_plateau">
-            {% include 'partials/playerBoard.twig' with {cards : infos.me.cards} %}
+            {% include 'partials/playerBoard.twig' with {cards : infos.me.cards, findScenario : infos.me.findScenario} %}
         </div>
     </div>
 {% include 'partials/chat.twig' %}

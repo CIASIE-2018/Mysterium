@@ -5,10 +5,9 @@
                 <img src="/images/cards/{{ scenario.perso }}.png" />
                 <img src="/images/cards/{{ scenario.lieu }}.png" />
                 <img src="/images/cards/{{ scenario.arme }}.png" />
-                <input type="checkbox" class="checkbox_final" name="{{ scenarios.indexOf(scenario) }}" value="Selectionner">
+                <input type="radio" name="scenario" value="{{ scenarios.indexOf(scenario) }}">
             </div>
         {% endfor %}
     </div>
-
-    <button type="submit" id="form_final_submit">Faire son choix</button>
+    <button type="submit">Choisir</button>
 </form>

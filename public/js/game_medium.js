@@ -5,19 +5,24 @@ function initBoard(socket){
     });
 
     let firstCardId = $($('.game_plateau .swiper-slide')[0]).data('idcard');
-    setScenarioCard(firstCardId);
+    if(firstCardId != undefined){
+        setScenarioCard(firstCardId);
+    }
 
+    $('.game_plateau .swiper-slide').off('click');
     $('.game_plateau .swiper-slide').on('click', function(e){
         let cardId = $(e.currentTarget).data('idcard');
         $('input[name=selected-card]').val(cardId);
         setScenarioCard(cardId);
     });
+    $('#selected_card_form').off('submit');
     $('#selected_card_form').on('submit', function(e){
         e.preventDefault();
         let cardId = $('input[name=selected-card]').val();
         socket.emit('choice_card', parseInt(cardId));
     });
 }
+
 
 function setScenarioCard(cardId){
     $('.card_selected_content img').attr('src', `/images/cards/${cardId}.png`);
@@ -27,6 +32,7 @@ function initHand(){
     if($('.cards_hand_list_item img').length > 0){
         let firstCardId = $($('.cards_hand_list_item img')[0]).data('idcard');
         setHandCard(firstCardId);
+        $('.cards_hand_list_item img').off('click');
         $('.cards_hand_list_item img').on('click', function(e){
             let cardId = $(e.currentTarget).data('idcard');
             setHandCard(cardId);
@@ -48,23 +54,12 @@ function setHandCard(cardId){
     });
 }
     
-function init_form_final(){
-    $('.checkbox_final').on('click', function(e){
-        $('.checkbox_final').each(function() {
-            if(this !== e.target){
-                $(this).prop('checked', false)
-            }
-        })
-    });
-
+function initFormFinal(socket){
+    $('#form_final').off('submit');
     $('#form_final').on('submit', function(e){
         e.preventDefault();
-        $('#form_final_submit').attr("disabled", "disabled");
-        $('.checkbox_final').each(function() {
-            $(this).attr("disabled", true);
-        })
-        let checkbox = $('input[type=checkbox]:checked');
-        socketGame.emit('choice_final_scenario', checkbox.attr('name'));
+        let selectedScenario = $('input[name=scenario]:checked').val();
+        socket.emit('choice_final_scenario', selectedScenario);
     });
 }
 
@@ -97,9 +92,24 @@ $(function(){
         initBoard(socketGame);
     });
 
-    socketGame.on('finalScenario', function(html){
+    socketGame.on('wait', function(){
+        let swiper = $('.swiper-container')[0].swiper;
+        swiper.removeAllSlides();
+        $('.cards_hand_list').html("");
+        setHandCard("default");
+        setScenarioCard("wait");
+        $('.selected_card_form .card_selected_btn').remove();
+    });
+
+    socketGame.on('finalScenarios', function(html){
         $('.game_plateau').remove();
         $('.card_selected').html(html);
-        init_form_final();
+        $('.cards_hand_list').html('');
+        setHandCard("default");
+        initFormFinal(socketGame);
+    });
+
+    socketGame.on('final_resultat', function(html){
+        $('.card_selected').html(html);
     });
 });

@@ -41,6 +41,7 @@ function setScenarioCard(cardId){
 function initHand(socket){
     let firstCardId = $($('.cards_hand_list_item img')[0]).data('idcard');
     setHandCard(firstCardId);
+    $('.cards_hand_list_item img').off('click');
     $('.cards_hand_list_item img').on('click', function(e){
         let cardId = $(e.currentTarget).data('idcard');
         setHandCard(cardId);
@@ -63,6 +64,7 @@ function setHandCard(cardId){
 
 
 function initGhostHandForm(socket){
+    $('#hand_form').off('submit');
     $('#hand_form').on('submit', function(e){
         e.preventDefault();
         let cards = [];
@@ -79,20 +81,26 @@ function initGhostHandForm(socket){
     });
 }
 
+function initFormFinal(socket){
+    $('#hand_form').off('submit');
+    $('#hand_form').on('submit', function(e){
+        e.preventDefault();
+        let cards = [];
+        $('input[name=cards_hand]:checked').each(function(i,card){
+            cards.push(parseInt($(card).val()));
+        });
+        if(cards.length > 0){
+            socket.emit('send_final_cards', cards);
+        }
+    });
+}
+
 function resetBoard(mediums){
     let infoFirstMedium = mediums[Object.keys(mediums)[0]];
     setBoard(infoFirstMedium.cards);
     setScenarioCard(infoFirstMedium.card);
     $('.player_list_item').removeClass('selected');
     $($('.player_list_item')[0]).addClass('selected');
-}
-
-function initFormFinal(){
-    $('#form_final_submit').attr("disabled", "disabled");
-    
-    $('.checkbox_final').each(function() {
-        $(this).attr("disabled", true);
-    })
 }
 
 $(function(){
@@ -136,7 +144,11 @@ $(function(){
             socketGame.on('finalScenario', function(html){
                 $('.game_plateau').remove();
                 $('.card_selected').html(html);
-                initFormFinal();
+                initFormFinal(socketGame);
+            });
+
+            socketGame.on('final_resultat', function(html){
+                $('.card_selected').html(html);
             });
         }
     });

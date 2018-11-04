@@ -101,6 +101,11 @@ body{
                     border: 2px solid rgb(168, 63, 63);
                     border-radius: 50%;
                     margin: 5px 0;
+                    &.finished{
+                        &:before{
+                            content:'fini';
+                        }
+                    }
                     &.selected{
                         outline : thick double #32a1ce;
                     }
@@ -163,6 +168,16 @@ body{
     
                     }
 
+                }
+
+                .final_scenario_ghost{
+                    height: 90%;
+                    display: flex;
+                    flex-direction: column;
+                    img{
+                        height: calc(100% / 3);
+                        object-fit: contain;
+                    }
                 }
 
                 #form_final{
